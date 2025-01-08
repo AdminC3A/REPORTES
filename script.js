@@ -11,7 +11,7 @@ let lastScanTime = 0;
 // Función para cargar la base de datos desde el CSV
 async function loadDatabase() {
     try {
-        const response = await fetch("https://raw.githubusercontent.com/..."); // Reemplaza con la URL del archivo CSV
+        const response = await fetch("https://raw.githubusercontent.com/AdminC3A/QRElemento/main/data/base_de_datos.csv"); // Reemplaza con la URL del archivo CSV
         const csvText = await response.text();
 
         // Procesar el contenido del archivo CSV
