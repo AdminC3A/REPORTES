@@ -3,16 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modulo2 Decidir</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Módulo 2: Decidir</title>
+    <link rel="stylesheet" href="/modulos/modulo2-decidir/styles.css">
 </head>
 <body>
     <header>
-        <h1>Modulo2 Decidir</h1>
+        <h1>Módulo 2: Decidir</h1>
     </header>
     <main>
-        <p>Contenido de Modulo2 Decidir</p>
+        <!-- Pregunta inicial -->
+        <fieldset>
+            <legend>¿Tomaste la fotografía "In Fraganti" o la tomamos ahorita?</legend>
+            <button id="cargarFotoArchivoBtn">Sí, tomé la fotografía</button>
+            <button id="cargarFotoCamaraBtn">Tomémosla ahorita</button>
+        </fieldset>
+
+        <!-- Contenedor para previsualización de la foto -->
+        <canvas id="fotoContainer" width="150" height="150" style="border: 1px solid #ccc;"></canvas>
+
+        <!-- Botón para continuar -->
+        <button id="next">Continuar al Módulo 3</button>
     </main>
-    <script src="script.js"></script>
+    <script src="/modulos/modulo2-decidir/script.js"></script>
 </body>
 </html>
