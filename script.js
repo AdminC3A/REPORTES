@@ -11,7 +11,7 @@ let lastScanTime = 0;
 // Función para cargar la base de datos desde el CSV
 async function loadDatabase() {
     try {
-        const response = await fetch("https://raw.githubusercontent.com/..."); // Ruta a tu archivo CSV
+        const response = await fetch("https://raw.githubusercontent.com/..."); // Reemplaza con la URL del archivo CSV
         const csvText = await response.text();
 
         // Procesar el contenido del archivo CSV
@@ -28,7 +28,6 @@ function onScanSuccess(decodedText) {
     const validationImage = document.getElementById("validation-image");
     const resultContainer = document.getElementById("result");
     const currentTime = new Date().getTime();
-    const timestamp = new Date().toISOString();
 
     // Evitar duplicados
     if (decodedText === lastScannedCode && currentTime - lastScanTime < 5000) {
@@ -45,26 +44,14 @@ function onScanSuccess(decodedText) {
         validationImage.src = "images/Permitido.png";
         validationImage.style.display = "block";
 
-        // Mostrar botón para continuar
-        resultContainer.innerHTML = `
-            <p>Código detectado: ${decodedText} - Acceso Permitido</p>
-            <button id="continueButton" class="btn btn-primary">Registrado > Seguir</button>
-        `;
-
-        // Agregar evento al botón para continuar al siguiente módulo
-        document.getElementById("continueButton").addEventListener("click", () => {
-            validationImage.style.display = "none";
-            resultContainer.innerHTML = "";
-            openModule2(decodedText); // Función que abre el módulo 2
-        });
+        // Mostrar mensaje de acceso permitido
+        resultContainer.innerText = `Código detectado: ${decodedText} - Acceso Permitido`;
     } else {
         validationImage.src = "images/Denegado.png";
         validationImage.style.display = "block";
 
-        resultContainer.innerHTML = `
-            <p>Código detectado: ${decodedText} - Acceso Denegado</p>
-        `;
-        setTimeout(() => restartScanner(), 5000);
+        // Mostrar mensaje de acceso denegado
+        resultContainer.innerText = `Código detectado: ${decodedText} - Acceso Denegado`;
     }
 }
 
