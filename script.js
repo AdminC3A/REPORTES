@@ -1,9 +1,6 @@
 // Variable global para almacenar la última cámara seleccionada
 let lastCameraId = null;
 
-// URL del Google Apps Script (reemplázalo con tu URL)
-const postUrl = "https://script.google.com/macros/s/..."; // Completar con tu URL
-
 // Variable para almacenar la base de datos cargada
 let validCodes = [];
 
@@ -14,7 +11,7 @@ let lastScanTime = 0;
 // Función para cargar la base de datos desde el CSV
 async function loadDatabase() {
     try {
-        const response = await fetch("https://raw.githubusercontent.com/..."); // Ruta a tu CSV
+        const response = await fetch("https://raw.githubusercontent.com/..."); // Ruta a tu archivo CSV
         const csvText = await response.text();
 
         // Procesar el contenido del archivo CSV
@@ -35,7 +32,7 @@ function onScanSuccess(decodedText) {
 
     // Evitar duplicados
     if (decodedText === lastScannedCode && currentTime - lastScanTime < 5000) {
-        console.log("Código duplicado detectado.");
+        console.log("Código duplicado detectado. Ignorando.");
         return;
     }
 
@@ -43,19 +40,22 @@ function onScanSuccess(decodedText) {
     lastScannedCode = decodedText;
     lastScanTime = currentTime;
 
+    // Verificar si el código es válido
     if (validCodes.includes(decodedText.trim())) {
         validationImage.src = "images/Permitido.png";
         validationImage.style.display = "block";
 
+        // Mostrar botón para continuar
         resultContainer.innerHTML = `
             <p>Código detectado: ${decodedText} - Acceso Permitido</p>
             <button id="continueButton" class="btn btn-primary">Registrado > Seguir</button>
         `;
 
+        // Agregar evento al botón para continuar al siguiente módulo
         document.getElementById("continueButton").addEventListener("click", () => {
             validationImage.style.display = "none";
             resultContainer.innerHTML = "";
-            openModule2(decodedText); // Función para abrir el módulo 2
+            openModule2(decodedText); // Función que abre el módulo 2
         });
     } else {
         validationImage.src = "images/Denegado.png";
@@ -102,11 +102,12 @@ function getBackCameraId() {
 }
 
 // Inicializar la aplicación
-loadDatabase().then(() => {
-    getBackCameraId()
-        .then(startScanner)
+document.addEventListener("DOMContentLoaded", () => {
+    loadDatabase()
+        .then(() => getBackCameraId())
+        .then(cameraId => startScanner(cameraId))
         .catch(error => {
-            console.error("Error al iniciar la cámara:", error);
-            document.getElementById("result").innerText = "Error al acceder a la cámara.";
+            console.error("Error al inicializar la aplicación:", error);
+            document.getElementById("result").innerText = "Error al iniciar la cámara. Verifica los permisos.";
         });
 });
