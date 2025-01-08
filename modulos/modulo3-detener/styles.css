@@ -9,10 +9,43 @@ body {
 header {
     background-color: #4914db;
     color: #fff;
-    padding: 10px 0;
+    padding: 10px;
     text-align: center;
 }
 
 main {
     padding: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+
+fieldset {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+legend {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.tooltip {
+    cursor: pointer;
+    font-weight: bold;
+    color: #4914db;
+    margin-left: 5px;
+}
+
+.tooltip:hover::after {
+    content: attr(data-tooltip);
+    display: block;
+    position: absolute;
+    background: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    z-index: 100;
 }
