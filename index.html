@@ -3,24 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elemento Arquitectura Interior</title>
-    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <title>Reporte BOS</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>REPORTE BOS</h1>
+        <h1>Reporte BOS - Sistema de Validación</h1>
     </header>
-    <main>
-        <div id="reader-container">
-            <div id="reader"></div>
-            <img id="validation-image" src="" alt="Validación">
-        </div>
+
+    <!-- Contenedor del escáner -->
+    <div id="scanner-container">
+        <h2>Escanear Código QR</h2>
+        <div id="reader" style="width: 300px; height: 300px; margin: auto;"></div>
         <p id="result">Por favor, escanea un código QR...</p>
-    </main>
+        <img id="validation-image" style="display: none; margin: 20px auto;" alt="Estado de Validación">
+    </div>
+
+    <!-- Contenedor del reporte BOS -->
+    <div id="report-container" style="display: none;">
+        <h2>Reporte BOS</h2>
+        <form id="report-form">
+            <p>Trabajador ID: <input type="text" id="worker-id" readonly></p>
+            <!-- Campos de la sección de reporte -->
+            <label for="decision">Decisión:</label>
+            <select id="decision" required>
+                <option value="">Seleccione una opción</option>
+                <option value="aprobado">Aprobado</option>
+                <option value="rechazado">Rechazado</option>
+            </select>
+
+            <label for="observations">Observaciones:</label>
+            <textarea id="observations" rows="4" cols="50" placeholder="Escribe tus observaciones aquí..."></textarea>
+
+            <button type="button" id="submit-report">Enviar Reporte</button>
+        </form>
+    </div>
+
     <footer>
-        <p>Elemento Arquitectura Interior © 2025</p>
+        <p>Elemento Arquitectura Interior 2025</p>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
