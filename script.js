@@ -1,5 +1,3 @@
-// Módulo 1: Escaneo de QR
-
 // Variable global para almacenar la última cámara seleccionada
 let lastCameraId = null;
 
