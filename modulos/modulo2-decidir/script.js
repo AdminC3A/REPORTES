@@ -1,7 +1,16 @@
 const cargarFotoArchivoBtn = document.getElementById("cargarFotoArchivoBtn");
 const cargarFotoCamaraBtn = document.getElementById("cargarFotoCamaraBtn");
 const fotoContainer = document.getElementById("fotoContainer");
+const riesgoOpciones = document.getElementById("riesgoOpciones");
+const nextButton = document.getElementById("next");
 let imagenSeleccionada = null;
+
+// Función para mostrar las opciones después de cargar la foto
+function mostrarOpciones() {
+    fotoContainer.style.display = "block"; // Mostrar previsualización
+    riesgoOpciones.style.display = "block"; // Mostrar opciones de selección
+    nextButton.style.display = "block"; // Mostrar botón "Continuar"
+}
 
 /**
  * Módulo 2: Cargar foto desde archivo
@@ -27,6 +36,7 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
                     ctxFoto.closePath();
                     ctxFoto.clip();
                     ctxFoto.drawImage(img, 0, 0, 150, 150); // Dibujar previsualización circular
+                    mostrarOpciones();
                 };
                 img.src = e.target.result;
             };
@@ -39,13 +49,6 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
  * Módulo 3: Cargar foto desde cámara
  */
 cargarFotoCamaraBtn.addEventListener("click", () => {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (!isMobile) {
-        alert("Esta función solo está disponible en dispositivos móviles. Por favor, usa tu dispositivo móvil para acceder a esta funcionalidad.");
-        return;
-    }
-
     const cameraInput = document.createElement("input");
     cameraInput.type = "file";
     cameraInput.accept = "image/*";
@@ -53,7 +56,6 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
     cameraInput.style.display = "none";
 
     document.body.appendChild(cameraInput);
-
     cameraInput.click();
 
     cameraInput.addEventListener("change", (event) => {
@@ -64,7 +66,6 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
                 const img = new Image();
                 img.onload = () => {
                     imagenSeleccionada = img;
-
                     const ctxFoto = fotoContainer.getContext("2d");
                     ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
                     ctxFoto.beginPath();
@@ -72,10 +73,8 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
                     ctxFoto.closePath();
                     ctxFoto.clip();
                     ctxFoto.drawImage(img, 0, 0, 150, 150);
-
-                    alert("La imagen capturada ha reemplazado la imagen previamente cargada.");
+                    mostrarOpciones();
                 };
-
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
@@ -87,7 +86,17 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
     });
 });
 
+// Mostrar campo adicional si se selecciona "Otros"
+document.getElementById("otros").addEventListener("change", function () {
+    const otrosDetalle = document.getElementById("otros-detalle");
+    if (this.checked) {
+        otrosDetalle.style.display = "block";
+    } else {
+        otrosDetalle.style.display = "none";
+    }
+});
+
 // Navegar al siguiente módulo
-document.getElementById("next").addEventListener("click", function () {
+nextButton.addEventListener("click", function () {
     window.location.href = "/modulos/modulo3-detener/index.html";
 });
