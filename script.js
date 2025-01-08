@@ -2,7 +2,7 @@
 let lastCameraId = null;
 
 // URL del Google Apps Script
-const postUrl = "https://script.google.com/macros/s/AKfycbwpMGoKpPqwFPaSKXxAuHigZD4RLoIXHEoqNF5EHv1S9TufseZ05i8yTqyThM6Yby1F/exec";
+const postUrl = "https://script.google.com/macros/s/AKfycbwZYrGzmWUQCjT7MCSmemPm5eXu_HYPTnFvxIDKOhyyao9GW6zAUvnbRsp7Y0VluQ0/exec";
 
 // Variable para almacenar la base de datos cargada
 let validCodes = [];
@@ -27,16 +27,16 @@ async function loadDatabase() {
     }
 }
 
-// Función para enviar datos de entradas a Google Sheets
+// Función para enviar datos de salidas a Google Sheets
 function sendToGoogleSheets(qrCode, result, timestamp) {
     fetch(postUrl, {
         method: "POST",
-        mode: "no-cors",
+        mode: "no-cors", // Permitir envío sin verificar la respuesta
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            operation: "entrada",
+            operation: "salida", // Operación específica para salidas
             qrCode: qrCode,
             result: result,
             timestamp: timestamp,
@@ -51,7 +51,14 @@ function sendToGoogleSheets(qrCode, result, timestamp) {
 }
 
 // Manejar el resultado exitoso del escaneo
+let isScanningPaused = false; // Bandera para pausar el escaneo
+
 function onScanSuccess(decodedText) {
+    if (isScanningPaused) {
+        console.log("Escaneo pausado. Esperando acción del usuario.");
+        return;
+    }
+
     const validationImage = document.getElementById("validation-image");
     const resultContainer = document.getElementById("result");
     const currentTime = new Date().getTime();
@@ -63,6 +70,9 @@ function onScanSuccess(decodedText) {
         return;
     }
 
+    // Pausar el escaneo
+    isScanningPaused = true;
+
     // Actualizar el último código y la hora del escaneo
     lastScannedCode = decodedText;
     lastScanTime = currentTime;
@@ -72,37 +82,55 @@ function onScanSuccess(decodedText) {
     const normalizedValidCodes = validCodes.map(code => code.trim());
 
     if (normalizedValidCodes.includes(normalizedText)) {
+        // Mostrar imagen de acceso permitido
         validationImage.src = "images/Permitido.png";
         validationImage.style.display = "block";
 
         resultContainer.innerHTML = `
-            Código detectado: ${decodedText} - Acceso Permitido<br>
-            <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Mochila Revisada</button>
+            Código detectado: ${decodedText} - Salida Permitida<br>
+            <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Mochila revisada</button>
         `;
 
         // Enviar datos a Google Sheets
-        sendToGoogleSheets(decodedText, "Permitido", timestamp);
+        sendToGoogleSheets(decodedText, "Registrada", timestamp);
 
-        // Agregar evento para avanzar al siguiente módulo
-        document.getElementById("continueButton").addEventListener("click", advanceToModule2);
+        // Agregar evento para reanudar el escaneo
+        document.getElementById("continueButton").addEventListener("click", () => {
+            // Limpiar variables del último escaneo
+            lastScannedCode = null;
+            lastScanTime = 0;
+
+            validationImage.style.display = "none"; // Ocultar la imagen
+            resultContainer.innerHTML = ""; // Limpiar el resultado
+            isScanningPaused = false; // Reanudar el escaneo
+            restartScanner(); // Reiniciar el escáner
+        });
     } else {
-        validationImage.src = "images/Denegado.png";
+        // Mostrar imagen de acceso ilegal
+        validationImage.src = "images/Alerta.png";
         validationImage.style.display = "block";
 
         resultContainer.innerHTML = `
-            Código detectado: ${decodedText} - Acceso Denegado<br>
-            Intentando de nuevo en 11 segundos...
+            Código detectado: ${decodedText} - ACCESO ILEGAL A REPORTAR...
         `;
 
-        setTimeout(restartScanner, 11000);
+        // Enviar registro de acceso ilegal a Google Sheets
+        sendToGoogleSheets(decodedText, "Acceso Ilegal", timestamp);
+
+        // Esperar 11 segundos antes de reanudar el escaneo
+        setTimeout(() => {
+            // Limpiar variables del último escaneo
+            lastScannedCode = null;
+            lastScanTime = 0;
+
+            validationImage.style.display = "none"; // Ocultar la imagen
+            resultContainer.innerHTML = ""; // Limpiar el resultado
+            isScanningPaused = false; // Reanudar el escaneo
+            restartScanner(); // Reiniciar el escáner
+        }, 11000);
     }
 }
 
-// Función para avanzar al Módulo 2
-function advanceToModule2() {
-    document.getElementById("result").innerHTML = "Iniciando Módulo 2: Decision...";
-    // Aquí iniciaremos el siguiente módulo
-}
 
 // Manejar errores durante el escaneo
 function onScanError(errorMessage) {
