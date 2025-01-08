@@ -3,9 +3,6 @@
 // Variable global para almacenar la última cámara seleccionada
 let lastCameraId = null;
 
-// URL del Google Apps Script
-const postUrl = "https://script.google.com/macros/s/AKfycbwZYrGzmWUQCjT7MCSmemPm5eXu_HYPTnFvxIDKOhyyao9GW6zAUvnbRsp7Y0VluQ0/exec";
-
 // Variable para almacenar la base de datos cargada
 let validCodes = [];
 
@@ -20,36 +17,13 @@ async function loadDatabase() {
         const csvText = await response.text();
 
         // Procesar el contenido del archivo CSV
-        validCodes = csvText.split("\n").map(row => row.trim()).filter(code => code); // Filtrar valores vacíos
+        validCodes = csvText.split("\n").map(row => row.trim()).filter(code => code);
         document.getElementById("result").innerText = "Base de datos cargada correctamente.";
         console.log("Base de datos cargada:", validCodes);
     } catch (error) {
         console.error("Error al cargar la base de datos:", error);
         document.getElementById("result").innerText = "Error al cargar la base de datos.";
     }
-}
-
-// Función para enviar datos de salidas a Google Sheets
-function sendToGoogleSheets(qrCode, result, timestamp) {
-    fetch(postUrl, {
-        method: "POST",
-        mode: "no-cors", // Permitir envío sin verificar la respuesta
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            operation: "salida", // Operación específica para salidas
-            qrCode: qrCode,
-            result: result,
-            timestamp: timestamp,
-        }),
-    })
-    .then(() => {
-        console.log("Registro enviado a Google Sheets.");
-    })
-    .catch((error) => {
-        console.error("Error al enviar la solicitud:", error);
-    });
 }
 
 // Manejar el resultado exitoso del escaneo
@@ -64,19 +38,15 @@ function onScanSuccess(decodedText) {
     const validationImage = document.getElementById("validation-image");
     const resultContainer = document.getElementById("result");
     const currentTime = new Date().getTime();
-    const timestamp = new Date().toISOString(); // Obtener el timestamp actual
 
-    // Evitar duplicados: Verificar si el código ya fue escaneado recientemente
+    // Evitar duplicados
     if (decodedText === lastScannedCode && currentTime - lastScanTime < 5000) {
         console.log("Código duplicado detectado. Ignorando.");
         return;
     }
 
-    // Pausar el escaneo
-    isScanningPaused = true;
-
-    // Actualizar el último código y la hora del escaneo
-    lastScannedCode = decodedText;
+    isScanningPaused = true; // Pausar el escaneo
+    lastScannedCode = decodedText; // Actualizar el último código
     lastScanTime = currentTime;
 
     // Normalizar valores para evitar problemas de formato
@@ -84,7 +54,6 @@ function onScanSuccess(decodedText) {
     const normalizedValidCodes = validCodes.map(code => code.trim());
 
     if (normalizedValidCodes.includes(normalizedText)) {
-        // Mostrar imagen de acceso permitido
         validationImage.src = "images/Permitido.png";
         validationImage.style.display = "block";
 
@@ -93,46 +62,37 @@ function onScanSuccess(decodedText) {
             <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Mochila revisada</button>
         `;
 
-        // Enviar datos a Google Sheets
-        sendToGoogleSheets(decodedText, "Registrada", timestamp);
-
-        // Agregar evento para reanudar el escaneo
         document.getElementById("continueButton").addEventListener("click", () => {
-            // Limpiar variables del último escaneo
-            lastScannedCode = null;
-            lastScanTime = 0;
-
-            validationImage.style.display = "none"; // Ocultar la imagen
-            resultContainer.innerHTML = ""; // Limpiar el resultado
-            isScanningPaused = false; // Reanudar el escaneo
-            restartScanner(); // Reiniciar el escáner
+            const action = confirm("¿Desea continuar escaneando o pasar al siguiente módulo?\nAceptar: Continuar escaneando\nCancelar: Siguiente módulo");
+            if (action) {
+                resetScanner();
+            } else {
+                window.location.href = "next-module.html"; // Redirigir al siguiente módulo
+            }
         });
     } else {
-        // Mostrar imagen de acceso ilegal
         validationImage.src = "images/Alerta.png";
         validationImage.style.display = "block";
 
         resultContainer.innerHTML = `
-            Código detectado: ${decodedText} - ACCESO ILEGAL A REPORTAR...
+            Código detectado: ${decodedText} - ACCESO DENEGADO.
         `;
 
-        // Enviar registro de acceso ilegal a Google Sheets
-        sendToGoogleSheets(decodedText, "Acceso Ilegal", timestamp);
-
-        // Esperar 11 segundos antes de reanudar el escaneo
         setTimeout(() => {
-            // Limpiar variables del último escaneo
-            lastScannedCode = null;
-            lastScanTime = 0;
-
-            validationImage.style.display = "none"; // Ocultar la imagen
-            resultContainer.innerHTML = ""; // Limpiar el resultado
-            isScanningPaused = false; // Reanudar el escaneo
-            restartScanner(); // Reiniciar el escáner
-        }, 11000);
+            resetScanner();
+        }, 5000);
     }
 }
 
+// Función para reiniciar el escáner
+function resetScanner() {
+    lastScannedCode = null;
+    lastScanTime = 0;
+    document.getElementById("validation-image").style.display = "none";
+    document.getElementById("result").innerHTML = "Por favor, escanea un código QR...";
+    isScanningPaused = false;
+    restartScanner();
+}
 
 // Manejar errores durante el escaneo
 function onScanError(errorMessage) {
@@ -160,9 +120,6 @@ function startScanner(cameraId) {
 
 // Función para reiniciar el escáner QR
 function restartScanner() {
-    document.getElementById("result").innerText = "Por favor, escanea un código QR...";
-    document.getElementById("validation-image").style.display = "none";
-
     if (lastCameraId) {
         startScanner(lastCameraId);
     } else {
@@ -196,24 +153,5 @@ loadDatabase().then(() => {
             console.error("Error al obtener la cámara trasera:", error);
             document.getElementById("result").innerText =
                 "Error al acceder a la cámara. Verifica los permisos.";
-        });
-});
-
-
-// Función para avanzar al siguiente módulo
-function proceedToNextModule(decodedText) {
-    console.log(`Pasando al siguiente módulo con el código: ${decodedText}`);
-    // Aquí redirigimos al módulo de decisión o mostramos su contenido
-}
-
-// Inicializar la aplicación
-loadDatabase().then(() => {
-    getBackCameraId()
-        .then(cameraId => {
-            startScanner(cameraId);
-        })
-        .catch(error => {
-            console.error("Error al obtener la cámara trasera:", error);
-            document.getElementById("result").innerText = "Error al acceder a la cámara.";
         });
 });
