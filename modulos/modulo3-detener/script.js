@@ -1,37 +1,51 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const rolRadios = document.querySelectorAll('input[name="rol"]');
-    const validacionLlave = document.getElementById("validacion-llave");
+    let rolesYllaves = {};
+
+    fetch('/data/roles.json')
+        .then(response => response.json())
+        .then(data => {
+            rolesYllaves = data;
+            console.log("Roles y llaves cargados:", rolesYllaves);
+        })
+        .catch(error => console.error("Error al cargar roles y llaves:", error));
+
+    const validarLlaveBtn = document.getElementById("validar-llave");
     const clasificacionFieldset = document.getElementById("clasificacion");
-    const fallaAdministrativaFieldset = document.getElementById("falla-administrativa");
-    const nextButton = document.getElementById("next");
+    const validacionLlaveFieldset = document.getElementById("validacion-llave");
+    const mensajeValidacion = document.getElementById("mensaje-validacion");
 
-    // Mostrar validación de llave al seleccionar rol
-    rolRadios.forEach(radio => {
-        radio.addEventListener("change", () => {
-            validacionLlave.style.display = "block";
-        });
-    });
-
-    // Validar llave
-    document.getElementById("validar-llave").addEventListener("click", () => {
+    validarLlaveBtn.addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
-        if (llave === "1234") { // Reemplaza con la lógica real de validación
+        const rolSeleccionado = document.querySelector('input[name="rol"]:checked').value;
+
+        let supervisores = {};
+        if (rolSeleccionado === "Supervisor de Seguridad") {
+            supervisores = rolesYllaves.supervisoresSeguridad.supervisores;
+        } else if (rolSeleccionado === "Supervisor de Obra") {
+            supervisores = rolesYllaves.supervisoresObra.supervisores;
+        } else if (rolSeleccionado === "Guardia en Turno") {
+            supervisores = rolesYllaves.guardiasTurno.supervisores;
+        }
+
+        const nombreSupervisor = prompt("Ingresa tu nombre (como aparece en el sistema):");
+
+        if (supervisores[nombreSupervisor] && supervisores[nombreSupervisor].includes(llave)) {
             clasificacionFieldset.style.display = "block";
-            validacionLlave.style.display = "none";
+            validacionLlaveFieldset.style.display = "none";
+            console.log(`Llave válida para ${nombreSupervisor}`);
         } else {
-            document.getElementById("mensaje-validacion").style.display = "block";
+            mensajeValidacion.style.display = "block";
+            mensajeValidacion.innerText = "Llave o nombre no válidos. Intenta nuevamente.";
+            console.error("Llave o nombre no válidos.");
         }
     });
 
-    // Mostrar opciones dinámicas para Falla Administrativa
-    document.querySelectorAll('input[name="clasificacion"]').forEach(radio => {
-        radio.addEventListener("change", (event) => {
-            if (event.target.value === "Falla Administrativa") {
-                fallaAdministrativaFieldset.style.display = "block";
-            } else {
-                fallaAdministrativaFieldset.style.display = "none";
-            }
-            nextButton.style.display = "block";
-        });
+    document.getElementById("trabajar-sin-llave").addEventListener("click", () => {
+        const confirmar = confirm("¿Seguro que deseas trabajar sin llave? Esto será registrado en el reporte.");
+        if (confirmar) {
+            clasificacionFieldset.style.display = "block";
+            validacionLlaveFieldset.style.display = "none";
+            console.warn("Trabajando sin llave. Esto será registrado.");
+        }
     });
 });
