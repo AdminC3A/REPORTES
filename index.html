@@ -8,41 +8,34 @@
 </head>
 <body>
     <header>
-        <h1>Reporte BOS - Sistema de Validación</h1>
+        <h1>Reporte BOS</h1>
     </header>
+    <main>
+        <!-- Contenedor para el escaneo -->
+        <section id="module1" class="module">
+            <h2>Escaneo de QR</h2>
+            <div id="reader" style="width: 300px; height: 300px;"></div>
+            <div id="validation-message"></div>
+        </section>
 
-    <!-- Contenedor del escáner -->
-    <div id="scanner-container">
-        <h2>Escanear Código QR</h2>
-        <div id="reader" style="width: 300px; height: 300px; margin: auto;"></div>
-        <p id="result">Por favor, escanea un código QR...</p>
-        <img id="validation-image" style="display: none; margin: 20px auto;" alt="Estado de Validación">
-    </div>
-
-    <!-- Contenedor del reporte BOS -->
-    <div id="report-container" style="display: none;">
-        <h2>Reporte BOS</h2>
-        <form id="report-form">
-            <p>Trabajador ID: <input type="text" id="worker-id" readonly></p>
-            <!-- Campos de la sección de reporte -->
-            <label for="decision">Decisión:</label>
-            <select id="decision" required>
-                <option value="">Seleccione una opción</option>
-                <option value="aprobado">Aprobado</option>
-                <option value="rechazado">Rechazado</option>
-            </select>
-
-            <label for="observations">Observaciones:</label>
-            <textarea id="observations" rows="4" cols="50" placeholder="Escribe tus observaciones aquí..."></textarea>
-
-            <button type="button" id="submit-report">Enviar Reporte</button>
-        </form>
-    </div>
-
+        <!-- Contenedor para captura de datos -->
+        <section id="module2" class="module hidden">
+            <h2>Captura de Datos</h2>
+            <form id="data-form">
+                <label for="decision">Decisión:</label>
+                <select id="decision" name="decision">
+                    <option value="Aprobado">Aprobado</option>
+                    <option value="Rechazado">Rechazado</option>
+                </select>
+                <label for="comments">Comentarios:</label>
+                <textarea id="comments" name="comments"></textarea>
+                <button type="button" id="proceed-button">Siguiente</button>
+            </form>
+        </section>
+    </main>
     <footer>
         <p>Elemento Arquitectura Interior 2025</p>
     </footer>
-
     <script src="script.js"></script>
 </body>
 </html>
