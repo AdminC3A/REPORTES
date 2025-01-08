@@ -57,15 +57,15 @@ function onScanSuccess(decodedText) {
 
         resultContainer.innerHTML = `
             Código detectado: ${decodedText} - Salida Permitida<br>
-            <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Continuar con reporte</button>
+            <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Continuar con Reporte</button>
         `;
 
         document.getElementById("continueButton").addEventListener("click", () => {
-            const action = confirm("¿Desea continuar escaneando o pasar al siguiente módulo?\nAceptar: Continuar escaneando\nCancelar: Siguiente módulo");
+            const action = confirm("¿Qué cambiaremos con el reporte?\nAceptar para continuar con el siguiente módulo.");
             if (action) {
-                resetScanner();
-            } else {
                 window.location.href = "next-module.html"; // Redirigir al siguiente módulo
+            } else {
+                resetScanner();
             }
         });
     } else {
