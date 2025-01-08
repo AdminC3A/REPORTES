@@ -1,6 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {};
 
+    // Cargar roles y llaves desde JSON
     fetch('/data/roles.json')
         .then(response => response.json())
         .then(data => {
@@ -27,19 +28,29 @@ document.addEventListener("DOMContentLoaded", () => {
             supervisores = rolesYllaves.guardiasTurno.supervisores;
         }
 
-        const nombreSupervisor = prompt("Ingresa tu nombre (como aparece en el sistema):");
+        // Validar la llave y extraer el nombre
+        let llaveValida = false;
+        let nombreSupervisor = "";
 
-        if (supervisores[nombreSupervisor] && supervisores[nombreSupervisor].includes(llave)) {
+        Object.entries(supervisores).forEach(([nombre, llaves]) => {
+            if (llaves.includes(llave)) {
+                llaveValida = true;
+                nombreSupervisor = nombre;
+            }
+        });
+
+        if (llaveValida) {
+            console.log(`Llave válida para ${nombreSupervisor}`);
             clasificacionFieldset.style.display = "block";
             validacionLlaveFieldset.style.display = "none";
-            console.log(`Llave válida para ${nombreSupervisor}`);
         } else {
             mensajeValidacion.style.display = "block";
-            mensajeValidacion.innerText = "Llave o nombre no válidos. Intenta nuevamente.";
-            console.error("Llave o nombre no válidos.");
+            mensajeValidacion.innerText = "Llave no válida. Intenta nuevamente.";
+            console.error("Llave no válida.");
         }
     });
 
+    // Opción para trabajar sin llave
     document.getElementById("trabajar-sin-llave").addEventListener("click", () => {
         const confirmar = confirm("¿Seguro que deseas trabajar sin llave? Esto será registrado en el reporte.");
         if (confirmar) {
