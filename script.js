@@ -125,15 +125,6 @@ function openModule2(workerId) {
     });
 }
 
-// MÓDULO 3: SECCIÓN SIGUIENTE (Ejemplo Placeholder)
-function openModule3(workerId) {
-    document.getElementById("result").innerHTML = `
-        <h2>Sección 2: Información adicional</h2>
-        <p>Trabajador identificado: ${workerId}</p>
-        <button style="font-size: 18px; padding: 10px 20px;">Finalizar</button>
-    `;
-}
-
 // INICIALIZAR
 document.addEventListener("DOMContentLoaded", () => {
     loadDatabase().then(startScanner);
