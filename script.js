@@ -29,50 +29,27 @@ async function loadDatabase() {
     }
 }
 
-// Función para obtener la cámara trasera automáticamente
-function getBackCameraId() {
-    return Html5Qrcode.getCameras().then((cameras) => {
-        if (cameras && cameras.length > 0) {
-            const backCamera = cameras.find((camera) =>
-                camera.label.toLowerCase().includes("back")
-            );
-            return backCamera ? backCamera.id : cameras[0].id;
-        } else {
-            throw new Error("No se encontraron cámaras disponibles.");
-        }
+// Función para enviar datos de salidas a Google Sheets
+function sendToGoogleSheets(qrCode, result, timestamp) {
+    fetch(postUrl, {
+        method: "POST",
+        mode: "no-cors", // Permitir envío sin verificar la respuesta
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            operation: "salida", // Operación específica para salidas
+            qrCode: qrCode,
+            result: result,
+            timestamp: timestamp,
+        }),
+    })
+    .then(() => {
+        console.log("Registro enviado a Google Sheets.");
+    })
+    .catch((error) => {
+        console.error("Error al enviar la solicitud:", error);
     });
-}
-
-// Inicializar la aplicación
-loadDatabase().then(() => {
-    getBackCameraId()
-        .then((cameraId) => {
-            startScanner(cameraId);
-        })
-        .catch((error) => {
-            console.error("Error al obtener la cámara trasera:", error);
-            document.getElementById("result").innerText =
-                "Error al acceder a la cámara. Verifica los permisos.";
-        });
-});
-
-// Función para iniciar el escaneo con una cámara específica
-function startScanner(cameraId) {
-    const html5Qrcode = new Html5Qrcode("reader");
-
-    html5Qrcode
-        .start(
-            cameraId,
-            { fps: 15, qrbox: { width: 125, height: 125 } },
-            onScanSuccess,
-            onScanError
-        )
-        .then(() => {
-            lastCameraId = cameraId;
-        })
-        .catch((error) => {
-            console.error("Error al iniciar el escaneo:", error);
-        });
 }
 
 // Manejar el resultado exitoso del escaneo
@@ -115,7 +92,10 @@ function onScanSuccess(decodedText) {
             Código detectado: ${decodedText} - Salida Permitida<br>
             <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Mochila revisada</button>
         `;
-      
+
+        // Enviar datos a Google Sheets
+        sendToGoogleSheets(decodedText, "Registrada", timestamp);
+
         // Agregar evento para reanudar el escaneo
         document.getElementById("continueButton").addEventListener("click", () => {
             // Limpiar variables del último escaneo
@@ -159,7 +139,24 @@ function onScanError(errorMessage) {
     console.error("Error durante el escaneo:", errorMessage);
 }
 
+// Función para iniciar el escaneo con una cámara específica
+function startScanner(cameraId) {
+    const html5Qrcode = new Html5Qrcode("reader");
 
+    html5Qrcode
+        .start(
+            cameraId,
+            { fps: 15, qrbox: { width: 125, height: 125 } },
+            onScanSuccess,
+            onScanError
+        )
+        .then(() => {
+            lastCameraId = cameraId;
+        })
+        .catch((error) => {
+            console.error("Error al iniciar el escaneo:", error);
+        });
+}
 
 // Función para reiniciar el escáner QR
 function restartScanner() {
@@ -175,7 +172,32 @@ function restartScanner() {
     }
 }
 
+// Función para obtener la cámara trasera automáticamente
+function getBackCameraId() {
+    return Html5Qrcode.getCameras().then((cameras) => {
+        if (cameras && cameras.length > 0) {
+            const backCamera = cameras.find((camera) =>
+                camera.label.toLowerCase().includes("back")
+            );
+            return backCamera ? backCamera.id : cameras[0].id;
+        } else {
+            throw new Error("No se encontraron cámaras disponibles.");
+        }
+    });
+}
 
+// Inicializar la aplicación
+loadDatabase().then(() => {
+    getBackCameraId()
+        .then((cameraId) => {
+            startScanner(cameraId);
+        })
+        .catch((error) => {
+            console.error("Error al obtener la cámara trasera:", error);
+            document.getElementById("result").innerText =
+                "Error al acceder a la cámara. Verifica los permisos.";
+        });
+});
 
 
 // Función para avanzar al siguiente módulo
