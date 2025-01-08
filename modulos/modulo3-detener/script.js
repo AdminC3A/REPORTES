@@ -108,7 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         // Redirigir al módulo 4
-        window.location.href = "/modulos/modulo4/index.html";
+        window.location.href = "/modulos/modulo4-observar/index.html";
     });
 
     // Permitir trabajar sin llave
