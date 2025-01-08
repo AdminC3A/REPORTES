@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo 3: Detener</title>
+    <!-- Vincula los estilos CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Encabezado del módulo -->
     <header>
         <h1>Módulo 3: Detener</h1>
     </header>
@@ -14,6 +16,7 @@
         <!-- Selección de Rol -->
         <fieldset>
             <legend>¿Quién está llenando el reporte?</legend>
+            <!-- Selección del rol -->
             <div>
                 <input type="radio" id="supervisor-seguridad" name="rol" value="Supervisor de Seguridad">
                 <label for="supervisor-seguridad">Supervisor de Seguridad</label>
@@ -31,19 +34,25 @@
         <!-- Validación de Llave -->
         <fieldset id="validacion-llave" style="display: none;">
             <legend>Valida tu llave</legend>
+            <!-- Campo para ingresar la llave -->
             <input type="text" id="llave" placeholder="Ingresa tu llave única">
+            <!-- Botón para validar la llave -->
             <button id="validar-llave">Validar</button>
+            <!-- Mensaje de error si la llave no es válida -->
             <p id="mensaje-validacion" class="error" style="display: none;">Llave no válida. Intenta nuevamente.</p>
-            <button id="trabajar-sin-llave" style="display: none;">Trabajar sin llave</button>
+            <!-- Botón para trabajar sin llave -->
+            <button id="trabajar-sin-llave" style="display: block;">Trabajar sin llave</button>
         </fieldset>
 
         <!-- Clasificación de la Observación -->
         <fieldset id="clasificacion" style="display: none;">
             <legend>Clasificación de la Observación</legend>
+            <!-- Opciones de clasificación -->
             <div>
                 <label>
                     <input type="radio" name="clasificacion" value="Condición Insegura">
                     Condición Insegura
+                    <!-- Tooltip para explicar esta opción -->
                     <span class="tooltip" data-tooltip="Situaciones físicas del entorno que representan un riesgo para las personas.">?</span>
                 </label>
             </div>
@@ -51,6 +60,7 @@
                 <label>
                     <input type="radio" name="clasificacion" value="Acto Inseguro">
                     Acto Inseguro
+                    <!-- Tooltip para explicar esta opción -->
                     <span class="tooltip" data-tooltip="Acciones humanas que ponen en riesgo la seguridad.">?</span>
                 </label>
             </div>
@@ -58,6 +68,7 @@
                 <label>
                     <input type="radio" name="clasificacion" value="Falla Administrativa">
                     Falla Administrativa
+                    <!-- Tooltip para explicar esta opción -->
                     <span class="tooltip" data-tooltip="Errores en gestión o supervisión que afectan la seguridad.">?</span>
                 </label>
             </div>
@@ -65,14 +76,16 @@
                 <label>
                     <input type="radio" name="clasificacion" value="Ambos">
                     Ambos
+                    <!-- Tooltip para explicar esta opción -->
                     <span class="tooltip" data-tooltip="Situaciones combinadas de condiciones y actos inseguros.">?</span>
                 </label>
             </div>
         </fieldset>
 
-        <!-- Opciones dinámicas de Falla Administrativa -->
+        <!-- Opciones dinámicas para Falla Administrativa -->
         <fieldset id="falla-administrativa" style="display: none;">
             <legend>Detalles de Falla Administrativa</legend>
+            <!-- Subcategorías específicas -->
             <div>
                 <input type="checkbox" id="falta-permisos" name="falla" value="Falta de Permisos">
                 <label for="falta-permisos">Falta de Permisos</label>
@@ -98,6 +111,8 @@
         <!-- Botón para continuar -->
         <button id="next" style="display: none;">Continuar al Siguiente Módulo</button>
     </main>
+
+    <!-- Enlace al script de validación -->
     <script src="script.js"></script>
 </body>
 </html>
