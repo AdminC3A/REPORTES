@@ -3,23 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte BOS - Módulo 1</title>
+    <title>Elemento Arquitectura Interior</title>
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Reporte BOS - Escaneo de QR</h1>
+        <h1>Registro de SALIDA de obra</h1>
     </header>
     <main>
-        <div id="scanner-container">
-            <h2>Escanea el Código QR</h2>
-            <div id="reader" class="qr-reader"></div>
-            <img id="validation-image" class="validation-image" style="display:none;">
-            <div id="result" class="result-container"></div>
+        <div id="reader-container">
+            <div id="reader"></div>
+            <img id="validation-image" src="" alt="Validación">
         </div>
+        <p id="result">Por favor, escanea un código QR...</p>
     </main>
     <footer>
-        <p>Elemento Arquitectura Interior 2025</p>
+        <p>Elemento Arquitectura Interior © 2024</p>
     </footer>
     <script src="script.js"></script>
 </body>
