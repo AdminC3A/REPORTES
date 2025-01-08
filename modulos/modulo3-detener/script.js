@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {};
 
-    // Cargar roles y llaves desde el archivo JSON
+    // Cargar roles y llaves desde JSON
     fetch('/data/roles.json')
         .then(response => response.json())
         .then(data => {
@@ -16,6 +16,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const validarLlaveBtn = document.getElementById("validar-llave");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
     const trabajarSinLlaveBtn = document.getElementById("trabajar-sin-llave");
+    const otrosDetalle = document.getElementById("otros-detalle");
+    const otrosEjemplos = document.getElementById("otros-ejemplos");
 
     // Mostrar el campo de validación de llave al seleccionar un rol
     rolRadios.forEach(radio => {
@@ -64,6 +66,19 @@ document.addEventListener("DOMContentLoaded", () => {
             mensajeValidacion.style.display = "block";
             mensajeValidacion.innerText = "Llave no válida. Intenta nuevamente.";
         }
+    });
+
+    // Mostrar campo de texto y ejemplos si seleccionan "Otros"
+    document.querySelectorAll('input[name="clasificacion"]').forEach(radio => {
+        radio.addEventListener("change", (event) => {
+            if (event.target.value === "Otros") {
+                otrosDetalle.style.display = "block";
+                otrosEjemplos.style.display = "block";
+            } else {
+                otrosDetalle.style.display = "none";
+                otrosEjemplos.style.display = "none";
+            }
+        });
     });
 
     // Permitir trabajar sin llave
