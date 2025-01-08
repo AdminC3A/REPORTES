@@ -56,12 +56,12 @@ function onScanSuccess(decodedText) {
         validationImage.style.display = "block";
 
         resultContainer.innerHTML = `
-            Código detectado: ${decodedText} - Salida Permitida<br>
+            Código detectado: ${decodedText} - Codigo Registrado<br>
             <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Continuar con Reporte</button>
         `;
 
         document.getElementById("continueButton").addEventListener("click", () => {
-            const action = confirm("¿Qué cambiaremos con el reporte?\nAceptar para continuar con el siguiente módulo.");
+            const action = confirm("¿Continuamos con el reporte?\nAceptar para continuar con el siguiente módulo.");
             if (action) {
                 window.location.href = "next-module.html"; // Redirigir al siguiente módulo
             } else {
@@ -73,7 +73,7 @@ function onScanSuccess(decodedText) {
         validationImage.style.display = "block";
 
         resultContainer.innerHTML = `
-            Código detectado: ${decodedText} - ACCESO DENEGADO.
+            Código detectado: ${decodedText} - ANOTAR, EXPULSAR Y MULTAR.
         `;
 
         setTimeout(() => {
