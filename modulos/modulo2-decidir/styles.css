@@ -31,9 +31,10 @@ legend {
 }
 
 canvas {
-    margin: 20px 0;
+    margin: 20px auto;
     display: block;
-    border-radius: 50%;
+    border-radius: 10px;
+    box-shadow: 0px 0px 5px #aaa;
 }
 
 button {
@@ -44,8 +45,21 @@ button {
     font-size: 1rem;
     cursor: pointer;
     border-radius: 5px;
+    margin: 5px;
 }
 
 button:hover {
     background-color: #3711a3;
+}
+
+.btn-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 15px;
+}
+
+#otros-detalle {
+    margin-top: 10px;
+    padding: 5px;
+    width: calc(100% - 12px);
 }
