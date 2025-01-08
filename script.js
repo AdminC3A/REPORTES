@@ -3,8 +3,15 @@
 // Variable global para almacenar la última cámara seleccionada
 let lastCameraId = null;
 
+// URL del Google Apps Script
+const postUrl = "https://script.google.com/macros/s/AKfycbwZYrGzmWUQCjT7MCSmemPm5eXu_HYPTnFvxIDKOhyyao9GW6zAUvnbRsp7Y0VluQ0/exec";
+
 // Variable para almacenar la base de datos cargada
 let validCodes = [];
+
+// Variable para evitar duplicados
+let lastScannedCode = null;
+let lastScanTime = 0;
 
 // Función para cargar la base de datos desde el CSV
 async function loadDatabase() {
@@ -20,53 +27,6 @@ async function loadDatabase() {
         console.error("Error al cargar la base de datos:", error);
         document.getElementById("result").innerText = "Error al cargar la base de datos.";
     }
-}
-
-// Manejar el resultado exitoso del escaneo
-function onScanSuccess(decodedText) {
-    const resultContainer = document.getElementById("result");
-
-    // Validar si el código escaneado está en la base de datos
-    if (validCodes.includes(decodedText.trim())) {
-        resultContainer.innerHTML = `
-            Código detectado: ${decodedText} - Acceso Permitido<br>
-            <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Continuar con el reporte</button>
-        `;
-
-        // Agregar evento para avanzar al siguiente módulo
-        document.getElementById("continueButton").addEventListener("click", () => {
-            console.log("Pasando al siguiente módulo...");
-            // Aquí puedes agregar la lógica para abrir el siguiente módulo
-        });
-    } else {
-        resultContainer.innerHTML = `
-            Código detectado: ${decodedText} - Acceso Denegado
-        `;
-    }
-}
-
-// Manejar errores durante el escaneo
-function onScanError(errorMessage) {
-    console.error("Error durante el escaneo:", errorMessage);
-}
-
-// Función para iniciar el escaneo con una cámara específica
-function startScanner(cameraId) {
-    const html5Qrcode = new Html5Qrcode("reader");
-
-    html5Qrcode
-        .start(
-            cameraId,
-            { fps: 15, qrbox: { width: 125, height: 125 } },
-            onScanSuccess,
-            onScanError
-        )
-        .then(() => {
-            lastCameraId = cameraId;
-        })
-        .catch((error) => {
-            console.error("Error al iniciar el escaneo:", error);
-        });
 }
 
 // Función para obtener la cámara trasera automáticamente
@@ -95,6 +55,127 @@ loadDatabase().then(() => {
                 "Error al acceder a la cámara. Verifica los permisos.";
         });
 });
+
+// Función para iniciar el escaneo con una cámara específica
+function startScanner(cameraId) {
+    const html5Qrcode = new Html5Qrcode("reader");
+
+    html5Qrcode
+        .start(
+            cameraId,
+            { fps: 15, qrbox: { width: 125, height: 125 } },
+            onScanSuccess,
+            onScanError
+        )
+        .then(() => {
+            lastCameraId = cameraId;
+        })
+        .catch((error) => {
+            console.error("Error al iniciar el escaneo:", error);
+        });
+}
+
+// Manejar el resultado exitoso del escaneo
+let isScanningPaused = false; // Bandera para pausar el escaneo
+
+function onScanSuccess(decodedText) {
+    if (isScanningPaused) {
+        console.log("Escaneo pausado. Esperando acción del usuario.");
+        return;
+    }
+
+    const validationImage = document.getElementById("validation-image");
+    const resultContainer = document.getElementById("result");
+    const currentTime = new Date().getTime();
+    const timestamp = new Date().toISOString(); // Obtener el timestamp actual
+
+    // Evitar duplicados: Verificar si el código ya fue escaneado recientemente
+    if (decodedText === lastScannedCode && currentTime - lastScanTime < 5000) {
+        console.log("Código duplicado detectado. Ignorando.");
+        return;
+    }
+
+    // Pausar el escaneo
+    isScanningPaused = true;
+
+    // Actualizar el último código y la hora del escaneo
+    lastScannedCode = decodedText;
+    lastScanTime = currentTime;
+
+    // Normalizar valores para evitar problemas de formato
+    const normalizedText = decodedText.trim();
+    const normalizedValidCodes = validCodes.map(code => code.trim());
+
+    if (normalizedValidCodes.includes(normalizedText)) {
+        // Mostrar imagen de acceso permitido
+        validationImage.src = "images/Permitido.png";
+        validationImage.style.display = "block";
+
+        resultContainer.innerHTML = `
+            Código detectado: ${decodedText} - Salida Permitida<br>
+            <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Mochila revisada</button>
+        `;
+      
+        // Agregar evento para reanudar el escaneo
+        document.getElementById("continueButton").addEventListener("click", () => {
+            // Limpiar variables del último escaneo
+            lastScannedCode = null;
+            lastScanTime = 0;
+
+            validationImage.style.display = "none"; // Ocultar la imagen
+            resultContainer.innerHTML = ""; // Limpiar el resultado
+            isScanningPaused = false; // Reanudar el escaneo
+            restartScanner(); // Reiniciar el escáner
+        });
+    } else {
+        // Mostrar imagen de acceso ilegal
+        validationImage.src = "images/Alerta.png";
+        validationImage.style.display = "block";
+
+        resultContainer.innerHTML = `
+            Código detectado: ${decodedText} - ACCESO ILEGAL A REPORTAR...
+        `;
+
+        // Enviar registro de acceso ilegal a Google Sheets
+        sendToGoogleSheets(decodedText, "Acceso Ilegal", timestamp);
+
+        // Esperar 11 segundos antes de reanudar el escaneo
+        setTimeout(() => {
+            // Limpiar variables del último escaneo
+            lastScannedCode = null;
+            lastScanTime = 0;
+
+            validationImage.style.display = "none"; // Ocultar la imagen
+            resultContainer.innerHTML = ""; // Limpiar el resultado
+            isScanningPaused = false; // Reanudar el escaneo
+            restartScanner(); // Reiniciar el escáner
+        }, 11000);
+    }
+}
+
+
+// Manejar errores durante el escaneo
+function onScanError(errorMessage) {
+    console.error("Error durante el escaneo:", errorMessage);
+}
+
+
+
+// Función para reiniciar el escáner QR
+function restartScanner() {
+    document.getElementById("result").innerText = "Por favor, escanea un código QR...";
+    document.getElementById("validation-image").style.display = "none";
+
+    if (lastCameraId) {
+        startScanner(lastCameraId);
+    } else {
+        getBackCameraId().then(startScanner).catch((error) => {
+            console.error("Error al obtener la cámara trasera:", error);
+        });
+    }
+}
+
+
 
 
 // Función para avanzar al siguiente módulo
