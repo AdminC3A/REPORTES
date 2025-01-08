@@ -15,4 +15,37 @@ header {
 
 main {
     padding: 20px;
+    max-width: 600px;
+    margin: auto;
+}
+
+fieldset {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+legend {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+canvas {
+    margin: 20px 0;
+    display: block;
+    border-radius: 50%;
+}
+
+button {
+    background-color: #4914db;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #3711a3;
 }
