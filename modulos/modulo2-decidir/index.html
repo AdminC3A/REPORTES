@@ -19,10 +19,36 @@
         </fieldset>
 
         <!-- Contenedor para previsualización de la foto -->
-        <canvas id="fotoContainer" width="150" height="150" style="border: 1px solid #ccc;"></canvas>
+        <canvas id="fotoContainer" width="150" height="150" style="border: 1px solid #ccc; display: none;"></canvas>
+
+        <!-- Opciones de selección -->
+        <fieldset id="riesgoOpciones" style="display: none;">
+            <legend>1. Decidir: Riesgo Potencial</legend>
+            <div>
+                <input type="checkbox" id="trabajo-alturas" name="riesgo" value="Trabajo en alturas">
+                <label for="trabajo-alturas">Trabajo en alturas</label>
+            </div>
+            <div>
+                <input type="checkbox" id="epp" name="riesgo" value="EPP">
+                <label for="epp">EPP</label>
+            </div>
+            <div>
+                <input type="checkbox" id="trabajos-calientes" name="riesgo" value="Trabajos calientes">
+                <label for="trabajos-calientes">Trabajos calientes</label>
+            </div>
+            <div>
+                <input type="checkbox" id="espacio-confinado" name="riesgo" value="Espacio confinado">
+                <label for="espacio-confinado">Espacio confinado</label>
+            </div>
+            <div>
+                <input type="checkbox" id="otros" name="riesgo" value="Otros">
+                <label for="otros">Otros</label>
+                <input type="text" id="otros-detalle" name="otros-detalle" placeholder="Especifique..." style="display: none;">
+            </div>
+        </fieldset>
 
         <!-- Botón para continuar -->
-        <button id="next">Continuar al Módulo 3</button>
+        <button id="next" style="display: none;">Continuar al Módulo 3</button>
     </main>
     <script src="/modulos/modulo2-decidir/script.js"></script>
 </body>
