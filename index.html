@@ -3,39 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte BOS</title>
+    <title>Módulo 1 - Escaneo de QR</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Reporte BOS</h1>
+        <h1>Escáner QR - Módulo 1</h1>
     </header>
-    <main>
-        <!-- Contenedor para el escaneo -->
-        <section id="module1" class="module">
-            <h2>Escaneo de QR</h2>
-            <div id="reader" style="width: 300px; height: 300px;"></div>
-            <div id="validation-message"></div>
-        </section>
 
-        <!-- Contenedor para captura de datos -->
-        <section id="module2" class="module hidden">
-            <h2>Captura de Datos</h2>
-            <form id="data-form">
-                <label for="decision">Decisión:</label>
-                <select id="decision" name="decision">
-                    <option value="Aprobado">Aprobado</option>
-                    <option value="Rechazado">Rechazado</option>
-                </select>
-                <label for="comments">Comentarios:</label>
-                <textarea id="comments" name="comments"></textarea>
-                <button type="button" id="proceed-button">Siguiente</button>
-            </form>
-        </section>
+    <main>
+        <div id="reader" class="qr-reader"></div>
+        <div id="result" class="result-container">Por favor, escanea un código QR...</div>
+        <img id="validation-image" class="validation-image" style="display: none;">
     </main>
+
     <footer>
         <p>Elemento Arquitectura Interior 2025</p>
     </footer>
+
     <script src="script.js"></script>
 </body>
 </html>
