@@ -14,35 +14,77 @@
         <!-- Pregunta inicial -->
         <fieldset>
             <legend>¿Tomaste la fotografía "In Fraganti" o la tomamos ahorita?</legend>
-            <button id="cargarFotoArchivoBtn">Sí, tomé la fotografía</button>
-            <button id="cargarFotoCamaraBtn">Tomémosla ahorita</button>
+            <div class="btn-container">
+                <button id="cargarFotoArchivoBtn">Sí, tomé la fotografía</button>
+                <button id="cargarFotoCamaraBtn">Tomémosla ahorita</button>
+            </div>
         </fieldset>
 
         <!-- Contenedor para previsualización de la foto -->
-        <canvas id="fotoContainer" width="150" height="150" style="border: 1px solid #ccc; display: none;"></canvas>
+        <canvas id="fotoContainer" width="200" height="200" style="display: none;"></canvas>
 
         <!-- Opciones de selección -->
         <fieldset id="riesgoOpciones" style="display: none;">
             <legend>1. Decidir: Riesgo Potencial</legend>
             <div>
                 <input type="checkbox" id="trabajo-alturas" name="riesgo" value="Trabajo en alturas">
-                <label for="trabajo-alturas">Trabajo en alturas</label>
+                <label for="trabajo-alturas">1. Trabajo en alturas</label>
             </div>
             <div>
                 <input type="checkbox" id="epp" name="riesgo" value="EPP">
-                <label for="epp">EPP</label>
+                <label for="epp">2. EPP</label>
             </div>
             <div>
                 <input type="checkbox" id="trabajos-calientes" name="riesgo" value="Trabajos calientes">
-                <label for="trabajos-calientes">Trabajos calientes</label>
+                <label for="trabajos-calientes">3. Trabajos calientes</label>
             </div>
             <div>
                 <input type="checkbox" id="espacio-confinado" name="riesgo" value="Espacio confinado">
-                <label for="espacio-confinado">Espacio confinado</label>
+                <label for="espacio-confinado">4. Espacio confinado</label>
+            </div>
+            <div>
+                <input type="checkbox" id="trabajos-electricos" name="riesgo" value="Trabajos eléctricos">
+                <label for="trabajos-electricos">5. Trabajos eléctricos</label>
+            </div>
+            <div>
+                <input type="checkbox" id="excavaciones" name="riesgo" value="Excavaciones">
+                <label for="excavaciones">6. Excavaciones</label>
+            </div>
+            <div>
+                <input type="checkbox" id="orden-limpieza" name="riesgo" value="Orden y limpieza">
+                <label for="orden-limpieza">7. Orden y limpieza</label>
+            </div>
+            <div>
+                <input type="checkbox" id="peatonal" name="riesgo" value="Peatonal">
+                <label for="peatonal">8. Peatonal</label>
+            </div>
+            <div>
+                <input type="checkbox" id="ambiental" name="riesgo" value="Ambiental">
+                <label for="ambiental">9. Ambiental</label>
+            </div>
+            <div>
+                <input type="checkbox" id="ayudas-visuales" name="riesgo" value="Ayudas visuales">
+                <label for="ayudas-visuales">10. Ayudas visuales</label>
+            </div>
+            <div>
+                <input type="checkbox" id="buenas-practicas" name="riesgo" value="Buenas prácticas">
+                <label for="buenas-practicas">11. Buenas prácticas</label>
+            </div>
+            <div>
+                <input type="checkbox" id="actitud" name="riesgo" value="Actitud">
+                <label for="actitud">12. Actitud</label>
+            </div>
+            <div>
+                <input type="checkbox" id="izaje" name="riesgo" value="Izaje">
+                <label for="izaje">13. Izaje</label>
+            </div>
+            <div>
+                <input type="checkbox" id="herramientas" name="riesgo" value="Herramientas/Equipos">
+                <label for="herramientas">14. Herramientas/Equipos</label>
             </div>
             <div>
                 <input type="checkbox" id="otros" name="riesgo" value="Otros">
-                <label for="otros">Otros</label>
+                <label for="otros">15. Otros</label>
                 <input type="text" id="otros-detalle" name="otros-detalle" placeholder="Especifique..." style="display: none;">
             </div>
         </fieldset>
