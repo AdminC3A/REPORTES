@@ -1,0 +1,23 @@
+{
+    "supervisoresSeguridad": {
+        "rol": "Supervisor de Seguridad",
+        "supervisores": {
+            "Juan Pérez": ["1234", "5678"],
+            "Carlos Ramírez": ["abcd", "efgh"]
+        }
+    },
+    "supervisoresObra": {
+        "rol": "Supervisor de Obra",
+        "supervisores": {
+            "Ana López": ["ijkl", "mnop"],
+            "Roberto Díaz": ["qrst", "uvwx"]
+        }
+    },
+    "guardiasTurno": {
+        "rol": "Guardia en Turno",
+        "supervisores": {
+            "Pedro Sánchez": ["yzab", "cdef"],
+            "María González": ["ghij", "klmn"]
+        }
+    }
+}
