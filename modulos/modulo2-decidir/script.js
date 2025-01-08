@@ -5,6 +5,19 @@ const riesgoOpciones = document.getElementById("riesgoOpciones");
 const nextButton = document.getElementById("next");
 let imagenSeleccionada = null;
 
+// Función para guardar en Local Storage
+function guardarEnLocalStorage(modulo, datos) {
+    let reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+    reporte[modulo] = datos;
+    localStorage.setItem("reporte", JSON.stringify(reporte));
+    console.log(`Datos del ${modulo} guardados:`, datos);
+}
+
+// Función para guardar la imagen en Local Storage
+function guardarImagenEnLocalStorage(dataURL) {
+    guardarEnLocalStorage("modulo2", { imagen: dataURL });
+}
+
 // Función para mostrar las opciones después de cargar la foto
 function mostrarOpciones() {
     fotoContainer.style.display = "block"; // Mostrar previsualización
@@ -13,7 +26,7 @@ function mostrarOpciones() {
 }
 
 /**
- * Módulo 2: Cargar foto desde archivo
+ * Cargar foto desde archivo
  */
 cargarFotoArchivoBtn.addEventListener("click", () => {
     const imagenInput = document.createElement("input");
@@ -29,6 +42,8 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
                 const img = new Image();
                 img.onload = () => {
                     imagenSeleccionada = img; // Guardar la imagen
+                    guardarImagenEnLocalStorage(e.target.result); // Guardar en Local Storage
+
                     const ctxFoto = fotoContainer.getContext("2d");
                     ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
                     ctxFoto.beginPath();
@@ -46,7 +61,7 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
 });
 
 /**
- * Módulo 3: Cargar foto desde cámara
+ * Cargar foto desde cámara
  */
 cargarFotoCamaraBtn.addEventListener("click", () => {
     const cameraInput = document.createElement("input");
@@ -66,6 +81,8 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
                 const img = new Image();
                 img.onload = () => {
                     imagenSeleccionada = img;
+                    guardarImagenEnLocalStorage(e.target.result); // Guardar en Local Storage
+
                     const ctxFoto = fotoContainer.getContext("2d");
                     ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
                     ctxFoto.beginPath();
@@ -96,7 +113,25 @@ document.getElementById("otros").addEventListener("change", function () {
     }
 });
 
-// Navegar al siguiente módulo
+// Guardar las opciones seleccionadas al hacer clic en "Continuar"
 nextButton.addEventListener("click", function () {
+    const seleccionados = [];
+    document.querySelectorAll('input[name="riesgo"]:checked').forEach((input) => {
+        seleccionados.push(input.value);
+    });
+
+    // Agregar detalle de "Otros" si está seleccionado
+    const otrosDetalle = document.getElementById("otros-detalle").value;
+    if (otrosDetalle) {
+        seleccionados.push(`Otros: ${otrosDetalle}`);
+    }
+
+    // Guardar los datos seleccionados
+    guardarEnLocalStorage("modulo2", {
+        imagen: localStorage.getItem("imagenCapturada"),
+        riesgos: seleccionados,
+    });
+
+    // Navegar al siguiente módulo
     window.location.href = "/modulos/modulo3-detener/index.html";
 });
