@@ -3,37 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte BOS</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Escáner de QR - Módulo 1</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Archivo CSS para estilos -->
+    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> <!-- Biblioteca del escáner QR -->
 </head>
 <body>
-    <!-- Contenedor del Escáner -->
-    <div id="scannerContainer">
+    <header>
         <h1>Escáner QR</h1>
-        <div id="reader"></div>
-        <p id="result">Cargando base de datos... Por favor espera.</p>
-        <img id="validation-image" style="display:none; width:100px;">
-    </div>
+    </header>
 
-    <!-- Contenedor de la Etapa 1: Decidir -->
-    <div id="stage1Container" style="display: none;">
-        <h2>Etapa 1: Decidir</h2>
-        <p id="workerCodeStage1"></p>
-        <form id="stage1Form">
-            <label for="decidir">Selecciona la acción:</label>
-            <select id="decidir" required>
-                <option value="" disabled selected>Selecciona una opción</option>
-                <option value="Trabajo en alturas">Trabajo en alturas</option>
-                <option value="EPP">EPP</option>
-                <option value="Trabajos Calientes">Trabajos Calientes</option>
-                <option value="Espacio Confinado">Espacio Confinado</option>
-                <option value="Trabajos Eléctricos">Trabajos Eléctricos</option>
-            </select>
-            <br><br>
-            <button type="button" id="nextToStage2">Siguiente</button>
-        </form>
-    </div>
+    <!-- Contenedor para el lector QR -->
+    <div id="reader" style="width: 300px; height: 300px; margin: auto;"></div>
 
+    <!-- Contenedor para mostrar resultados -->
+    <div id="result" style="text-align: center; margin-top: 20px;">Cargando...</div>
+
+    <!-- Imagen de validación -->
+    <img id="validation-image" style="display:none; margin: 20px auto; width: 100px; height: 100px;" alt="Estado de validación" />
+
+    <!-- Script principal -->
     <script src="script.js"></script>
 </body>
 </html>
