@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {};
 
-    // Cargar roles y llaves desde JSON
+    // Cargar roles y llaves desde el archivo JSON
     fetch('/data/roles.json')
         .then(response => response.json())
         .then(data => {
@@ -10,14 +10,31 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(error => console.error("Error al cargar roles y llaves:", error));
 
-    const validarLlaveBtn = document.getElementById("validar-llave");
-    const clasificacionFieldset = document.getElementById("clasificacion");
+    const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
+    const clasificacionFieldset = document.getElementById("clasificacion");
+    const validarLlaveBtn = document.getElementById("validar-llave");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
+    const trabajarSinLlaveBtn = document.getElementById("trabajar-sin-llave");
 
+    // Mostrar el campo de validación de llave al seleccionar un rol
+    rolRadios.forEach(radio => {
+        radio.addEventListener("change", () => {
+            validacionLlaveFieldset.style.display = "block";
+            mensajeValidacion.style.display = "none"; // Ocultar mensaje de error al cambiar de rol
+        });
+    });
+
+    // Validar la llave ingresada
     validarLlaveBtn.addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
         const rolSeleccionado = document.querySelector('input[name="rol"]:checked').value;
+
+        if (!llave || !rolSeleccionado) {
+            mensajeValidacion.style.display = "block";
+            mensajeValidacion.innerText = "Por favor selecciona un rol y proporciona una llave.";
+            return;
+        }
 
         let supervisores = {};
         if (rolSeleccionado === "Supervisor de Seguridad") {
@@ -28,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             supervisores = rolesYllaves.guardiasTurno.supervisores;
         }
 
-        // Validar la llave y extraer el nombre
+        // Validar la llave ingresada
         let llaveValida = false;
         let nombreSupervisor = "";
 
@@ -46,12 +63,11 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             mensajeValidacion.style.display = "block";
             mensajeValidacion.innerText = "Llave no válida. Intenta nuevamente.";
-            console.error("Llave no válida.");
         }
     });
 
-    // Opción para trabajar sin llave
-    document.getElementById("trabajar-sin-llave").addEventListener("click", () => {
+    // Permitir trabajar sin llave
+    trabajarSinLlaveBtn.addEventListener("click", () => {
         const confirmar = confirm("¿Seguro que deseas trabajar sin llave? Esto será registrado en el reporte.");
         if (confirmar) {
             clasificacionFieldset.style.display = "block";
