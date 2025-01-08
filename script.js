@@ -58,3 +58,64 @@ function onScanSuccess(decodedText) {
         resultContainer.innerHTML = `Código detectado: ${decodedText} - ACCESO DENEGADO.`;
         setTimeout(() => {
             validationImage.style.display = "none";
+            resultContainer.innerHTML = "Por favor, escanea un código QR...";
+            isScanningPaused = false;
+        }, 3000); // Pausa antes de reiniciar
+    }
+}
+
+// Función para manejar errores durante el escaneo
+function onScanError(errorMessage) {
+    console.error("Error durante el escaneo:", errorMessage);
+}
+
+// Función para iniciar el escaneo con una cámara específica
+function startScanner(cameraId) {
+    const html5Qrcode = new Html5Qrcode("reader");
+
+    html5Qrcode
+        .start(
+            cameraId,
+            { fps: 15, qrbox: { width: 250, height: 250 } },
+            onScanSuccess,
+            onScanError
+        )
+        .then(() => {
+            lastCameraId = cameraId;
+        })
+        .catch(error => {
+            console.error("Error al iniciar el escaneo:", error);
+        });
+}
+
+// Función para obtener la cámara trasera automáticamente
+function getBackCameraId() {
+    return Html5Qrcode.getCameras().then((cameras) => {
+        if (cameras && cameras.length > 0) {
+            const backCamera = cameras.find(camera =>
+                camera.label.toLowerCase().includes("back")
+            );
+            return backCamera ? backCamera.id : cameras[0].id;
+        } else {
+            throw new Error("No se encontraron cámaras disponibles.");
+        }
+    });
+}
+
+// Función para avanzar al siguiente módulo
+function proceedToNextModule(decodedText) {
+    console.log(`Pasando al siguiente módulo con el código: ${decodedText}`);
+    // Aquí redirigimos al módulo de decisión o mostramos su contenido
+}
+
+// Inicializar la aplicación
+loadDatabase().then(() => {
+    getBackCameraId()
+        .then(cameraId => {
+            startScanner(cameraId);
+        })
+        .catch(error => {
+            console.error("Error al obtener la cámara trasera:", error);
+            document.getElementById("result").innerText = "Error al acceder a la cámara.";
+        });
+});
