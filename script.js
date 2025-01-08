@@ -29,6 +29,7 @@ async function loadDatabase() {
 // Manejar el resultado exitoso del escaneo
 function onScanSuccess(decodedText) {
     const validationImage = document.getElementById("validation-image");
+    const resultContainer = document.getElementById("result");
     const currentTime = new Date().getTime();
 
     // Evitar duplicados
@@ -49,7 +50,7 @@ function onScanSuccess(decodedText) {
     } else {
         validationImage.src = "images/Denegado.png";
         validationImage.style.display = "block";
-        document.getElementById("result").innerText = `Código detectado: ${decodedText} - Inválido`;
+        resultContainer.innerText = `Código detectado: ${decodedText} - Inválido`;
     }
 }
 
@@ -70,12 +71,13 @@ function startScanner(cameraId) {
     const html5Qrcode = new Html5Qrcode("reader");
 
     html5Qrcode
-        .start(cameraId, { fps: 15, qrbox: { width: 125, height: 125 } }, onScanSuccess, onScanError)
+        .start(cameraId, { fps: 10, qrbox: { width: 250, height: 250 } }, onScanSuccess, onScanError)
         .then(() => {
             lastCameraId = cameraId;
         })
         .catch((error) => {
             console.error("Error al iniciar el escaneo:", error);
+            document.getElementById("result").innerText = "No se pudo acceder a la cámara. Verifica los permisos.";
         });
 }
 
@@ -103,20 +105,18 @@ function getBackCameraId() {
     });
 }
 
-// Manejar "Siguiente" en la Etapa 1
-document.getElementById("nextToStage2").addEventListener("click", () => {
-    const decision = document.getElementById("decidir").value;
-
-    if (!decision) {
-        alert("Por favor, selecciona una acción.");
-        return;
-    }
-
-    localStorage.setItem("BOS_decision", decision);
-    console.log("Decisión guardada:", decision);
-});
-
 // Inicializar la aplicación
-loadDatabase().then(() => {
-    getBackCameraId().then(cameraId => startScanner(cameraId));
-});
+async function initializeScanner() {
+    try {
+        await loadDatabase(); // Cargar la base de datos
+
+        const cameraId = await getBackCameraId();
+        startScanner(cameraId); // Iniciar el escáner con la cámara
+    } catch (error) {
+        console.error("Error al inicializar el escáner:", error);
+        document.getElementById("result").innerText = "Error al iniciar la aplicación.";
+    }
+}
+
+// Iniciar la aplicación cuando el DOM esté cargado
+document.addEventListener("DOMContentLoaded", initializeScanner);
