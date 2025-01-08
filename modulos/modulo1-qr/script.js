@@ -63,7 +63,7 @@ function onScanSuccess(decodedText) {
         document.getElementById("continueButton").addEventListener("click", () => {
             const action = confirm("¿Continuamos con el reporte?\nAceptar para continuar con el siguiente módulo.");
             if (action) {
-                window.location.href = "next-module.html"; // Redirigir al siguiente módulo
+                window.location.href = "/modulos/modulo2-decidir/index.html"; // Redirigir al siguiente módulo
             } else {
                 resetScanner();
             }
