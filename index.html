@@ -3,25 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tarjeta BOS - Escaneo Inicial</title>
+    <title>Reporte BOS</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header>
-        <h1>Tarjeta BOS - Escaneo Inicial</h1>
-    </header>
+    <!-- Contenedor del Escáner -->
+    <div id="scannerContainer">
+        <h1>Escáner QR</h1>
+        <div id="reader"></div>
+        <p id="result">Por favor, escanea un código QR...</p>
+        <img id="validation-image" style="display:none; width:100px;">
+    </div>
 
-    <main>
-        <div id="scanner">
-            <p>Por favor, escanea el código QR del trabajador.</p>
-            <div id="reader"></div>
-            <p id="scan-result"></p>
-            <button id="start-scan" class="hidden">Iniciar Escaneo</button>
-            <button id="next-button" class="hidden">Siguiente</button>
-        </div>
-    </main>
+    <!-- Contenedor de la Etapa 1: Decidir -->
+    <div id="stage1Container" style="display: none;">
+        <h2>Etapa 1: Decidir</h2>
+        <p id="workerCodeStage1"></p>
+        <form id="stage1Form">
+            <label for="decidir">Selecciona la acción:</label>
+            <select id="decidir" required>
+                <option value="" disabled selected>Selecciona una opción</option>
+                <option value="Trabajo en alturas">Trabajo en alturas</option>
+                <option value="EPP">EPP</option>
+                <option value="Trabajos Calientes">Trabajos Calientes</option>
+                <option value="Espacio Confinado">Espacio Confinado</option>
+                <option value="Trabajos Eléctricos">Trabajos Eléctricos</option>
+                <!-- Más opciones según necesidad -->
+            </select>
+            <br><br>
+            <button type="button" id="nextToStage2">Siguiente</button>
+        </form>
+    </div>
 
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <!-- Contenedor de la Etapa 2: Detener (Placeholder para seguir expandiendo) -->
+    <div id="stage2Container" style="display: none;">
+        <h2>Etapa 2: Detener</h2>
+        <!-- Contenido de la Etapa 2 -->
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
