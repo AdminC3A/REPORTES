@@ -57,7 +57,7 @@ function onScanSuccess(decodedText) {
 
         resultContainer.innerHTML = `
             Código detectado: ${decodedText} - Salida Permitida<br>
-            <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Mochila revisada</button>
+            <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Continuar con reporte</button>
         `;
 
         document.getElementById("continueButton").addEventListener("click", () => {
