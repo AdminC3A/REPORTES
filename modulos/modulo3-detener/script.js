@@ -85,24 +85,31 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // Capturar clic en ejemplos y completar el campo de texto
+    document.querySelectorAll('.ejemplo-opcion').forEach(ejemplo => {
+        ejemplo.addEventListener("click", (event) => {
+            const textoEjemplo = event.target.getAttribute("data-value");
+            otrosDetalle.value = textoEjemplo;
+        });
+    });
+
     // Continuar al siguiente módulo
-nextButton.addEventListener("click", () => {
-    const seleccion = document.querySelector('input[name="clasificacion"]:checked');
-    if (!seleccion) {
-        alert("Por favor selecciona una clasificación para continuar.");
-        return;
-    }
+    nextButton.addEventListener("click", () => {
+        const seleccion = document.querySelector('input[name="clasificacion"]:checked');
+        if (!seleccion) {
+            alert("Por favor selecciona una clasificación para continuar.");
+            return;
+        }
 
-    // Validar que si es "Otros", se haya ingresado un detalle
-    if (seleccion.value === "Otros" && !otrosDetalle.value.trim()) {
-        alert("Por favor describe la observación en el campo de texto.");
-        return;
-    }
+        // Validar que si es "Otros", se haya ingresado un detalle
+        if (seleccion.value === "Otros" && !otrosDetalle.value.trim()) {
+            alert("Por favor describe la observación en el campo de texto.");
+            return;
+        }
 
-    // Redirigir al módulo 4
-    window.location.href = "/modulos/modulo4/index.html";
-});
-
+        // Redirigir al módulo 4
+        window.location.href = "/modulos/modulo4/index.html";
+    });
 
     // Permitir trabajar sin llave
     trabajarSinLlaveBtn.addEventListener("click", () => {
