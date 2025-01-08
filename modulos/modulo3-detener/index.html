@@ -1,17 +1,86 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Modulo3 Detener</title>
+    <title>Reporte de Observación</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Modulo3 Detener</h1>
+        <h1>Reporte de Observación</h1>
     </header>
     <main>
-        <p>Contenido de Modulo3 Detener</p>
+        <!-- Selección de Rol -->
+        <fieldset>
+            <legend>¿Quién está llenando el reporte?</legend>
+            <div>
+                <input type="radio" id="supervisor-seguridad" name="rol" value="Supervisor de Seguridad">
+                <label for="supervisor-seguridad">Supervisor de Seguridad</label>
+            </div>
+            <div>
+                <input type="radio" id="supervisor-obra" name="rol" value="Supervisor de Obra">
+                <label for="supervisor-obra">Supervisor de Obra</label>
+            </div>
+            <div>
+                <input type="radio" id="guardia-turno" name="rol" value="Guardia en Turno">
+                <label for="guardia-turno">Guardia en Turno</label>
+            </div>
+        </fieldset>
+
+        <!-- Ingreso de Llave -->
+        <div id="llave-container" style="display: none;">
+            <label for="llave">Ingresa tu llave de identificación:</label>
+            <input type="password" id="llave" name="llave">
+            <button type="button" onclick="validarLlave()">Validar Llave</button>
+            <p id="llave-error" style="color: red; display: none;">Llave no válida. Por favor, inténtalo de nuevo.</p>
+        </div>
+
+        <!-- Clasificación de la Observación -->
+        <fieldset id="clasificacion" style="display: none;">
+            <legend>Clasificación de la Observación</legend>
+            <div>
+                <input type="radio" id="condicion-insegura" name="clasificacion" value="Condición Insegura">
+                <label for="condicion-insegura">Condición Insegura</label>
+            </div>
+            <div>
+                <input type="radio" id="acto-inseguro" name="clasificacion" value="Acto Inseguro">
+                <label for="acto-inseguro">Acto Inseguro</label>
+            </div>
+            <div>
+                <input type="radio" id="falla-administrativa" name="clasificacion" value="Falla Administrativa">
+                <label for="falla-administrativa">Falla Administrativa</label>
+            </div>
+            <div id="falla-administrativa-opciones" style="display: none; margin-left: 20px;">
+                <div>
+                    <input type="checkbox" id="falta-permisos" name="falla-administrativa" value="Falta de Permisos">
+                    <label for="falta-permisos">Falta de Permisos</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="supervision-insuficiente" name="falla-administrativa" value="Supervisión Insuficiente">
+                    <label for="supervision-insuficiente">Supervisión Insuficiente</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="documentacion-incompleta" name="falla-administrativa" value="Documentación Incompleta">
+                    <label for="documentacion-incompleta">Documentación Incompleta</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="capacitacion-deficiente" name="falla-administrativa" value="Capacitación Deficiente">
+                    <label for="capacitacion-deficiente">Capacitación Deficiente</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="incumplimiento-normativas" name="falla-administrativa" value="Incumplimiento de Normativas">
+                    <label for="incumplimiento-normativas">Incumplimiento de Normativas</label>
+                </div>
+            </div>
+            <div>
+                <input type="radio" id="ambos" name="clasificacion" value="Ambos">
+                <label for="ambos">Ambos</label>
+            </div>
+        </fieldset>
+
+        <!-- Botón para Continuar -->
+        <button id="continuar" style="display: none;" onclick="continuarFormulario()">Continuar</button>
     </main>
     <script src="script.js"></script>
 </body>
