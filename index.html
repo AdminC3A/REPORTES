@@ -1,27 +1,26 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Escáner de QR - Módulo 1</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Archivo CSS para estilos -->
-    <script src="https://unpkg.com/html5-qrcode/minified/html5-qrcode.min.js"></script> <!-- Biblioteca del escáner QR -->
+    <title>Elemento Arquitectura Interior</title>
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
-        <h1>Escáner QR</h1>
+        <h1>Registro de SALIDA de obra</h1>
     </header>
-
-    <!-- Contenedor para el lector QR -->
-    <div id="reader" style="width: 300px; height: 300px; margin: auto;"></div>
-
-    <!-- Contenedor para mostrar resultados -->
-    <div id="result" style="text-align: center; margin-top: 20px;">Cargando...</div>
-
-    <!-- Imagen de validación -->
-    <img id="validation-image" style="display:none; margin: 20px auto; width: 100px; height: 100px;" alt="Estado de validación" />
-
-    <!-- Script principal -->
+    <main>
+        <div id="reader-container">
+            <div id="reader"></div>
+            <img id="validation-image" src="" alt="Validación">
+        </div>
+        <p id="result">Por favor, escanea un código QR...</p>
+    </main>
+    <footer>
+        <p>Elemento Arquitectura Interior © 2024</p>
+    </footer>
     <script src="script.js"></script>
 </body>
-</html>
+</html>V
