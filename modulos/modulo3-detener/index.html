@@ -46,41 +46,48 @@
 
         <!-- Clasificación de la Observación -->
         <fieldset id="clasificacion" style="display: none;">
-            <legend>Clasificación de la Observación</legend>
-            <!-- Opciones de clasificación -->
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Condición Insegura">
-                    Condición Insegura
-                    <!-- Tooltip para explicar esta opción -->
-                    <span class="tooltip" data-tooltip="Situaciones físicas del entorno que representan un riesgo para las personas.">?</span>
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Acto Inseguro">
-                    Acto Inseguro
-                    <!-- Tooltip para explicar esta opción -->
-                    <span class="tooltip" data-tooltip="Acciones humanas que ponen en riesgo la seguridad.">?</span>
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Falla Administrativa">
-                    Falla Administrativa
-                    <!-- Tooltip para explicar esta opción -->
-                    <span class="tooltip" data-tooltip="Errores en gestión o supervisión que afectan la seguridad.">?</span>
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Ambos">
-                    Ambos
-                    <!-- Tooltip para explicar esta opción -->
-                    <span class="tooltip" data-tooltip="Situaciones combinadas de condiciones y actos inseguros.">?</span>
-                </label>
-            </div>
-        </fieldset>
+    <legend>Clasificación de la Observación</legend>
+    <!-- Opciones de clasificación -->
+    <div>
+        <label>
+            <input type="radio" name="clasificacion" value="Condición Insegura">
+            Condición Insegura
+            <span class="tooltip" data-tooltip="Situaciones físicas del entorno que representan un riesgo para las personas.">?</span>
+        </label>
+    </div>
+    <div>
+        <label>
+            <input type="radio" name="clasificacion" value="Acto Inseguro">
+            Acto Inseguro
+            <span class="tooltip" data-tooltip="Acciones humanas que ponen en riesgo la seguridad.">?</span>
+        </label>
+    </div>
+    <div>
+        <label>
+            <input type="radio" name="clasificacion" value="Falla Administrativa">
+            Falla Administrativa
+            <span class="tooltip" data-tooltip="Errores en gestión o supervisión que afectan la seguridad.">?</span>
+        </label>
+    </div>
+    <div>
+        <label>
+            <input type="radio" name="clasificacion" value="Otros">
+            Otros
+            <span class="tooltip" data-tooltip="Describe cualquier observación no incluida en las categorías anteriores.">?</span>
+        </label>
+        <!-- Campo de texto para describir "Otros" -->
+        <textarea id="otros-detalle" placeholder="Describe la observación..." style="display: none; width: 100%; margin-top: 10px;"></textarea>
+        <!-- Ejemplos para "Otros" -->
+        <ul id="otros-ejemplos" style="display: none; margin-top: 10px;">
+            <li>Conductas inapropiadas en zonas críticas.</li>
+            <li>Uso indebido de maquinaria.</li>
+            <li>Desobediencia de órdenes de seguridad.</li>
+            <li>Falta de uso de EPP.</li>
+            <li>Ausencia de inspecciones periódicas.</li>
+        </ul>
+    </div>
+</fieldset>
+
 
         <!-- Opciones dinámicas para Falla Administrativa -->
         <fieldset id="falla-administrativa" style="display: none;">
