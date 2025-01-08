@@ -18,6 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const trabajarSinLlaveBtn = document.getElementById("trabajar-sin-llave");
     const otrosDetalle = document.getElementById("otros-detalle");
     const otrosEjemplos = document.getElementById("otros-ejemplos");
+    const nextButton = document.getElementById("next");
 
     // Mostrar el campo de validación de llave al seleccionar un rol
     rolRadios.forEach(radio => {
@@ -78,7 +79,28 @@ document.addEventListener("DOMContentLoaded", () => {
                 otrosDetalle.style.display = "none";
                 otrosEjemplos.style.display = "none";
             }
+
+            // Mostrar botón para continuar
+            nextButton.style.display = "block";
         });
+    });
+
+    // Continuar al siguiente módulo
+    nextButton.addEventListener("click", () => {
+        const seleccion = document.querySelector('input[name="clasificacion"]:checked');
+        if (!seleccion) {
+            alert("Por favor selecciona una clasificación para continuar.");
+            return;
+        }
+
+        // Validar que si es "Otros", se haya ingresado un detalle
+        if (seleccion.value === "Otros" && !otrosDetalle.value.trim()) {
+            alert("Por favor describe la observación en el campo de texto.");
+            return;
+        }
+
+        // Redirigir al módulo 4
+        window.location.href = "/modulos/modulo4/modulo4.html";
     });
 
     // Permitir trabajar sin llave
