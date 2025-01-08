@@ -10,7 +10,7 @@ h1, h2 {
     color: #333;
 }
 
-#scannerContainer, #stage1Container, #stage2Container {
+#scannerContainer, #stage1Container {
     margin: 20px auto;
     padding: 20px;
     background: white;
