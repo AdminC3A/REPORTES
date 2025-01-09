@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextButton = document.getElementById("next");
     const nombreExternoInput = document.getElementById("nombre-externo");
     const otrosDetalle = document.getElementById("otros-detalle");
-    const observacionesAdicionales = document.getElementById("observaciones-adicionales");
 
     // Cargar roles y llaves desde el JSON
     async function loadRolesAndKeys() {
@@ -78,7 +77,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Mostrar campo de texto para "Otros" y habilitar observaciones adicionales
+    // Mostrar campo de texto para "Otros"
     document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
         radio.addEventListener("change", (event) => {
             const seleccion = event.target.value;
@@ -86,12 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
             if (seleccion === "Otros") {
                 otrosDetalle.style.display = "block";
                 otrosDetalle.required = true; // Obligatorio para "Otros"
-                observacionesAdicionales.style.display = "none"; // Deshabilitar observaciones adicionales
-                observacionesAdicionales.value = ""; // Limpiar valor
             } else {
                 otrosDetalle.style.display = "none";
                 otrosDetalle.required = false;
-                observacionesAdicionales.style.display = "block";
             }
 
             // Mostrar botón "Continuar" al seleccionar cualquier clasificación
@@ -110,7 +106,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const clasificacion = clasificacionSeleccionada.value;
         const detalleOtros = otrosDetalle.value.trim();
-        const observaciones = observacionesAdicionales.value.trim();
 
         if (clasificacion === "Otros" && !detalleOtros) {
             alert("Por favor describe la observación en el campo de texto.");
@@ -120,7 +115,6 @@ document.addEventListener("DOMContentLoaded", () => {
         guardarEnLocalStorage("modulo3", {
             clasificacion,
             detalleOtros: clasificacion === "Otros" ? detalleOtros : null,
-            observacionesAdicionales: observaciones || null,
         });
 
         // Redirigir al siguiente módulo
