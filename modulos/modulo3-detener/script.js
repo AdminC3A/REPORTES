@@ -11,7 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const continuarExternoButton = document.getElementById("continuar-externo");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
     const otrosDetalle = document.getElementById("otros-detalle");
-    const otrosEjemplos = document.getElementById("otros-ejemplos");
     const nextButton = document.getElementById("next");
 
     // Cargar roles y llaves desde el JSON
@@ -83,7 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
             validacionLlaveFieldset.style.display = "none";
         } else {
             mensajeValidacion.style.display = "block";
-            mensajeValidacion.innerText = "Llave no válida. Intenta nuevamente.";
+            mensajeValidacion.innerText = "Llave no válida. Puedes continuar sin validar.";
+            clasificacionFieldset.style.display = "block"; // Permitir avanzar
         }
     });
 
@@ -93,11 +93,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!nombreExterno) {
             mensajeValidacion.style.display = "block";
-            mensajeValidacion.innerText = "Por favor ingresa tu nombre para continuar.";
-            return;
+            mensajeValidacion.innerText = "No ingresaste tu nombre, pero puedes continuar.";
         }
 
-        console.log(`Nombre ingresado: ${nombreExterno}`);
+        console.log(`Nombre ingresado (o vacío): ${nombreExterno}`);
         clasificacionFieldset.style.display = "block";
         validacionNombreFieldset.style.display = "none";
     });
@@ -127,6 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
+        console.log("Datos cargados. Continuando al siguiente módulo.");
         window.location.href = "/modulos/modulo4-observar/index.html";
     });
 
