@@ -9,7 +9,7 @@
 </head>
 <body>
     <header>
-        <h1>Módulo 3: Validacion</h1>
+        <h1>Módulo 3: Validación</h1>
     </header>
     <main>
         <!-- Selección de Rol -->
@@ -28,9 +28,11 @@
                 <input type="radio" id="guardia-turno" name="rol" value="Guardia en Turno">
                 <label for="guardia-turno">Guardia en Turno</label>
             </div>
+            <div>
+                <input type="radio" id="externo" name="rol" value="Externo">
+                <label for="externo">Externo</label>
+            </div>
         </fieldset>
-        <div id="qr-reader" style="width: 300px; height: 300px; margin: 0 auto; display: none;"></div>
-
 
         <!-- Validación de Llave -->
         <fieldset id="validacion-llave" style="display: none;">
@@ -43,49 +45,58 @@
             <!-- Botón para trabajar sin llave -->
             <button id="trabajar-sin-llave" style="display: block;">Trabajar sin llave</button>
         </fieldset>
-<!-- Clasificación de la Observación -->
-<fieldset id="clasificacion" style="display: none;">
-    <legend>Clasificación de la Observación</legend>
-    <div>
-        <label>
-            <input type="radio" name="clasificacion" value="Condición Insegura">
-            Condición Insegura
-            <span class="tooltip" data-tooltip="Situaciones físicas del entorno que representan un riesgo para las personas.">?</span>
-        </label>
-    </div>
-    <div>
-        <label>
-            <input type="radio" name="clasificacion" value="Acto Inseguro">
-            Acto Inseguro
-            <span class="tooltip" data-tooltip="Acciones humanas que ponen en riesgo la seguridad.">?</span>
-        </label>
-    </div>
-    <div>
-        <label>
-            <input type="radio" name="clasificacion" value="Falla Administrativa">
-            Falla Administrativa
-            <span class="tooltip" data-tooltip="Errores en gestión o supervisión que afectan la seguridad.">?</span>
-        </label>
-    </div>
-    <div>
-        <label>
-            <input type="radio" name="clasificacion" value="Otros">
-            Otros
-            <span class="tooltip" data-tooltip="Describe cualquier observación no incluida en las categorías anteriores.">?</span>
-        </label>
-        <!-- Campo de texto para describir "Otros" -->
-        <textarea id="otros-detalle" placeholder="Describe la observación..." style="display: none; width: 100%; margin-top: 10px;"></textarea>
-        <!-- Ejemplos interactivos para "Otros" -->
-        <ul id="otros-ejemplos" style="display: none; margin-top: 10px; list-style: none; padding: 0;">
-            <li class="ejemplo-opcion" data-value="Conductas inapropiadas en area de trabajo.">Conductas inapropiadas en zonas críticas.</li>
-            <li class="ejemplo-opcion" data-value="NO trae gaffete visible.">NO trae gaffete visible.</li>
-            <li class="ejemplo-opcion" data-value="Desobediencia de órdenes de seguridad.">Desobediencia de órdenes de seguridad.</li>
-            <li class="ejemplo-opcion" data-value="EPP incompleto.">EPP incompleto.</li>
-            <li class="ejemplo-opcion" data-value="No tiene gaffete e ingreso a trabajar.">No tiene gaffete e ingreso a trabajar.</li>
-        </ul>
-    </div>
-</fieldset>
 
+        <!-- Validación de QR para Externos -->
+        <fieldset id="validacion-qr" style="display: none;">
+            <legend>Valida tu acceso mediante QR</legend>
+            <div id="qr-reader" style="width: 300px; height: 300px; margin: 0 auto; display: none;"></div>
+            <button id="validar-qr" style="display: block;">Validar QR Externo</button>
+            <!-- Mensaje de validación QR -->
+            <p id="mensaje-validacion-qr" class="error" style="display: none;">QR no válido. Intenta nuevamente.</p>
+        </fieldset>
+
+        <!-- Clasificación de la Observación -->
+        <fieldset id="clasificacion" style="display: none;">
+            <legend>Clasificación de la Observación</legend>
+            <div>
+                <label>
+                    <input type="radio" name="clasificacion" value="Condición Insegura">
+                    Condición Insegura
+                    <span class="tooltip" data-tooltip="Situaciones físicas del entorno que representan un riesgo para las personas.">?</span>
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" name="clasificacion" value="Acto Inseguro">
+                    Acto Inseguro
+                    <span class="tooltip" data-tooltip="Acciones humanas que ponen en riesgo la seguridad.">?</span>
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" name="clasificacion" value="Falla Administrativa">
+                    Falla Administrativa
+                    <span class="tooltip" data-tooltip="Errores en gestión o supervisión que afectan la seguridad.">?</span>
+                </label>
+            </div>
+            <div>
+                <label>
+                    <input type="radio" name="clasificacion" value="Otros">
+                    Otros
+                    <span class="tooltip" data-tooltip="Describe cualquier observación no incluida en las categorías anteriores.">?</span>
+                </label>
+                <!-- Campo de texto para describir "Otros" -->
+                <textarea id="otros-detalle" placeholder="Describe la observación..." style="display: none; width: 100%; margin-top: 10px;"></textarea>
+                <!-- Ejemplos interactivos para "Otros" -->
+                <ul id="otros-ejemplos" style="display: none; margin-top: 10px; list-style: none; padding: 0;">
+                    <li class="ejemplo-opcion" data-value="Conductas inapropiadas en area de trabajo.">Conductas inapropiadas en zonas críticas.</li>
+                    <li class="ejemplo-opcion" data-value="NO trae gaffete visible.">NO trae gaffete visible.</li>
+                    <li class="ejemplo-opcion" data-value="Desobediencia de órdenes de seguridad.">Desobediencia de órdenes de seguridad.</li>
+                    <li class="ejemplo-opcion" data-value="EPP incompleto.">EPP incompleto.</li>
+                    <li class="ejemplo-opcion" data-value="No tiene gaffete e ingreso a trabajar.">No tiene gaffete e ingreso a trabajar.</li>
+                </ul>
+            </div>
+        </fieldset>
 
         <!-- Botón para continuar al siguiente módulo -->
         <button id="next" style="display: none;">Continuar al Siguiente Módulo</button>
