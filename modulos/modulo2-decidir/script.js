@@ -4,6 +4,7 @@ const fotoContainer = document.getElementById("fotoContainer");
 const riesgoOpciones = document.getElementById("riesgoOpciones");
 const nextButton = document.getElementById("next");
 const otrosDetalleInput = document.getElementById("otros-detalle");
+const baseDeDatosQR = JSON.parse(localStorage.getItem("baseDeDatosQR"));
 let imagenSeleccionada = null;
 
 // Función para guardar en Local Storage
