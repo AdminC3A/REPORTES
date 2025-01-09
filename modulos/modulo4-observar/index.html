@@ -3,60 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Combinaciones Botones</title>
+    <title>Módulo 4: Observar</title>
+    <!-- Enlace al CSS con ruta absoluta -->
+    <link rel="stylesheet" href="/modulos/modulo4-observar/styles.css">
+    <!-- Enlace a PapaParse para manejar el CSV -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 </head>
 <body>
-    <h1>Combinaciones Botones</h1>
-    <div id="contenedor-botones"></div>
-    <script>
-        // Cargar el archivo CSV
-        Papa.parse('./data/combinaciones_botones.csv', {
-            download: true,
-            header: true, // Interpretar las cabeceras como claves del objeto
-            complete: function(results) {
-                const combinaciones = results.data; // Datos extraídos del CSV
-                console.log(combinaciones);
+    <!-- Encabezado -->
+    <header>
+        <h1>Módulo 4: Observar</h1>
+        <p>Clasifica la observación y selecciona la acción a implementar.</p>
+    </header>
 
-                // Mostrar una combinación específica
-                mostrarCombinacion(combinaciones, 1); // Mostrar combinación número 1
-            },
-            error: function(error) {
-                console.error("Error al cargar el CSV:", error);
-            }
-        });
+    <!-- Contenedor dinámico -->
+    <main>
+        <div id="contenedor-dinamico">
+            <!-- El contenido dinámico se cargará aquí -->
+        </div>
+    </main>
 
-        // Función para mostrar una combinación específica
-        function mostrarCombinacion(combinaciones, numero) {
-            const combinacion = combinaciones.find(c => c.Numero == numero);
-            if (combinacion) {
-                console.log(`Acción: ${combinacion.Accion}`);
-                console.log(`Clasificación: ${combinacion.Clasificacion}`);
-                console.log(`Botón Corregir: ${combinacion.BotonCorregir}`);
-                console.log(`Botón Retroalimentar: ${combinacion.BotonRetroalimentar}`);
+    <!-- Pie de Página -->
+    <footer>
+        <p>© 2024 Sistema de Seguridad. Todos los derechos reservados.</p>
+    </footer>
 
-                mostrarBotones(combinacion);
-            } else {
-                console.error("No se encontró la combinación especificada.");
-            }
-        }
-
-        // Función para generar botones dinámicamente
-        function mostrarBotones(combinacion) {
-            const contenedor = document.getElementById('contenedor-botones');
-
-            // Crear botón "Corregir"
-            const botonCorregir = document.createElement('button');
-            botonCorregir.innerText = "Corregir";
-            botonCorregir.onclick = () => alert(`Contramedida: ${combinacion.BotonCorregir}`);
-            contenedor.appendChild(botonCorregir);
-
-            // Crear botón "Retroalimentar"
-            const botonRetroalimentar = document.createElement('button');
-            botonRetroalimentar.innerText = "Retroalimentar";
-            botonRetroalimentar.onclick = () => alert(`Retroalimentación: ${combinacion.BotonRetroalimentar}`);
-            contenedor.appendChild(botonRetroalimentar);
-        }
-    </script>
+    <!-- Enlace al script del módulo -->
+    <script src="/modulos/modulo4-observar/script.js"></script>
 </body>
 </html>
