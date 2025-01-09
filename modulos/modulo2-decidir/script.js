@@ -38,7 +38,7 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
                 const img = new Image();
                 img.onload = () => {
                     imagenSeleccionada = img; // Guardar la imagen
-                    guardarImagenEnLocalStorage(e.target.result); // Guardar en Local Storage
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result }); // Guardar en Local Storage
 
                     const ctxFoto = fotoContainer.getContext("2d");
                     ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height); // Limpiar canvas
@@ -73,7 +73,7 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
                 const img = new Image();
                 img.onload = () => {
                     imagenSeleccionada = img;
-                    guardarImagenEnLocalStorage(e.target.result); // Guardar en Local Storage
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result }); // Guardar en Local Storage
 
                     const ctxFoto = fotoContainer.getContext("2d");
                     ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height); // Limpiar canvas
