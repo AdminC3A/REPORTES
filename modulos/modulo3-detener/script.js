@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {};
 
-    // Cargar roles y llaves desde JSON
+    // Cargar roles y llaves desde JSON.
     fetch('/data/roles.json')
         .then(response => response.json())
         .then(data => {
