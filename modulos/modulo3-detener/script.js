@@ -98,11 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const nombre = nombreExternoInput.value.trim();
         const telefono = telefonoExternoInput.value.trim();
 
-        if (!nombre || !telefono) {
-            alert("Por favor ingresa el nombre y el teléfono para continuar.");
-            return;
-        }
-
         clasificacionFieldset.style.display = "block";
         validacionExternoFieldset.style.display = "none";
 
@@ -116,10 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (seleccion === "Otros") {
                 otrosDetalle.style.display = "block";
-                otrosDetalle.required = true; // Obligatorio para "Otros"
             } else {
                 otrosDetalle.style.display = "none";
-                otrosDetalle.required = false;
             }
 
             // Mostrar botón "Continuar" al seleccionar cualquier clasificación
@@ -130,20 +123,10 @@ document.addEventListener("DOMContentLoaded", () => {
     // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
         const clasificacionSeleccionada = document.querySelector('input[name="clasificacion"]:checked');
-
-        if (!clasificacionSeleccionada) {
-            alert("Por favor selecciona una clasificación para continuar.");
-            return;
-        }
-
-        const clasificacion = clasificacionSeleccionada.value;
+        const clasificacion = clasificacionSeleccionada ? clasificacionSeleccionada.value : null;
         const detalleOtros = otrosDetalle.value.trim();
 
-        if (clasificacion === "Otros" && !detalleOtros) {
-            alert("Por favor describe la observación en el campo de texto.");
-            return;
-        }
-
+        // Guardar datos en Local Storage
         guardarEnLocalStorage("modulo3", {
             clasificacion,
             detalleOtros: clasificacion === "Otros" ? detalleOtros : null,
