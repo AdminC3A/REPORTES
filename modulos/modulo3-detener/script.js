@@ -1,11 +1,18 @@
 document.addEventListener("DOMContentLoaded", () => {
     let validCodes = []; // Base de datos de QR cargada
     let rolesYllaves = {}; // Base de datos de roles y llaves
-    const qrReaderContainer = document.getElementById("qr-reader");
-    const mensajeValidacion = document.getElementById("mensaje-validacion");
+    let qrReaderActive = false; // Control del lector QR
+    const html5QrCode = new Html5Qrcode("qr-reader"); // Instancia del lector QR
+
+    // Elementos del DOM
+    const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
     const validacionQRFieldset = document.getElementById("validacion-qr");
     const clasificacionFieldset = document.getElementById("clasificacion");
+    const validarLlaveButton = document.getElementById("validar-llave");
+    const validarQRButton = document.getElementById("validar-qr");
+    const mensajeValidacion = document.getElementById("mensaje-validacion");
+    const otrosDetalle = document.getElementById("otros-detalle");
     const nextButton = document.getElementById("next");
 
     // Cargar la base de datos de QR desde Local Storage
@@ -34,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // Mostrar campo según rol seleccionado
-    document.querySelectorAll('input[name="rol"]').forEach((radio) => {
+    rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
 
@@ -53,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Validar llave para roles internos
-    document.getElementById("validar-llave").addEventListener("click", () => {
+    validarLlaveButton.addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
         const rolSeleccionado = document.querySelector('input[name="rol"]:checked').value;
 
@@ -94,8 +101,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Lector QR para rol externo
-    const html5QrCode = new Html5Qrcode("qr-reader");
-
     function startQrReader() {
         html5QrCode
             .start(
@@ -118,7 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .catch((err) => console.error("Error al iniciar el lector QR:", err));
     }
 
-    document.getElementById("validar-qr").addEventListener("click", () => {
+    validarQRButton.addEventListener("click", () => {
         if (!qrReaderActive) {
             startQrReader();
             qrReaderActive = true;
