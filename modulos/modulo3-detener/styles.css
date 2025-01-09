@@ -1,16 +1,20 @@
+/* Estilo base */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
+    font-size: 1.75rem; /* Incremento del 75% */
+    line-height: 1.6; /* Mejora de legibilidad */
 }
 
 header {
     background-color: #4914db;
     color: #fff;
-    padding: 10px;
+    padding: 15px;
     text-align: center;
+    font-size: 2rem;
 }
 
 main {
@@ -23,29 +27,79 @@ fieldset {
     border: 1px solid #ccc;
     padding: 15px;
     margin-bottom: 20px;
+    font-size: 1.5rem; /* Incremento del 75% */
 }
 
 legend {
-    font-size: 1.2rem;
+    font-size: 1.8rem; /* Incremento del 75% */
     font-weight: bold;
 }
 
-.tooltip {
-    cursor: pointer;
-    font-weight: bold;
-    color: #4914db;
-    margin-left: 5px;
-}
-
-.tooltip:hover::after {
-    content: attr(data-tooltip);
+label {
+    font-size: 1.5rem; /* Ajuste para las etiquetas */
     display: block;
-    position: absolute;
-    background: #333;
+    margin-bottom: 10px;
+}
+
+canvas {
+    margin: 20px auto;
+    display: block;
+    width: 100%; /* Ajuste dinámico */
+    max-width: 300px; /* Limitar tamaño en móviles */
+}
+
+button {
+    background-color: #4914db;
     color: #fff;
-    padding: 5px;
+    border: none;
+    padding: 15px 20px;
+    font-size: 1.5rem; /* Incremento del 75% */
+    cursor: pointer;
     border-radius: 5px;
-    font-size: 0.8rem;
-    margin-top: 5px;
-    z-index: 100;
+    margin: 10px 0;
+    width: 100%; /* Botones ocupan todo el ancho */
+    box-sizing: border-box;
+}
+
+button:hover {
+    background-color: #3711a3;
+}
+
+.btn-container {
+    display: flex;
+    flex-direction: column; /* Botones apilados en móviles */
+    align-items: center;
+    gap: 15px; /* Espaciado entre botones */
+}
+
+#otros-detalle {
+    margin-top: 10px;
+    padding: 10px;
+    width: calc(100% - 20px);
+    font-size: 1.5rem; /* Incremento del 75% */
+}
+
+/* Media Query para pantallas pequeñas */
+@media screen and (max-width: 768px) {
+    body {
+        font-size: 1.5rem; /* Ajuste para dispositivos pequeños */
+    }
+
+    header {
+        font-size: 1.8rem;
+        padding: 10px;
+    }
+
+    fieldset {
+        font-size: 1.4rem;
+    }
+
+    button {
+        font-size: 1.4rem;
+        padding: 15px;
+    }
+
+    legend {
+        font-size: 1.6rem;
+    }
 }
