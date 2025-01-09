@@ -16,8 +16,12 @@ async function loadDatabase() {
 
         // Procesar el contenido del archivo CSV
         validCodes = csvText.split("\n").map(row => row.trim()).filter(code => code);
+
+        // Guardar la base de datos en Local Storage para otros módulos
+        localStorage.setItem("baseDeDatosQR", JSON.stringify(validCodes));
+        console.log("Base de datos cargada y guardada en Local Storage:", validCodes);
+
         document.getElementById("result").innerText = "Base de datos cargada correctamente.";
-        console.log("Base de datos cargada:", validCodes);
     } catch (error) {
         console.error("Error al cargar la base de datos:", error);
         document.getElementById("result").innerText = "Error al cargar la base de datos.";
