@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     let validCodes = []; // Base de datos de QR cargada desde Local Storage
-    let qrEscaneado = null;
+    let qrReaderActive = false; // Bandera para controlar el lector QR
 
     // Cargar la base de datos desde Local Storage
     function loadDatabaseFromCache() {
@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 validacionQRFieldset.style.display = "block";
                 validacionLlaveFieldset.style.display = "none";
                 clasificacionFieldset.style.display = "none";
-                qrEscaneado = null; // Resetear estado del QR
+                qrReaderActive = false; // Resetear estado del lector QR
             } else {
                 // Mostrar validación por llave
                 validacionQRFieldset.style.display = "none";
@@ -59,26 +59,35 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Escaneo QR al hacer clic en "Validar QR Externo"
     escanearQRButton.addEventListener("click", () => {
+        if (qrReaderActive) {
+            alert("El lector QR ya está activo.");
+            return;
+        }
+
         const html5QrCode = new Html5Qrcode("qr-reader"); // ID del contenedor
         const config = { fps: 10, qrbox: 250 };
+
+        qrReaderActive = true;
+        qrReaderContainer.style.display = "block";
 
         html5QrCode.start(
             { facingMode: "environment" }, // Cámara trasera
             config,
             (decodedText) => {
                 console.log(`QR escaneado: ${decodedText}`);
-                qrEscaneado = decodedText;
+                qrReaderActive = false; // Desactivar el lector
 
                 // Validar QR contra la base de datos
                 if (validCodes.includes(decodedText.trim())) {
                     alert("Código QR válido. Acceso concedido.");
                     guardarEnLocalStorage("modulo3", { rol: "Externo", qr: decodedText });
 
-                    // Mostrar mensaje y habilitar la siguiente sección
-                    clasificacionFieldset.style.display = "block";
-                    validacionQRFieldset.style.display = "none";
-
-                    html5QrCode.stop();
+                    // Ocultar el lector QR y habilitar la clasificación
+                    html5QrCode.stop().then(() => {
+                        qrReaderContainer.style.display = "none";
+                        clasificacionFieldset.style.display = "block";
+                        validacionQRFieldset.style.display = "none";
+                    });
                 } else {
                     alert("Código QR no válido. Intenta nuevamente.");
                 }
