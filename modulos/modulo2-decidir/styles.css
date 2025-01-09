@@ -1,10 +1,11 @@
+/* Estilo base */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
-    font-size: 1.75rem; /* Incremento del 75% */
+    font-size: 1.5rem;
 }
 
 header {
@@ -12,60 +13,86 @@ header {
     color: #fff;
     padding: 10px 0;
     text-align: center;
-    font-size: 2rem; /* Incremento del 75% */
+    font-size: 2rem;
 }
 
 main {
     padding: 20px;
     max-width: 600px;
     margin: auto;
-    font-size: 1.5rem; /* Incremento del 75% */
+    font-size: 1.5rem;
 }
 
 fieldset {
     border: 1px solid #ccc;
     padding: 15px;
     margin-bottom: 20px;
-    font-size: 1.4rem; /* Incremento del 75% */
+    font-size: 1.4rem;
 }
 
 legend {
-    font-size: 1.8rem; /* Incremento del 75% */
+    font-size: 1.6rem;
     font-weight: bold;
 }
 
 canvas {
     margin: 20px auto;
     display: block;
-    border-radius: 10px;
-    box-shadow: 0px 0px 5px #aaa;
+    width: 100%; /* Ajuste dinámico */
+    max-width: 300px; /* Limitar tamaño en móviles */
 }
 
+/* Estilo para los botones */
 button {
     background-color: #4914db;
     color: #fff;
     border: none;
-    padding: 15px 25px; /* Ajuste proporcional para mayor tamaño */
-    font-size: 1.75rem; /* Incremento del 75% */
+    padding: 15px 20px;
+    font-size: 1.2rem;
     cursor: pointer;
     border-radius: 5px;
-    margin: 5px;
+    margin: 10px 0;
+    width: 100%; /* Botones ocupan todo el ancho */
+    box-sizing: border-box;
 }
 
 button:hover {
     background-color: #3711a3;
 }
 
+/* Contenedor para los botones */
 .btn-container {
     display: flex;
-    justify-content: space-between;
-    margin-bottom: 15px;
-    font-size: 1.4rem; /* Incremento del 75% */
+    flex-direction: column; /* En móviles, los botones estarán apilados */
+    align-items: center;
+    gap: 10px; /* Espaciado entre botones */
 }
 
+/* Ajuste del detalle de "Otros" */
 #otros-detalle {
     margin-top: 10px;
-    padding: 10px; /* Ajustado proporcionalmente */
-    width: calc(100% - 24px); /* Ajuste para el padding */
-    font-size: 1.5rem; /* Incremento del 75% */
+    padding: 10px;
+    width: calc(100% - 20px);
+    font-size: 1.2rem;
+}
+
+/* Media Query para pantallas pequeñas */
+@media screen and (max-width: 768px) {
+    header {
+        font-size: 1.8rem; /* Reduce ligeramente el tamaño del título */
+        padding: 15px;
+    }
+
+    button {
+        font-size: 1.5rem; /* Botones más grandes en móviles */
+        padding: 20px 15px;
+    }
+
+    legend {
+        font-size: 1.5rem;
+    }
+
+    main {
+        padding: 15px;
+    }
 }
