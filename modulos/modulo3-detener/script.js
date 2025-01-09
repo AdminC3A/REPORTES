@@ -8,7 +8,10 @@ document.addEventListener("DOMContentLoaded", () => {
             rolesYllaves = data;
             console.log("Roles y llaves cargados:", rolesYllaves);
         })
-        .catch(error => console.error("Error al cargar roles y llaves:", error));
+        .catch(error => {
+            console.error("Error al cargar roles y llaves:", error);
+            alert("No se pudieron cargar los roles y llaves. Verifique la conexión.");
+        });
 
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
@@ -19,6 +22,14 @@ document.addEventListener("DOMContentLoaded", () => {
     const otrosDetalle = document.getElementById("otros-detalle");
     const otrosEjemplos = document.getElementById("otros-ejemplos");
     const nextButton = document.getElementById("next");
+
+    // Función para guardar en Local Storage
+    function guardarEnLocalStorage(modulo, datos) {
+        let reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+        reporte[modulo] = { ...reporte[modulo], ...datos };
+        localStorage.setItem("reporte", JSON.stringify(reporte));
+        console.log(`Datos del ${modulo} guardados:`, datos);
+    }
 
     // Mostrar el campo de validación de llave al seleccionar un rol
     rolRadios.forEach(radio => {
@@ -63,6 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log(`Llave válida para ${nombreSupervisor}`);
             clasificacionFieldset.style.display = "block";
             validacionLlaveFieldset.style.display = "none";
+            guardarEnLocalStorage("modulo3", { rol: rolSeleccionado, llave, supervisor: nombreSupervisor });
         } else {
             mensajeValidacion.style.display = "block";
             mensajeValidacion.innerText = "Llave no válida. Intenta nuevamente.";
@@ -107,6 +119,11 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        guardarEnLocalStorage("modulo3", {
+            clasificacion: seleccion.value,
+            detalleOtros: seleccion.value === "Otros" ? otrosDetalle.value.trim() : null
+        });
+
         // Redirigir al módulo 4
         window.location.href = "/modulos/modulo4-observar/index.html";
     });
@@ -118,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
             clasificacionFieldset.style.display = "block";
             validacionLlaveFieldset.style.display = "none";
             console.warn("Trabajando sin llave. Esto será registrado.");
+            guardarEnLocalStorage("modulo3", { sinLlave: true });
         }
     });
 });
