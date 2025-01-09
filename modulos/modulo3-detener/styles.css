@@ -103,38 +103,30 @@ button:hover {
         font-size: 1.6rem;
     }
 }
-.tooltip {
-    cursor: pointer;
-    border-bottom: 1px dashed #333;
-    color: #333;
-    position: relative;
+/* Ajustes para el campo de nombre */
+#nombre-externo {
+    width: 100%;
+    font-size: 16px;
+    padding: 10px;
+    margin-top: 10px;
 }
 
-.tooltip:hover::after,
-.tooltip:focus::after {
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tooltip:hover::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: -40px; /* Ajuste para no superponer */
-    left: 50%;
-    transform: translateX(-50%);
     background: #333;
     color: #fff;
     padding: 5px 10px;
     border-radius: 5px;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
     white-space: nowrap;
-    font-size: 0.9rem;
-    z-index: 10;
-    width: max-content;
-    max-width: 90vw; /* Limitar ancho del tooltip */
-    overflow-wrap: break-word;
-    text-align: center;
 }
-
-.tooltip:hover::after {
-    display: block;
-}
-
-.tooltip:focus::after {
-    display: block;
-}
-
