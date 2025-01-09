@@ -1,28 +1,31 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let rolesYllaves = {};
+    let validCodes = []; // Base de datos de QR cargada desde Local Storage
+    let qrEscaneado = null;
 
-    // Cargar roles y llaves desde JSON.
-    fetch('/data/roles.json')
-        .then(response => response.json())
-        .then(data => {
-            rolesYllaves = data;
-            console.log("Roles y llaves cargados:", rolesYllaves);
-        })
-        .catch(error => {
-            console.error("Error al cargar roles y llaves:", error);
-            alert("No se pudieron cargar los roles y llaves. Verifique la conexión.");
-        });
+    // Cargar la base de datos desde Local Storage
+    function loadDatabaseFromCache() {
+        const cachedData = localStorage.getItem("baseDeDatosQR");
+        if (cachedData) {
+            validCodes = JSON.parse(cachedData);
+            console.log("Base de datos cargada desde el cache:", validCodes);
+        } else {
+            console.error("No se encontró la base de datos en el cache.");
+            alert("No se encontró la base de datos. Asegúrate de haberla cargado en el Módulo 1.");
+        }
+    }
 
+    // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
+    const validacionQRFieldset = document.getElementById("validacion-qr");
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
     const clasificacionFieldset = document.getElementById("clasificacion");
-    const validarLlaveBtn = document.getElementById("validar-llave");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
-    const trabajarSinLlaveBtn = document.getElementById("trabajar-sin-llave");
     const otrosDetalle = document.getElementById("otros-detalle");
     const otrosEjemplos = document.getElementById("otros-ejemplos");
     const nextButton = document.getElementById("next");
-    const baseDeDatosQR = JSON.parse(localStorage.getItem("baseDeDatosQR"));
+    const escanearQRButton = document.getElementById("validar-qr");
+    const validarLlaveButton = document.getElementById("validar-llave");
+    const qrReaderContainer = document.getElementById("qr-reader");
 
     // Función para guardar en Local Storage
     function guardarEnLocalStorage(modulo, datos) {
@@ -32,16 +35,62 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log(`Datos del ${modulo} guardados:`, datos);
     }
 
-    // Mostrar el campo de validación de llave al seleccionar un rol
+    // Mostrar campos según el rol seleccionado
     rolRadios.forEach(radio => {
         radio.addEventListener("change", () => {
-            validacionLlaveFieldset.style.display = "block";
+            const rolSeleccionado = radio.value;
+
+            if (rolSeleccionado === "Externo") {
+                // Mostrar validación QR
+                validacionQRFieldset.style.display = "block";
+                validacionLlaveFieldset.style.display = "none";
+                clasificacionFieldset.style.display = "none";
+                qrEscaneado = null; // Resetear estado del QR
+            } else {
+                // Mostrar validación por llave
+                validacionQRFieldset.style.display = "none";
+                validacionLlaveFieldset.style.display = "block";
+                clasificacionFieldset.style.display = "none";
+            }
+
             mensajeValidacion.style.display = "none"; // Ocultar mensaje de error al cambiar de rol
         });
     });
 
-    // Validar la llave ingresada
-    validarLlaveBtn.addEventListener("click", () => {
+    // Escaneo QR al hacer clic en "Validar QR Externo"
+    escanearQRButton.addEventListener("click", () => {
+        const html5QrCode = new Html5Qrcode("qr-reader"); // ID del contenedor
+        const config = { fps: 10, qrbox: 250 };
+
+        html5QrCode.start(
+            { facingMode: "environment" }, // Cámara trasera
+            config,
+            (decodedText) => {
+                console.log(`QR escaneado: ${decodedText}`);
+                qrEscaneado = decodedText;
+
+                // Validar QR contra la base de datos
+                if (validCodes.includes(decodedText.trim())) {
+                    alert("Código QR válido. Acceso concedido.");
+                    guardarEnLocalStorage("modulo3", { rol: "Externo", qr: decodedText });
+
+                    // Mostrar mensaje y habilitar la siguiente sección
+                    clasificacionFieldset.style.display = "block";
+                    validacionQRFieldset.style.display = "none";
+
+                    html5QrCode.stop();
+                } else {
+                    alert("Código QR no válido. Intenta nuevamente.");
+                }
+            },
+            (error) => {
+                console.warn("Error al escanear QR:", error);
+            }
+        ).catch(error => console.error("Error al iniciar el escáner QR:", error));
+    });
+
+    // Validar llave para roles internos
+    validarLlaveButton.addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
         const rolSeleccionado = document.querySelector('input[name="rol"]:checked').value;
 
@@ -51,6 +100,7 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // Obtener supervisores según el rol
         let supervisores = {};
         if (rolSeleccionado === "Supervisor de Seguridad") {
             supervisores = rolesYllaves.supervisoresSeguridad.supervisores;
@@ -93,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 otrosEjemplos.style.display = "none";
             }
 
-            // Mostrar botón para continuar
             nextButton.style.display = "block";
         });
     });
@@ -109,34 +158,36 @@ document.addEventListener("DOMContentLoaded", () => {
     // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
         const seleccion = document.querySelector('input[name="clasificacion"]:checked');
+        let validacionOtros = true;
+
         if (!seleccion) {
             alert("Por favor selecciona una clasificación para continuar.");
             return;
         }
 
-        // Validar que si es "Otros", se haya ingresado un detalle
-        if (seleccion.value === "Otros" && !otrosDetalle.value.trim()) {
-            alert("Por favor describe la observación en el campo de texto.");
-            return;
+        if (seleccion.value === "Otros") {
+            const otrosTexto = otrosDetalle.value.trim();
+            if (!otrosTexto) {
+                validacionOtros = false;
+                alert("Por favor describe la observación en el campo de texto para continuar.");
+            } else {
+                guardarEnLocalStorage("modulo3", {
+                    clasificacion: "Otros",
+                    detalleOtros: otrosTexto
+                });
+            }
+        } else {
+            guardarEnLocalStorage("modulo3", {
+                clasificacion: seleccion.value
+            });
         }
 
-        guardarEnLocalStorage("modulo3", {
-            clasificacion: seleccion.value,
-            detalleOtros: seleccion.value === "Otros" ? otrosDetalle.value.trim() : null
-        });
-
-        // Redirigir al módulo 4
-        window.location.href = "/modulos/modulo4-observar/index.html";
-    });
-
-    // Permitir trabajar sin llave
-    trabajarSinLlaveBtn.addEventListener("click", () => {
-        const confirmar = confirm("¿Seguro que deseas trabajar sin llave? Esto será registrado en el reporte.");
-        if (confirmar) {
-            clasificacionFieldset.style.display = "block";
-            validacionLlaveFieldset.style.display = "none";
-            console.warn("Trabajando sin llave. Esto será registrado.");
-            guardarEnLocalStorage("modulo3", { sinLlave: true });
+        // Redirigir al siguiente módulo si la validación es correcta
+        if (validacionOtros) {
+            window.location.href = "/modulos/modulo4-observar/index.html";
         }
     });
+
+    // Inicializar la carga de la base de datos desde el cache
+    loadDatabaseFromCache();
 });
