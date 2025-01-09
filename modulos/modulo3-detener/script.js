@@ -4,11 +4,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Elementos del DOM
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
+    const validacionExternoFieldset = document.getElementById("validacion-externo");
     const clasificacionFieldset = document.getElementById("clasificacion");
     const validarLlaveButton = document.getElementById("validar-llave");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
     const nextButton = document.getElementById("next");
     const nombreExternoInput = document.getElementById("nombre-externo");
+    const telefonoExternoInput = document.getElementById("telefono-externo");
     const otrosDetalle = document.getElementById("otros-detalle");
 
     // Cargar roles y llaves desde el JSON
@@ -23,6 +25,27 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("No se pudieron cargar los roles y llaves. Verifica la conexión.");
         }
     }
+
+    // Mostrar el campo según el rol seleccionado
+    document.querySelectorAll('input[name="rol"]').forEach((radio) => {
+        radio.addEventListener("change", () => {
+            const rolSeleccionado = radio.value;
+
+            if (rolSeleccionado === "Externo") {
+                validacionLlaveFieldset.style.display = "none";
+                validacionExternoFieldset.style.display = "block";
+                clasificacionFieldset.style.display = "none";
+                nextButton.style.display = "none";
+            } else {
+                validacionLlaveFieldset.style.display = "block";
+                validacionExternoFieldset.style.display = "none";
+                clasificacionFieldset.style.display = "none";
+                nextButton.style.display = "none";
+            }
+
+            mensajeValidacion.style.display = "none";
+        });
+    });
 
     // Validar llave para roles internos
     validarLlaveButton.addEventListener("click", () => {
@@ -44,15 +67,9 @@ document.addEventListener("DOMContentLoaded", () => {
             supervisores = rolesYllaves.supervisoresObra.supervisores;
         } else if (rol === "Guardia en Turno") {
             supervisores = rolesYllaves.guardiasTurno.supervisores;
-        } else if (rol === "Externo") {
-            // Permitir avanzar directamente para externos
-            clasificacionFieldset.style.display = "block";
-            validacionLlaveFieldset.style.display = "none";
-            guardarEnLocalStorage("modulo3", { rol, nombreExterno: nombreExternoInput.value.trim() });
-            return;
         }
 
-        // Validar llave ingresada
+        // Validar la llave ingresada
         let llaveValida = false;
         let nombreSupervisor = "";
 
@@ -69,12 +86,27 @@ document.addEventListener("DOMContentLoaded", () => {
             clasificacionFieldset.style.display = "block";
             validacionLlaveFieldset.style.display = "none";
 
-            // Guardar datos en Local Storage
             guardarEnLocalStorage("modulo3", { rol, llave, supervisor: nombreSupervisor });
         } else {
             mensajeValidacion.style.display = "block";
             mensajeValidacion.innerText = "Llave no válida. Intenta nuevamente.";
         }
+    });
+
+    // Continuar con "Externo"
+    document.getElementById("continuar-externo").addEventListener("click", () => {
+        const nombre = nombreExternoInput.value.trim();
+        const telefono = telefonoExternoInput.value.trim();
+
+        if (!nombre || !telefono) {
+            alert("Por favor ingresa el nombre y el teléfono para continuar.");
+            return;
+        }
+
+        clasificacionFieldset.style.display = "block";
+        validacionExternoFieldset.style.display = "none";
+
+        guardarEnLocalStorage("modulo3", { rol: "Externo", nombreExterno: nombre, telefonoExterno: telefono });
     });
 
     // Mostrar campo de texto para "Otros"
