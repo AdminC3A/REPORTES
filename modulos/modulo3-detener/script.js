@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const otrosDetalle = document.getElementById("otros-detalle");
     const otrosEjemplos = document.getElementById("otros-ejemplos");
     const nextButton = document.getElementById("next");
+    const baseDeDatosQR = JSON.parse(localStorage.getItem("baseDeDatosQR"));
 
     // Función para guardar en Local Storage
     function guardarEnLocalStorage(modulo, datos) {
