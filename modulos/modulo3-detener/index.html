@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 3: Detener</title>
+    <title>Módulo 3: Validación</title>
     <!-- Vincular el archivo de estilos -->
     <link rel="stylesheet" href="/modulos/modulo3-detener/styles.css">
+    <!-- Librería QR -->
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
 </head>
 <body>
@@ -16,7 +17,6 @@
         <!-- Selección de Rol -->
         <fieldset>
             <legend>¿Quién está llenando el reporte?</legend>
-            <!-- Opciones de rol -->
             <div>
                 <input type="radio" id="supervisor-seguridad" name="rol" value="Supervisor de Seguridad">
                 <label for="supervisor-seguridad">Supervisor de Seguridad</label>
@@ -38,72 +38,52 @@
         <!-- Validación de Llave -->
         <fieldset id="validacion-llave" style="display: none;">
             <legend>Valida tu llave</legend>
-            <!-- Campo para ingresar la llave -->
             <input type="text" id="llave" placeholder="Ingresa tu llave única">
             <button id="validar-llave">Validar</button>
-            <!-- Mensaje de error -->
             <p id="mensaje-validacion" class="error" style="display: none;">Llave no válida. Intenta nuevamente.</p>
-            <!-- Botón para trabajar sin llave -->
-            <button id="trabajar-sin-llave" style="display: block;">Trabajar sin llave</button>
         </fieldset>
 
-        <!-- Validación de QR para Externos -->
+        <!-- Lector QR -->
         <fieldset id="validacion-qr" style="display: none;">
-            <legend>Valida tu acceso mediante QR</legend>
-            <div id="qr-reader" style="width: 300px; height: 300px; margin: 0 auto; display: none;"></div>
-            <button id="validar-qr" style="display: block;">Validar QR Externo</button>
-            <!-- Mensaje de validación QR -->
-            <p id="mensaje-validacion-qr" class="error" style="display: none;">QR no válido. Intenta nuevamente.</p>
+            <legend>Valida con QR</legend>
+            <div id="qr-reader" style="width: 300px; height: 300px; margin: 0 auto;"></div>
+            <p id="qr-status" style="text-align: center;"></p>
         </fieldset>
 
-        <!-- Clasificación de la Observación -->
+        <!-- Clasificación -->
         <fieldset id="clasificacion" style="display: none;">
             <legend>Clasificación de la Observación</legend>
             <div>
                 <label>
                     <input type="radio" name="clasificacion" value="Condición Insegura">
                     Condición Insegura
-                    <span class="tooltip" data-tooltip="Situaciones físicas del entorno que representan un riesgo para las personas.">?</span>
                 </label>
             </div>
             <div>
                 <label>
                     <input type="radio" name="clasificacion" value="Acto Inseguro">
                     Acto Inseguro
-                    <span class="tooltip" data-tooltip="Acciones humanas que ponen en riesgo la seguridad.">?</span>
                 </label>
             </div>
             <div>
                 <label>
                     <input type="radio" name="clasificacion" value="Falla Administrativa">
                     Falla Administrativa
-                    <span class="tooltip" data-tooltip="Errores en gestión o supervisión que afectan la seguridad.">?</span>
                 </label>
             </div>
             <div>
                 <label>
                     <input type="radio" name="clasificacion" value="Otros">
                     Otros
-                    <span class="tooltip" data-tooltip="Describe cualquier observación no incluida en las categorías anteriores.">?</span>
                 </label>
-                <!-- Campo de texto para describir "Otros" -->
-                <textarea id="otros-detalle" placeholder="Describe la observación..." style="display: none; width: 100%; margin-top: 10px;"></textarea>
-                <!-- Ejemplos interactivos para "Otros" -->
-                <ul id="otros-ejemplos" style="display: none; margin-top: 10px; list-style: none; padding: 0;">
-                    <li class="ejemplo-opcion" data-value="Conductas inapropiadas en area de trabajo.">Conductas inapropiadas en zonas críticas.</li>
-                    <li class="ejemplo-opcion" data-value="NO trae gaffete visible.">NO trae gaffete visible.</li>
-                    <li class="ejemplo-opcion" data-value="Desobediencia de órdenes de seguridad.">Desobediencia de órdenes de seguridad.</li>
-                    <li class="ejemplo-opcion" data-value="EPP incompleto.">EPP incompleto.</li>
-                    <li class="ejemplo-opcion" data-value="No tiene gaffete e ingreso a trabajar.">No tiene gaffete e ingreso a trabajar.</li>
-                </ul>
+                <textarea id="otros-detalle" placeholder="Describe la observación..." style="display: none; width: 100%;"></textarea>
             </div>
         </fieldset>
 
-        <!-- Botón para continuar al siguiente módulo -->
-        <button id="next" style="display: none;">Continuar al Siguiente Módulo</button>
+        <!-- Botón para continuar -->
+        <button id="next" style="display: none;">Continuar</button>
     </main>
 
-    <!-- Vincular el archivo JavaScript -->
-    <script src="script.js"></script>
+    <script src="/modulos/modulo3-detener/script.js"></script>
 </body>
 </html>
