@@ -4,6 +4,7 @@ body {
     padding: 0;
     background-color: #f4f4f4;
     color: #333;
+    font-size: 1.75rem; /* Incremento del 75% */
 }
 
 header {
@@ -11,22 +12,25 @@ header {
     color: #fff;
     padding: 10px 0;
     text-align: center;
+    font-size: 2rem; /* Incremento del 75% */
 }
 
 main {
     padding: 20px;
     max-width: 600px;
     margin: auto;
+    font-size: 1.5rem; /* Incremento del 75% */
 }
 
 fieldset {
     border: 1px solid #ccc;
     padding: 15px;
     margin-bottom: 20px;
+    font-size: 1.4rem; /* Incremento del 75% */
 }
 
 legend {
-    font-size: 1.2rem;
+    font-size: 1.8rem; /* Incremento del 75% */
     font-weight: bold;
 }
 
@@ -41,8 +45,8 @@ button {
     background-color: #4914db;
     color: #fff;
     border: none;
-    padding: 10px 20px;
-    font-size: 1rem;
+    padding: 15px 25px; /* Ajuste proporcional para mayor tamaño */
+    font-size: 1.75rem; /* Incremento del 75% */
     cursor: pointer;
     border-radius: 5px;
     margin: 5px;
@@ -56,10 +60,12 @@ button:hover {
     display: flex;
     justify-content: space-between;
     margin-bottom: 15px;
+    font-size: 1.4rem; /* Incremento del 75% */
 }
 
 #otros-detalle {
     margin-top: 10px;
-    padding: 5px;
-    width: calc(100% - 12px);
+    padding: 10px; /* Ajustado proporcionalmente */
+    width: calc(100% - 24px); /* Ajuste para el padding */
+    font-size: 1.5rem; /* Incremento del 75% */
 }
