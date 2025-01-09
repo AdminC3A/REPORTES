@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Continuar al siguiente módulo
+    // Continuar al siguiente módulo (sin validar)
     nextButton.addEventListener("click", () => {
         const clasificacionSeleccionada = document.querySelector('input[name="clasificacion"]:checked');
         const clasificacion = clasificacionSeleccionada ? clasificacionSeleccionada.value : null;
