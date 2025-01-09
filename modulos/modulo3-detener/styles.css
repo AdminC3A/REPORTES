@@ -104,33 +104,22 @@ button:hover {
     }
 }
 .tooltip {
-    position: relative;
-    display: inline-block;
     cursor: pointer;
-    color: #4914db;
-    font-weight: bold;
+    border-bottom: 1px dashed #333;
+    color: #333;
+    position: relative;
 }
 
-.tooltip .tooltip-text {
-    visibility: hidden;
-    width: 200px;
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 5px;
-    border-radius: 5px;
+.tooltip:hover::after {
+    content: attr(data-tooltip);
     position: absolute;
-    z-index: 1;
-    bottom: 125%; /* Aparece arriba del texto */
-    left: 50%;
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.3s;
+    bottom: -25px;
+    left: 0;
+    background: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    white-space: nowrap;
     font-size: 0.9rem;
+    z-index: 10;
 }
-
-.tooltip:hover .tooltip-text {
-    visibility: visible;
-    opacity: 1;
-}
-
