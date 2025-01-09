@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextButton = document.getElementById("next");
     const nombreExternoInput = document.getElementById("nombre-externo");
     const telefonoExternoInput = document.getElementById("telefono-externo");
+    const continuarExternoButton = document.getElementById("continuar-externo");
     const otrosDetalle = document.getElementById("otros-detalle");
 
     // Cargar roles y llaves desde el JSON
@@ -94,9 +95,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Continuar con "Externo"
-    document.getElementById("continuar-externo").addEventListener("click", () => {
+    continuarExternoButton.addEventListener("click", () => {
         const nombre = nombreExternoInput.value.trim();
         const telefono = telefonoExternoInput.value.trim();
+
+        if (!nombre || !telefono) {
+            alert("Por favor ingresa el nombre y el teléfono antes de continuar.");
+            return;
+        }
 
         clasificacionFieldset.style.display = "block";
         validacionExternoFieldset.style.display = "none";
