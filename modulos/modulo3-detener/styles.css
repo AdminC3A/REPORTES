@@ -110,11 +110,13 @@ button:hover {
     position: relative;
 }
 
-.tooltip:hover::after {
+.tooltip:hover::after,
+.tooltip:focus::after {
     content: attr(data-tooltip);
     position: absolute;
-    bottom: -25px;
-    left: 0;
+    bottom: -40px; /* Ajuste para no superponer */
+    left: 50%;
+    transform: translateX(-50%);
     background: #333;
     color: #fff;
     padding: 5px 10px;
@@ -122,4 +124,17 @@ button:hover {
     white-space: nowrap;
     font-size: 0.9rem;
     z-index: 10;
+    width: max-content;
+    max-width: 90vw; /* Limitar ancho del tooltip */
+    overflow-wrap: break-word;
+    text-align: center;
 }
+
+.tooltip:hover::after {
+    display: block;
+}
+
+.tooltip:focus::after {
+    display: block;
+}
+
