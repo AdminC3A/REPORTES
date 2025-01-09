@@ -1,31 +1,40 @@
 document.addEventListener("DOMContentLoaded", () => {
     let validCodes = []; // Base de datos de QR cargada
-    let qrReaderActive = false; // Control del lector QR
+    let rolesYllaves = {}; // Base de datos de roles y llaves
+    const qrReaderContainer = document.getElementById("qr-reader");
+    const mensajeValidacion = document.getElementById("mensaje-validacion");
+    const validacionLlaveFieldset = document.getElementById("validacion-llave");
+    const validacionQRFieldset = document.getElementById("validacion-qr");
+    const clasificacionFieldset = document.getElementById("clasificacion");
+    const nextButton = document.getElementById("next");
 
     // Cargar la base de datos de QR desde Local Storage
     function loadDatabaseFromCache() {
         const cachedData = localStorage.getItem("baseDeDatosQR");
         if (cachedData) {
             validCodes = JSON.parse(cachedData);
-            console.log("Base de datos cargada:", validCodes);
+            console.log("Base de datos de QR cargada:", validCodes);
         } else {
-            alert("No se encontró la base de datos. Asegúrate de haberla cargado en el Módulo 1.");
+            alert("No se encontró la base de datos de QR. Asegúrate de haberla cargado en el Módulo 1.");
         }
     }
 
-    // Elementos del DOM
-    const rolRadios = document.querySelectorAll('input[name="rol"]');
-    const validacionLlaveFieldset = document.getElementById("validacion-llave");
-    const validacionQRFieldset = document.getElementById("validacion-qr");
-    const clasificacionFieldset = document.getElementById("clasificacion");
-    const validarLlaveButton = document.getElementById("validar-llave");
-    const qrReaderContainer = document.getElementById("qr-reader");
-    const mensajeValidacion = document.getElementById("mensaje-validacion");
-    const otrosDetalle = document.getElementById("otros-detalle");
-    const nextButton = document.getElementById("next");
+    // Cargar la base de datos de roles y llaves
+    function loadRolesAndKeys() {
+        fetch("/data/roles.json")
+            .then((response) => response.json())
+            .then((data) => {
+                rolesYllaves = data;
+                console.log("Roles y llaves cargados:", rolesYllaves);
+            })
+            .catch((error) => {
+                console.error("Error al cargar roles y llaves:", error);
+                alert("No se pudieron cargar los roles y llaves. Verifique la conexión.");
+            });
+    }
 
-    // Mostrar campo según rol
-    rolRadios.forEach(radio => {
+    // Mostrar campo según rol seleccionado
+    document.querySelectorAll('input[name="rol"]').forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
 
@@ -43,46 +52,78 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Validar llave
-    validarLlaveButton.addEventListener("click", () => {
+    // Validar llave para roles internos
+    document.getElementById("validar-llave").addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
+        const rolSeleccionado = document.querySelector('input[name="rol"]:checked').value;
 
-        if (!llave) {
+        if (!llave || !rolSeleccionado) {
             mensajeValidacion.style.display = "block";
-            mensajeValidacion.innerText = "Por favor ingresa una llave.";
+            mensajeValidacion.innerText = "Por favor selecciona un rol y proporciona una llave.";
             return;
         }
 
-        // Simula una validación de llave
-        if (llave === "12345") {
+        let supervisores = {};
+        if (rolSeleccionado === "Supervisor de Seguridad") {
+            supervisores = rolesYllaves.supervisoresSeguridad.supervisores;
+        } else if (rolSeleccionado === "Supervisor de Obra") {
+            supervisores = rolesYllaves.supervisoresObra.supervisores;
+        } else if (rolSeleccionado === "Guardia en Turno") {
+            supervisores = rolesYllaves.guardiasTurno.supervisores;
+        }
+
+        // Validar la llave ingresada
+        let llaveValida = false;
+        let nombreSupervisor = "";
+
+        Object.entries(supervisores).forEach(([nombre, llaves]) => {
+            if (llaves.includes(llave)) {
+                llaveValida = true;
+                nombreSupervisor = nombre;
+            }
+        });
+
+        if (llaveValida) {
+            console.log(`Llave válida para ${nombreSupervisor}`);
             clasificacionFieldset.style.display = "block";
             validacionLlaveFieldset.style.display = "none";
         } else {
             mensajeValidacion.style.display = "block";
-            mensajeValidacion.innerText = "Llave no válida.";
+            mensajeValidacion.innerText = "Llave no válida. Intenta nuevamente.";
         }
     });
 
-    // Lector QR
+    // Lector QR para rol externo
     const html5QrCode = new Html5Qrcode("qr-reader");
 
-    html5QrCode.start(
-        { facingMode: "environment" },
-        { fps: 10, qrbox: 250 },
-        (decodedText) => {
-            if (validCodes.includes(decodedText.trim())) {
-                alert("Código QR válido. Acceso concedido.");
-                clasificacionFieldset.style.display = "block";
-                validacionQRFieldset.style.display = "none";
-                html5QrCode.stop();
-            } else {
-                alert("Código QR no válido. Intenta nuevamente.");
-            }
-        },
-        (errorMessage) => {
-            console.error("Error al escanear QR:", errorMessage);
+    function startQrReader() {
+        html5QrCode
+            .start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    if (validCodes.includes(decodedText.trim())) {
+                        alert("Código QR válido. Acceso concedido.");
+                        clasificacionFieldset.style.display = "block";
+                        validacionQRFieldset.style.display = "none";
+                        html5QrCode.stop();
+                    } else {
+                        alert("Código QR no válido. Intenta nuevamente.");
+                    }
+                },
+                (errorMessage) => {
+                    console.error("Error al escanear QR:", errorMessage);
+                }
+            )
+            .catch((err) => console.error("Error al iniciar el lector QR:", err));
+    }
+
+    document.getElementById("validar-qr").addEventListener("click", () => {
+        if (!qrReaderActive) {
+            startQrReader();
+            qrReaderActive = true;
         }
-    ).catch((err) => console.error("Error al iniciar el lector QR:", err));
+    });
 
     // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
@@ -91,4 +132,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Inicialización
     loadDatabaseFromCache();
+    loadRolesAndKeys();
 });
