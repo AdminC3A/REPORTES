@@ -79,6 +79,38 @@ button:hover {
     font-size: 1.5rem; /* Incremento del 75% */
 }
 
+/* Ajustes para el campo de nombre */
+#nombre-externo {
+    width: 100%;
+    font-size: 1.5rem;
+    padding: 12px;
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    background: #333;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 5px;
+    top: calc(100% + 5px); /* Mejor separación */
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: normal; /* Permitir ajuste de línea */
+    max-width: 250px; /* Ajustar ancho máximo */
+    z-index: 1000;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3); /* Añadir sombra */
+}
+
 /* Media Query para pantallas pequeñas */
 @media screen and (max-width: 768px) {
     body {
@@ -102,31 +134,9 @@ button:hover {
     legend {
         font-size: 1.6rem;
     }
-}
-/* Ajustes para el campo de nombre */
-#nombre-externo {
-    width: 100%;
-    font-size: 16px;
-    padding: 10px;
-    margin-top: 10px;
-}
 
-/* Tooltips */
-.tooltip {
-    position: relative;
-    display: inline-block;
-    cursor: pointer;
-}
-
-.tooltip:hover::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    background: #333;
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    white-space: nowrap;
+    .tooltip:hover::after {
+        font-size: 1.2rem; /* Ajuste para texto más pequeño */
+        max-width: 200px; /* Reducir el ancho */
+    }
 }
