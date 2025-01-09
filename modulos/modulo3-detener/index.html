@@ -1,89 +1,37 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 3: Validación</title>
-    <!-- Vincular el archivo de estilos -->
-    <link rel="stylesheet" href="/modulos/modulo3-detener/styles.css">
-    <!-- Librería QR -->
-    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode/minified/html5-qrcode.min.js"></script>
-</head>
-<body>
-    <header>
-        <h1>Módulo 3: Validación</h1>
-    </header>
-    <main>
-        <!-- Selección de Rol -->
-        <fieldset>
-            <legend>¿Quién está llenando el reporte?</legend>
-            <div>
-                <input type="radio" id="supervisor-seguridad" name="rol" value="Supervisor de Seguridad">
-                <label for="supervisor-seguridad">Supervisor de Seguridad</label>
-            </div>
-            <div>
-                <input type="radio" id="supervisor-obra" name="rol" value="Supervisor de Obra">
-                <label for="supervisor-obra">Supervisor de Obra</label>
-            </div>
-            <div>
-                <input type="radio" id="guardia-turno" name="rol" value="Guardia en Turno">
-                <label for="guardia-turno">Guardia en Turno</label>
-            </div>
-            <div>
-                <input type="radio" id="externo" name="rol" value="Externo">
-                <label for="externo">Externo</label>
-            </div>
-        </fieldset>
-
-        <!-- Validación de Llave -->
-        <fieldset id="validacion-llave" style="display: none;">
-            <legend>Valida tu llave</legend>
-            <input type="text" id="llave" placeholder="Ingresa tu llave única">
-            <button id="validar-llave">Validar</button>
-            <p id="mensaje-validacion" class="error" style="display: none;">Llave no válida. Intenta nuevamente.</p>
-        </fieldset>
-
-        <!-- Lector QR -->
-        <fieldset id="validacion-qr" style="display: none;">
-            <legend>Valida con QR</legend>
-            <div id="qr-reader" style="width: 300px; height: 300px; margin: 0 auto;"></div>
-            <p id="qr-status" style="text-align: center;"></p>
-        </fieldset>
-
-        <!-- Clasificación -->
-        <fieldset id="clasificacion" style="display: none;">
-            <legend>Clasificación de la Observación</legend>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Condición Insegura">
-                    Condición Insegura
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Acto Inseguro">
-                    Acto Inseguro
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Falla Administrativa">
-                    Falla Administrativa
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Otros">
-                    Otros
-                </label>
-                <textarea id="otros-detalle" placeholder="Describe la observación..." style="display: none; width: 100%;"></textarea>
-            </div>
-        </fieldset>
-
-        <!-- Botón para continuar -->
-        <button id="next" style="display: none;">Continuar</button>
-    </main>
-
-    <script src="/modulos/modulo3-detener/script.js"></script>
-</body>
-</html>
+<!-- Clasificación -->
+<fieldset id="clasificacion" style="display: none;">
+    <legend>Clasificación de la Observación</legend>
+    <div>
+        <label>
+            <input type="radio" name="clasificacion" value="Condición Insegura">
+            Condición Insegura
+        </label>
+    </div>
+    <div>
+        <label>
+            <input type="radio" name="clasificacion" value="Acto Inseguro">
+            Acto Inseguro
+        </label>
+    </div>
+    <div>
+        <label>
+            <input type="radio" name="clasificacion" value="Falla Administrativa">
+            Falla Administrativa
+        </label>
+    </div>
+    <div>
+        <label>
+            <input type="radio" name="clasificacion" value="Otros">
+            Otros
+        </label>
+        <!-- Campo de texto para describir "Otros" -->
+        <textarea id="otros-detalle" placeholder="Describe la observación..." style="display: none;"></textarea>
+        <!-- Ejemplos interactivos para "Otros" -->
+        <ul id="otros-ejemplos" style="display: none; margin-top: 10px; list-style: none; padding: 0;">
+            <li class="ejemplo-opcion" data-value="Falta de EPP.">Falta de EPP.</li>
+            <li class="ejemplo-opcion" data-value="Comportamiento inapropiado.">Comportamiento inapropiado.</li>
+            <li class="ejemplo-opcion" data-value="Ingreso no autorizado.">Ingreso no autorizado.</li>
+            <li class="ejemplo-opcion" data-value="Uso indebido de herramientas.">Uso indebido de herramientas.</li>
+        </ul>
+    </div>
+</fieldset>
