@@ -12,32 +12,37 @@ document.addEventListener("DOMContentLoaded", () => {
     const validarLlaveButton = document.getElementById("validar-llave");
     const validarQRButton = document.getElementById("validar-qr");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
-    const otrosDetalle = document.getElementById("otros-detalle");
     const nextButton = document.getElementById("next");
 
-    // Cargar la base de datos de QR desde Local Storage
-    function loadDatabaseFromCache() {
-        const cachedData = localStorage.getItem("baseDeDatosQR");
-        if (cachedData) {
-            validCodes = JSON.parse(cachedData);
-            console.log("Base de datos de QR cargada:", validCodes);
-        } else {
-            alert("No se encontró la base de datos de QR. Asegúrate de haberla cargado en el Módulo 1.");
+    // Cargar la base de datos QR
+    async function loadDatabase() {
+        try {
+            const response = await fetch("https://raw.githubusercontent.com/AdminC3A/QRElemento/main/data/base_de_datos.csv");
+            const csvText = await response.text();
+
+            // Procesar el contenido del archivo CSV
+            validCodes = csvText.split("\n").map(row => row.trim()).filter(code => code);
+
+            // Guardar la base de datos en Local Storage
+            localStorage.setItem("baseDeDatosQR", JSON.stringify(validCodes));
+            console.log("Base de datos cargada y guardada en Local Storage:", validCodes);
+        } catch (error) {
+            console.error("Error al cargar la base de datos:", error);
+            alert("Error al cargar la base de datos. Verifica la conexión.");
         }
     }
 
     // Cargar la base de datos de roles y llaves
-    function loadRolesAndKeys() {
-        fetch("/data/roles.json")
-            .then((response) => response.json())
-            .then((data) => {
-                rolesYllaves = data;
-                console.log("Roles y llaves cargados:", rolesYllaves);
-            })
-            .catch((error) => {
-                console.error("Error al cargar roles y llaves:", error);
-                alert("No se pudieron cargar los roles y llaves. Verifique la conexión.");
-            });
+    async function loadRolesAndKeys() {
+        try {
+            const response = await fetch("/data/roles.json");
+            if (!response.ok) throw new Error("Error al cargar roles.json");
+            rolesYllaves = await response.json();
+            console.log("Roles y llaves cargados:", rolesYllaves);
+        } catch (error) {
+            console.error("Error al cargar roles y llaves:", error);
+            alert("No se pudieron cargar los roles y llaves. Verifica la conexión y el archivo roles.json.");
+        }
     }
 
     // Mostrar campo según rol seleccionado
@@ -117,7 +122,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 },
                 (errorMessage) => {
-                    console.error("Error al escanear QR:", errorMessage);
+                    console.warn("Error al escanear QR:", errorMessage);
                 }
             )
             .catch((err) => console.error("Error al iniciar el lector QR:", err));
@@ -136,6 +141,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Inicialización
-    loadDatabaseFromCache();
+    loadDatabase();
     loadRolesAndKeys();
 });
