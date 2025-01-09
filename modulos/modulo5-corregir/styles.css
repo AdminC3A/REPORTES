@@ -1,18 +1,29 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
+/* styles.css */
+
+/* Botones */
+button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
 }
 
-header {
-    background-color: #4914db;
-    color: #fff;
-    padding: 10px 0;
-    text-align: center;
+button#btn-corregir {
+    background-color: #28a745;
 }
 
-main {
-    padding: 20px;
+button#btn-corregir:hover {
+    background-color: #218838;
+}
+
+button#btn-retroalimentar {
+    background-color: #dc3545;
+}
+
+button#btn-retroalimentar:hover {
+    background-color: #c82333;
 }
