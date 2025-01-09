@@ -126,7 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Continuar al siguiente módulo (sin validar)
+    // Continuar al siguiente módulo (siempre a módulo 4)
     nextButton.addEventListener("click", () => {
         const clasificacionSeleccionada = document.querySelector('input[name="clasificacion"]:checked');
         const clasificacion = clasificacionSeleccionada ? clasificacionSeleccionada.value : null;
@@ -138,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
             detalleOtros: clasificacion === "Otros" ? detalleOtros : null,
         });
 
-        // Redirigir al siguiente módulo
+        // Redirigir al módulo 4
         window.location.href = "/modulos/modulo4-observar/index.html";
     });
 
