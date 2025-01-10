@@ -30,9 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
+
+            // Guardar selección de rol en Local Storage
             datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, rolSeleccionado };
             localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
 
+            // Mostrar u ocultar secciones basadas en el rol seleccionado
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.classList.add("hidden");
                 validacionNombreFieldset.classList.remove("hidden");
@@ -70,6 +73,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (llaveValida) {
                 mensajeValidacionLlave.classList.add("hidden");
+
+                // Guardar llave en Local Storage
+                datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, llave };
+                localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+
                 alert("Llave válida.");
                 nextButton.classList.remove("hidden");
             } else {
@@ -79,8 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
             alert("Rol no encontrado en roles.json.");
         }
-
-        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
     });
 
     // Validar y continuar al siguiente módulo
@@ -97,6 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Guardar datos de "Externo" en Local Storage
             datosAcumulados.modulo3 = {
                 ...datosAcumulados.modulo3,
                 nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
@@ -109,7 +116,10 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
+        // Guardar datos acumulados en Local Storage
         localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+        console.log("Datos guardados en módulo 3:", datosAcumulados);
+
         window.location.href = "/modulos/modulo4-observar/";
     });
 
