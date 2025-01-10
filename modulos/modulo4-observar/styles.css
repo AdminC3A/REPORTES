@@ -2,7 +2,7 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #f9f9f9;
     color: #333;
 }
 
@@ -10,7 +10,8 @@ header {
     background-color: #4914db;
     color: #fff;
     text-align: center;
-    padding: 15px;
+    padding: 20px 0;
+    font-size: 2rem;
 }
 
 main {
@@ -26,15 +27,34 @@ h1, h2 {
     text-align: center;
 }
 
+.modulo {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background: #f7f7f7;
+}
+
+.modulo h3 {
+    margin-top: 0;
+    color: #4914db;
+}
+
 ul {
     list-style: none;
     padding: 0;
 }
 
 ul li {
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.imagen-reporte {
+    display: block;
     margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ddd;
+    max-width: 100%;
+    border: 1px solid #ccc;
     border-radius: 5px;
 }
 
@@ -46,7 +66,7 @@ button {
     color: #fff;
     border: none;
     border-radius: 5px;
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     cursor: pointer;
 }
 
