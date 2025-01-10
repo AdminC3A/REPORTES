@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const clasificacionFieldset = document.getElementById("clasificacion");
     const observacionesFieldset = document.getElementById("observaciones-adicionales");
     const nextButton = document.getElementById("next");
+    const mensajeValidacion = document.getElementById("mensaje-validacion");
+
+    let llaveValida = false;
 
     // Mostrar campos según el rol seleccionado
     rolRadios.forEach((radio) => {
@@ -17,22 +20,53 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
 
             if (rolSeleccionado === "Externo") {
-                // Mostrar ambos campos para "Externo"
+                // Mostrar campos de nombre y teléfono para "Externo"
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
 
-                // Reiniciar campos de "Externo"
+                // Reiniciar valores
                 document.getElementById("nombre-externo").value = "";
                 document.getElementById("telefono-externo").value = "";
+                llaveValida = true; // No requiere llave
             } else {
                 // Mostrar validación de llave para otros roles
                 validacionLlaveFieldset.style.display = "block";
                 validacionNombreFieldset.style.display = "none";
+                llaveValida = false; // Requiere validación de llave
             }
 
             clasificacionFieldset.style.display = "none";
             observacionesFieldset.style.display = "none";
         });
+    });
+
+    // Validar llave
+    document.getElementById("validar-llave").addEventListener("click", () => {
+        const llave = document.getElementById("llave").value.trim();
+        if (!llave) {
+            alert("Por favor, ingresa una llave.");
+            return;
+        }
+
+        // Lógica de validación de llave (reemplazar con lógica real)
+        const supervisores = {
+            "1234": "Empleado 1",
+            "5678": "Empleado 2",
+            "abcd": "Empleado 3"
+        };
+
+        if (supervisores[llave]) {
+            alert(`Llave válida. Identificado: ${supervisores[llave]}`);
+            datosAcumulados.llave = llave;
+            datosAcumulados.nombreEmpleado = supervisores[llave];
+            llaveValida = true;
+            clasificacionFieldset.style.display = "block";
+        } else {
+            alert("Llave no válida. Intenta nuevamente.");
+            llaveValida = false;
+        }
+
+        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
     });
 
     // Continuar al siguiente módulo
@@ -44,14 +78,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const telefono = document.getElementById("telefono-externo").value.trim();
 
             if (!nombre && !telefono) {
-                alert("Por favor, ingresa al menos el nombre o el teléfono antes de avanzar.");
+                mensajeValidacion.style.display = "block";
+                mensajeValidacion.textContent = "Por favor ingresa al menos tu nombre o teléfono.";
                 return;
             }
 
             if (nombre) datosAcumulados.nombreExterno = nombre;
             if (telefono) datosAcumulados.telefonoExterno = telefono;
         } else {
-            if (!datosAcumulados.llave) {
+            if (!llaveValida) {
                 alert("Por favor, valida la llave antes de continuar.");
                 return;
             }
