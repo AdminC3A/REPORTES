@@ -1,6 +1,13 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
+
+    // Limpia solo los datos del módulo 3 en Local Storage
     let datosAcumulados = JSON.parse(localStorage.getItem("reporte")) || {};
+    if (datosAcumulados.modulo3) {
+        delete datosAcumulados.modulo3; // Eliminar datos del módulo 3
+        localStorage.setItem("reporte", JSON.stringify(datosAcumulados)); // Actualizar almacenamiento
+        console.log("Datos del módulo 3 eliminados.");
+    }
 
     // Referencias al DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
