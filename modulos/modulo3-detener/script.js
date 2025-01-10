@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
-    let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {};
+    let datosAcumulados = JSON.parse(localStorage.getItem("reporte")) || {};
 
     // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
@@ -33,20 +33,18 @@ document.addEventListener("DOMContentLoaded", () => {
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
-            datosAcumulados.rolSeleccionado = rolSeleccionado;
-            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                rolSeleccionado: rolSeleccionado,
+            };
+            localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+            console.log("Rol seleccionado guardado:", rolSeleccionado);
 
             if (rolSeleccionado === "Externo") {
-                // Mostrar campos de nombre y teléfono para "Externo"
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
-
-                // Reiniciar valores
-                document.getElementById("nombre-externo").value = "";
-                document.getElementById("telefono-externo").value = "";
                 llaveValida = true; // Externos no requieren validación de llave
             } else {
-                // Mostrar validación de llave para otros roles
                 validacionLlaveFieldset.style.display = "block";
                 validacionNombreFieldset.style.display = "none";
                 llaveValida = false; // Requieren validación de llave
@@ -60,20 +58,18 @@ document.addEventListener("DOMContentLoaded", () => {
     // Validar llave
     document.getElementById("validar-llave").addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
-        const rolSeleccionado = datosAcumulados.rolSeleccionado;
+        const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
 
         if (!llave) {
             alert("Por favor, ingresa una llave.");
             return;
         }
 
-        // Buscar el rol seleccionado en roles.json
         const rolKey = Object.keys(rolesYllaves).find(
             (key) => rolesYllaves[key].rol === rolSeleccionado
         );
 
         if (rolKey) {
-            // Buscar llave en los supervisores del rol seleccionado
             const supervisores = rolesYllaves[rolKey]?.supervisores || {};
             llaveValida = Object.entries(supervisores).some(([nombre, llaves]) =>
                 llaves.includes(llave)
@@ -81,7 +77,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (llaveValida) {
                 alert("Llave válida.");
-                datosAcumulados.llave = llave;
+                datosAcumulados.modulo3 = {
+                    ...datosAcumulados.modulo3,
+                    llave: llave,
+                };
                 clasificacionFieldset.style.display = "block";
             } else {
                 alert("Llave no válida. Intenta nuevamente.");
@@ -90,38 +89,35 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Rol no encontrado en roles.json.");
         }
 
-        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
     });
 
     // Manejar selección de clasificación
     clasificacionRadios.forEach((radio) => {
         radio.addEventListener("change", (e) => {
             const clasificacion = e.target.value;
-            datosAcumulados.clasificacionSeleccionada = clasificacion;
-            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                clasificacionSeleccionada: clasificacion,
+            };
+            localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
 
-            // Mostrar campos según la selección
             if (clasificacion === "Otros") {
-                // Mostrar descripción (obligatoria)
                 descripcionFieldset.style.display = "block";
                 observacionesFieldset.style.display = "none";
-                descripcionTexto.required = true; // Hacer obligatorio
-                observacionesTexto.required = false; // Quitar obligatoriedad
+                descripcionTexto.required = true;
             } else {
-                // Mostrar observaciones adicionales (opcional)
                 descripcionFieldset.style.display = "none";
                 observacionesFieldset.style.display = "block";
-                descripcionTexto.required = false; // Quitar obligatoriedad
-                observacionesTexto.required = false; // Sigue siendo opcional
+                descripcionTexto.required = false;
             }
         });
     });
 
-    // Validar campos antes de avanzar
+    // Validar y continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
-        const rolSeleccionado = datosAcumulados.rolSeleccionado;
+        const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
 
-        // Validar "Externo" con nombre o teléfono
         if (rolSeleccionado === "Externo") {
             const nombre = document.getElementById("nombre-externo").value.trim();
             const telefono = document.getElementById("telefono-externo").value.trim();
@@ -132,8 +128,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            if (nombre) datosAcumulados.nombreExterno = nombre;
-            if (telefono) datosAcumulados.telefonoExterno = telefono;
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
+                telefonoExterno: telefono || datosAcumulados.modulo3?.telefonoExterno,
+            };
         } else {
             if (!llaveValida) {
                 alert("Por favor, valida la llave antes de continuar.");
@@ -141,30 +140,31 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        // Validar descripción si es visible y requerida
         if (descripcionFieldset.style.display === "block" && !descripcionTexto.value.trim()) {
             alert("Por favor, completa la descripción.");
-            descripcionTexto.focus();
             return;
         }
 
-        // Guardar observaciones o descripción según el caso
-        if (observacionesFieldset.style.display === "block" && observacionesTexto.value.trim()) {
-            datosAcumulados.observacionesAdicionales = observacionesTexto.value.trim();
+        if (descripcionFieldset.style.display === "block") {
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                descripcion: descripcionTexto.value.trim(),
+            };
         }
 
-        if (descripcionFieldset.style.display === "block" && descripcionTexto.value.trim()) {
-            datosAcumulados.descripcion = descripcionTexto.value.trim();
+        if (observacionesFieldset.style.display === "block") {
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                observacionesAdicionales: observacionesTexto.value.trim(),
+            };
         }
 
-        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-        console.log("Datos acumulados:", datosAcumulados);
+        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+        console.log("Datos acumulados en módulo 3:", datosAcumulados);
 
-        // Redirigir al siguiente módulo
         window.location.href = "/modulos/modulo4-observar/";
     });
 
-    // Inicializar el estado
     loadRolesAndKeys();
     nextButton.style.display = "block";
 });
