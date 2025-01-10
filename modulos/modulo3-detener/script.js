@@ -8,8 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const validacionNombreFieldset = document.getElementById("validacion-nombre");
     const nextButton = document.getElementById("next");
     const llaveInput = document.getElementById("llave");
-    const mensajeValidacionLlave = document.getElementById("mensaje-validacion");
-    const mensajeValidacionNombre = document.getElementById("mensaje-validacion-nombre");
+    const validacionMensaje = document.createElement("p");
+    validacionMensaje.className = "error hidden";
+    validacionLlaveFieldset.appendChild(validacionMensaje);
 
     let llaveValida = false;
 
@@ -52,9 +53,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 llaveValida = false; // Requiere validación de llave
             }
 
-            // Ocultar mensaje de error al cambiar de rol
-            mensajeValidacionLlave.classList.add("hidden");
-            mensajeValidacionLlave.textContent = "";
+            validacionMensaje.classList.add("hidden");
+            validacionMensaje.textContent = "";
             nextButton.classList.add("hidden");
         });
     });
@@ -65,8 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
 
         if (!llave) {
-            mensajeValidacionLlave.textContent = "Por favor, ingresa una llave.";
-            mensajeValidacionLlave.classList.remove("hidden");
+            validacionMensaje.textContent = "Por favor, ingresa una llave.";
+            validacionMensaje.classList.remove("hidden");
             return;
         }
 
@@ -81,8 +81,8 @@ document.addEventListener("DOMContentLoaded", () => {
             );
 
             if (llaveValida) {
-                mensajeValidacionLlave.classList.add("hidden");
-                mensajeValidacionLlave.textContent = "";
+                validacionMensaje.classList.add("hidden");
+                validacionMensaje.textContent = "";
 
                 // Guardar llave en Local Storage
                 datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, llave };
@@ -91,8 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("Llave válida.");
                 nextButton.classList.remove("hidden");
             } else {
-                mensajeValidacionLlave.textContent = "Llave no válida. Intenta nuevamente.";
-                mensajeValidacionLlave.classList.remove("hidden");
+                validacionMensaje.textContent = "Llave no válida.";
+                validacionMensaje.classList.remove("hidden");
             }
         } else {
             alert("Rol no encontrado en roles.json.");
@@ -108,8 +108,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const telefono = document.getElementById("telefono-externo").value.trim();
 
             if (!nombre && !telefono) {
-                mensajeValidacionNombre.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
-                mensajeValidacionNombre.classList.remove("hidden");
+                const mensajeNombre = document.getElementById("mensaje-validacion-nombre");
+                mensajeNombre.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
+                mensajeNombre.classList.remove("hidden");
                 return;
             }
 
@@ -119,11 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
                 telefonoExterno: telefono || datosAcumulados.modulo3?.telefonoExterno,
             };
-        }
-
-        if (!llaveValida && rolSeleccionado !== "Externo") {
-            alert("Por favor, valida la llave antes de continuar.");
-            return;
+        } else {
+            if (!llaveValida) {
+                alert("Por favor, valida la llave antes de continuar.");
+                return;
+            }
         }
 
         // Guardar datos acumulados en Local Storage
