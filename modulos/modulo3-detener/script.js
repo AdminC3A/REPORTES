@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const clasificacionFieldset = document.getElementById("clasificacion");
     const observacionesFieldset = document.getElementById("observaciones-adicionales");
     const nextButton = document.getElementById("next");
+    const mensajeValidacion = document.getElementById("mensaje-validacion");
 
     // Cargar roles y llaves desde JSON
     async function loadRolesAndKeys() {
@@ -34,6 +35,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
+
+                // Asegurar que ambos campos sean visibles para Externo
                 document.getElementById("nombre-externo").value = ""; // Reiniciar el campo
                 document.getElementById("telefono-externo").value = ""; // Reiniciar el teléfono
             } else {
@@ -58,7 +61,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const rolKey = `${rolSeleccionado.toLowerCase().replace(/ /g, "")}`; // Convertir el rol a la clave correspondiente en JSON
         const supervisores = rolesYllaves[rolKey]?.supervisores || {}; // Obtener los supervisores para el rol seleccionado
-        console.log("Supervisores para validación:", supervisores);
 
         let llaveValida = false;
 
@@ -82,13 +84,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const telefono = document.getElementById("telefono-externo").value.trim();
 
         if (!nombre || !telefono) {
-            alert("Por favor, completa el nombre y el teléfono.");
+            mensajeValidacion.style.display = "block";
+            mensajeValidacion.textContent = "Por favor, completa el nombre y el teléfono.";
             return;
         }
 
         datosAcumulados.nombreExterno = nombre;
         datosAcumulados.telefonoExterno = telefono;
         localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+        mensajeValidacion.style.display = "none";
         clasificacionFieldset.style.display = "block";
     });
 
