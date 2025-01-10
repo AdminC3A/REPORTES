@@ -95,14 +95,15 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
 });
 
 // Mostrar campo adicional si se selecciona "Otros"
-document.querySelectorAll('input[name="riesgo"]').forEach((input) => {
-    input.addEventListener("change", function () {
-        if (this.id === "otros" && this.checked) {
-            otrosDetalleInput.style.display = "block"; // Mostrar campo "Otros"
-        } else if (this.id === "otros" && !this.checked) {
-            otrosDetalleInput.style.display = "none"; // Ocultar campo "Otros"
-        }
-    });
+document.getElementById("otros").addEventListener("change", function () {
+    const otrosDetalleContainer = document.getElementById("otros-detalle-container");
+
+    if (this.checked) {
+        otrosDetalleContainer.style.display = "block"; // Mostrar campo "Otros"
+    } else {
+        otrosDetalleContainer.style.display = "none"; // Ocultar campo "Otros"
+        document.getElementById("otros-detalle").value = ""; // Limpiar el valor
+    }
 });
 
 // Validar y continuar al siguiente módulo
