@@ -1,29 +1,55 @@
-/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
 
-/* Botones */
+header {
+    background-color: #4914db;
+    color: #fff;
+    text-align: center;
+    padding: 15px;
+}
+
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+h1, h2 {
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
 button {
-    margin: 10px;
-    padding: 10px 20px;
-    font-size: 16px;
-    color: white;
+    display: block;
+    margin: 20px auto;
+    padding: 15px 20px;
+    background-color: #4914db;
+    color: #fff;
     border: none;
     border-radius: 5px;
+    font-size: 1.2rem;
     cursor: pointer;
-    transition: background-color 0.3s;
 }
 
-button#btn-corregir {
-    background-color: #28a745;
-}
-
-button#btn-corregir:hover {
-    background-color: #218838;
-}
-
-button#btn-retroalimentar {
-    background-color: #dc3545;
-}
-
-button#btn-retroalimentar:hover {
-    background-color: #c82333;
+button:hover {
+    background-color: #3711a3;
 }
