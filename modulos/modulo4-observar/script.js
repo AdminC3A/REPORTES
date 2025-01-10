@@ -9,15 +9,28 @@ function enmascararLlave(llave) {
 }
 
     // Función para cargar y mostrar el reporte
-    function cargarReporte() {
-        const reporte = JSON.parse(localStorage.getItem("reporte"));
+   function cargarReporte() {
+    const reporte = JSON.parse(localStorage.getItem("reporte"));
 
-        if (!reporte) {
-            reporteContainer.innerHTML = "<p>No se encontró información del reporte.</p>";
-            return;
+    if (!reporte) {
+        reporteContainer.innerHTML = "<p>No se encontró información del reporte.</p>";
+        return;
+    }
+
+    let contenidoHTML = "";
+
+    for (const [modulo, datos] of Object.entries(reporte)) {
+        contenidoHTML += `<div class="modulo"><h3>${modulo.toUpperCase()}</h3><ul>`;
+        for (const [clave, valor] of Object.entries(datos)) {
+            if (!valor) continue; // Omitir valores nulos o vacíos
+            contenidoHTML += `<li><strong>${clave}:</strong> ${Array.isArray(valor) ? valor.join(", ") : valor}</li>`;
         }
+        contenidoHTML += "</ul></div>";
+    }
 
-        let contenidoHTML = "";
+    reporteContainer.innerHTML = contenidoHTML;
+}
+
 
         // Iterar sobre los módulos del reporte
         for (const [modulo, datos] of Object.entries(reporte)) {
