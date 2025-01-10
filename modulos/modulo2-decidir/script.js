@@ -9,16 +9,20 @@ const detalleRiesgoInput = document.getElementById("detalle-riesgo");
 const detalleClasificacionInput = document.getElementById("detalle-otra-clasificacion");
 let imagenSeleccionada = null;
 
+// Inicializar el módulo
 document.addEventListener("DOMContentLoaded", () => {
-    // Obtener los datos actuales del reporte
+    // Limpieza de datos residuales del módulo 2
     const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
 
-    // Eliminar datos residuales específicos del módulo 2
     if (reporte.modulo2) {
-        delete reporte.modulo2; // Eliminar los datos del módulo 2
-        localStorage.setItem("reporte", JSON.stringify(reporte)); // Guardar el reporte actualizado
+        delete reporte.modulo2; // Eliminar datos previos del módulo 2
+        localStorage.setItem("reporte", JSON.stringify(reporte)); // Actualizar Local Storage
         console.log("Datos del módulo 2 eliminados.");
     }
+
+    // Resto de la lógica del módulo
+});
+
 // Función para guardar en Local Storage
 function guardarEnLocalStorage(modulo, datos) {
     const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
