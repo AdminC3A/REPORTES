@@ -32,11 +32,13 @@ document.addEventListener("DOMContentLoaded", () => {
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
+                document.getElementById("telefono-externo").style.display = "block"; // Mostrar campo de teléfono
             } else {
                 validacionLlaveFieldset.style.display = "block";
                 validacionNombreFieldset.style.display = "none";
             }
             clasificacionFieldset.style.display = "none";
+            observacionesFieldset.style.display = "none";
             nextButton.style.display = "none";
         });
     });
@@ -71,11 +73,15 @@ document.addEventListener("DOMContentLoaded", () => {
     // Continuar con nombre para externos
     document.getElementById("continuar-externo").addEventListener("click", () => {
         const nombre = document.getElementById("nombre-externo").value.trim();
-        if (!nombre) {
-            alert("Por favor, ingresa tu nombre.");
+        const telefono = document.getElementById("telefono-externo").value.trim();
+
+        if (!nombre || !telefono) {
+            alert("Por favor, ingresa tu nombre y teléfono.");
             return;
         }
+
         datosAcumulados.nombreExterno = nombre;
+        datosAcumulados.telefonoExterno = telefono;
         localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
         clasificacionFieldset.style.display = "block";
     });
