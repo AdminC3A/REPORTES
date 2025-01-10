@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,65 +38,12 @@
             <input type="text" id="llave" placeholder="Ingresa tu llave única">
             <button id="validar-llave">Validar</button>
             <p id="mensaje-validacion" class="error" style="display: none;">Llave no válida. Intenta nuevamente.</p>
-        </fieldset>
-
-        <!-- Validación de Nombre y Teléfono para Externos -->
-        <fieldset id="validacion-nombre" style="display: none;">
-            <legend>Ingresa tus datos</legend>
-            <label for="nombre-externo">Nombre:</label>
-            <input type="text" id="nombre-externo" placeholder="Ingresa tu nombre completo">
-
-            <label for="telefono-externo" style="margin-top: 10px;">Teléfono:</label>
-            <input type="tel" id="telefono-externo" placeholder="Ingresa tu teléfono">
-            
-            <p id="mensaje-validacion" class="error" style="display: none;">Por favor ingresa al menos tu nombre o teléfono.</p>
-        </fieldset>
-
-        <!-- Clasificación -->
-        <fieldset id="clasificacion" style="display: none;">
-            <legend>Clasificación de la Observación</legend>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Condición Insegura">
-                    Condición Insegura
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Acto Inseguro">
-                    Acto Inseguro
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Falla Administrativa">
-                    Falla Administrativa
-                </label>
-            </div>
-            <div>
-                <label>
-                    <input type="radio" name="clasificacion" value="Otros">
-                    Otros
-                </label>
-            </div>
-        </fieldset>
-
-        <!-- Campo de Observaciones Adicionales -->
-        <fieldset id="observaciones-adicionales" style="display: none;">
-            <legend>Observaciones Adicionales (Opcional)</legend>
-            <textarea id="observaciones-texto" placeholder="Ingresa observaciones adicionales aquí..."></textarea>
-        </fieldset>
-
-        <!-- Campo de Descripción (Obligatorio para "Otros") -->
-        <fieldset id="descripcion" style="display: none;">
-            <legend>Descripción</legend>
-            <textarea id="descripcion-texto" placeholder="Describe el riesgo potencial aquí..."></textarea>
+            <p id="supervisor-nombre" style="display: none;">Supervisor: <span></span></p>
         </fieldset>
 
         <!-- Botón para continuar -->
-        <button id="next" style="display: none;">Continuar</button>
+        <button id="next" style="display: none;">Continuar al Módulo 4</button>
     </main>
-
     <script src="/modulos/modulo3-detener/script.js"></script>
 </body>
 </html>
