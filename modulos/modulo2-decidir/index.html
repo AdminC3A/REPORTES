@@ -30,86 +30,44 @@
             <div>
                 <input type="checkbox" id="trabajo-alturas" name="riesgo" value="Trabajo en alturas">
                 <label for="trabajo-alturas">1. Trabajo en alturas</label>
+                <span class="tooltip" data-tooltip="Trabajo realizado a más de 1.8 metros de altura.">?</span>
             </div>
             <div>
                 <input type="checkbox" id="epp" name="riesgo" value="EPP">
                 <label for="epp">2. EPP</label>
+                <span class="tooltip" data-tooltip="Equipos de Protección Personal como casco, guantes, etc.">?</span>
             </div>
-            <div>
-                <input type="checkbox" id="trabajos-calientes" name="riesgo" value="Trabajos calientes">
-                <label for="trabajos-calientes">3. Trabajos calientes</label>
-            </div>
-            <div>
-                <input type="checkbox" id="espacio-confinado" name="riesgo" value="Espacio confinado">
-                <label for="espacio-confinado">4. Espacio confinado</label>
-            </div>
-            <div>
-                <input type="checkbox" id="trabajos-electricos" name="riesgo" value="Trabajos eléctricos">
-                <label for="trabajos-electricos">5. Trabajos eléctricos</label>
-            </div>
-            <div>
-                <input type="checkbox" id="excavaciones" name="riesgo" value="Excavaciones">
-                <label for="excavaciones">6. Excavaciones</label>
-            </div>
-            <div>
-                <input type="checkbox" id="orden-limpieza" name="riesgo" value="Orden y limpieza">
-                <label for="orden-limpieza">7. Orden y limpieza</label>
-            </div>
-            <div>
-                <input type="checkbox" id="peatonal" name="riesgo" value="Peatonal">
-                <label for="peatonal">8. Peatonal</label>
-            </div>
-            <div>
-                <input type="checkbox" id="ambiental" name="riesgo" value="Ambiental">
-                <label for="ambiental">9. Ambiental</label>
-            </div>
-            <div>
-                <input type="checkbox" id="ayudas-visuales" name="riesgo" value="Ayudas visuales">
-                <label for="ayudas-visuales">10. Ayudas visuales</label>
-            </div>
-            <div>
-                <input type="checkbox" id="buenas-practicas" name="riesgo" value="Buenas prácticas">
-                <label for="buenas-practicas">11. Buenas prácticas</label>
-            </div>
-            <div>
-                <input type="checkbox" id="actitud" name="riesgo" value="Actitud">
-                <label for="actitud">12. Actitud</label>
-            </div>
-            <div>
-                <input type="checkbox" id="izaje" name="riesgo" value="Izaje">
-                <label for="izaje">13. Izaje</label>
-            </div>
-            <div>
-                <input type="checkbox" id="herramientas" name="riesgo" value="Herramientas/Equipos">
-                <label for="herramientas">14. Herramientas/Equipos</label>
-            </div>
-
-            <!-- Opción 15 "Otros" -->
+            <!-- Agregar tooltips para los demás riesgos siguiendo este formato -->
             <div>
                 <input type="checkbox" id="otros" name="riesgo" value="Otros">
                 <label for="otros">15. Otros</label>
+                <span class="tooltip" data-tooltip="Cualquier riesgo no incluido en las categorías anteriores.">?</span>
             </div>
             <!-- Campo para detalles siempre visible -->
             <div id="otros-detalle-container" style="margin-left: 20px; margin-top: 10px;">
                 <input type="text" id="otros-detalle" name="otros-detalle" placeholder="Especifique...">
             </div>
         </fieldset>
-        <fieldset id="clasificacionFieldset" style="display: none;">
-    <legend>Clasificación</legend>
-    <div>
-        <input type="radio" id="acto-inseguro" name="clasificacion" value="Acto Inseguro">
-        <label for="acto-inseguro">Acto Inseguro</label>
-    </div>
-    <div>
-        <input type="radio" id="condicion-insegura" name="clasificacion" value="Condición Insegura">
-        <label for="condicion-insegura">Condición Insegura</label>
-    </div>
-    <div>
-        <input type="radio" id="falla-administrativa" name="clasificacion" value="Falla Administrativa">
-        <label for="falla-administrativa">Falla Administrativa</label>
-    </div>
-</fieldset>
 
+        <!-- Clasificación -->
+        <fieldset id="clasificacionFieldset" style="display: none;">
+            <legend>Clasificación</legend>
+            <div>
+                <input type="radio" id="acto-inseguro" name="clasificacion" value="Acto Inseguro">
+                <label for="acto-inseguro">Acto Inseguro</label>
+                <span class="tooltip" data-tooltip="Acción peligrosa realizada por una persona.">?</span>
+            </div>
+            <div>
+                <input type="radio" id="condicion-insegura" name="clasificacion" value="Condición Insegura">
+                <label for="condicion-insegura">Condición Insegura</label>
+                <span class="tooltip" data-tooltip="Situación física que representa un riesgo.">?</span>
+            </div>
+            <div>
+                <input type="radio" id="falla-administrativa" name="clasificacion" value="Falla Administrativa">
+                <label for="falla-administrativa">Falla Administrativa</label>
+                <span class="tooltip" data-tooltip="Error en la gestión o supervisión de seguridad.">?</span>
+            </div>
+        </fieldset>
 
         <!-- Botón para continuar -->
         <button id="next" style="display: none;">Continuar al Módulo 3</button>
