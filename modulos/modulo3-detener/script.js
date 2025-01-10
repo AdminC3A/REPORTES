@@ -1,16 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // Recuperar datos previos o inicializar objeto vacío
     let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {};
-
-    // Validar que existan datos de módulos anteriores
-    if (!datosAcumulados.modulo1 || !datosAcumulados.modulo2) {
-        alert("Faltan datos de módulos anteriores. Por favor, completa los pasos previos.");
-        window.location.href = "/modulos/modulo1-inicio/"; // Redirigir al primer módulo
-        return;
-    }
-
-    // Inicializar datos del Módulo 3 si no existen
-    datosAcumulados.modulo3 = datosAcumulados.modulo3 || {};
 
     // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
@@ -25,14 +14,13 @@ document.addEventListener("DOMContentLoaded", () => {
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
-            datosAcumulados.modulo3.rolSeleccionado = rolSeleccionado;
+            datosAcumulados.rolSeleccionado = rolSeleccionado;
             localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
 
+            // Mostrar campos según rol
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
-
-                // Reiniciar campos para Externo
                 document.getElementById("nombre-externo").value = "";
                 document.getElementById("telefono-externo").value = "";
             } else {
@@ -41,27 +29,28 @@ document.addEventListener("DOMContentLoaded", () => {
             }
             clasificacionFieldset.style.display = "none";
             observacionesFieldset.style.display = "none";
-            nextButton.style.display = "none";
+            nextButton.style.display = "block"; // Permitir avanzar
         });
     });
 
     // Validar llave
     document.getElementById("validar-llave").addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
-        const rolSeleccionado = datosAcumulados.modulo3.rolSeleccionado;
+        const rolSeleccionado = datosAcumulados.rolSeleccionado;
 
         if (!llave) {
             alert("Por favor, ingresa una llave.");
             return;
         }
 
-        // Validar llave (simplificado para este ejemplo)
-        if (llave === "1234") { // Cambiar según lógica real
+        const llaveValida = true; // Puedes reemplazarlo por tu lógica de validación real
+
+        if (llaveValida) {
+            datosAcumulados.llave = llave;
             alert("Llave válida.");
-            datosAcumulados.modulo3.llave = llave;
             clasificacionFieldset.style.display = "block";
         } else {
-            alert("Llave no válida. Intenta nuevamente.");
+            alert("Llave no válida.");
         }
         localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
     });
@@ -71,24 +60,25 @@ document.addEventListener("DOMContentLoaded", () => {
         const nombre = document.getElementById("nombre-externo").value.trim();
         const telefono = document.getElementById("telefono-externo").value.trim();
 
-        if (!nombre || !telefono) {
+        if (!nombre && !telefono) {
             mensajeValidacion.style.display = "block";
-            mensajeValidacion.textContent = "Por favor, completa el nombre y el teléfono.";
+            mensajeValidacion.textContent = "Por favor, ingresa al menos un dato para continuar.";
             return;
         }
 
-        datosAcumulados.modulo3.nombreExterno = nombre;
-        datosAcumulados.modulo3.telefonoExterno = telefono;
-        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+        if (nombre) datosAcumulados.nombreExterno = nombre;
+        if (telefono) datosAcumulados.telefonoExterno = telefono;
+
         mensajeValidacion.style.display = "none";
         clasificacionFieldset.style.display = "block";
+        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
     });
 
     // Manejar selección de clasificación
     document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
         radio.addEventListener("change", (e) => {
             const clasificacion = e.target.value;
-            datosAcumulados.modulo3.clasificacionSeleccionada = clasificacion;
+            datosAcumulados.clasificacionSeleccionada = clasificacion;
 
             if (clasificacion === "Otros") {
                 document.getElementById("otros-detalle").style.display = "block";
@@ -104,14 +94,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Guardar observaciones adicionales
     document.getElementById("observaciones-texto").addEventListener("input", (e) => {
-        datosAcumulados.modulo3.observacionesAdicionales = e.target.value;
+        datosAcumulados.observacionesAdicionales = e.target.value;
         localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
     });
 
     // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
-        console.log("Datos acumulados hasta el Módulo 3:", datosAcumulados);
-        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-        window.location.href = "/modulos/modulo4-observar/";
+        if (
+            datosAcumulados.rolSeleccionado ||
+            datosAcumulados.llave ||
+            datosAcumulados.nombreExterno ||
+            datosAcumulados.telefonoExterno ||
+            datosAcumulados.clasificacionSeleccionada ||
+            datosAcumulados.observacionesAdicionales
+        ) {
+            console.log("Datos acumulados hasta el Módulo 3:", datosAcumulados);
+            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+            window.location.href = "/modulos/modulo4-observar/";
+        } else {
+            alert("Por favor, completa al menos un campo antes de avanzar.");
+        }
     });
+
+    // Inicializar el estado
+    nextButton.style.display = "block"; // Mostrar el botón desde el inicio
 });
