@@ -2,6 +2,7 @@ const cargarFotoArchivoBtn = document.getElementById("cargarFotoArchivoBtn");
 const cargarFotoCamaraBtn = document.getElementById("cargarFotoCamaraBtn");
 const fotoContainer = document.getElementById("fotoContainer");
 const riesgoOpciones = document.getElementById("riesgoOpciones");
+const clasificacionFieldset = document.getElementById("clasificacionFieldset"); // Campo para clasificación
 const nextButton = document.getElementById("next");
 const otrosDetalleInput = document.getElementById("otros-detalle");
 let imagenSeleccionada = null;
@@ -18,7 +19,6 @@ function guardarEnLocalStorage(modulo, datos) {
 function mostrarOpciones() {
     fotoContainer.style.display = "block"; // Mostrar previsualización
     riesgoOpciones.style.display = "block"; // Mostrar opciones de selección
-    nextButton.style.display = "block"; // Mostrar botón "Continuar"
     riesgoOpciones.scrollIntoView({ behavior: "smooth" }); // Desplazar automáticamente
 }
 
@@ -91,14 +91,28 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
     });
 });
 
-/**
- * Validar y continuar al siguiente módulo
- */
-nextButton.addEventListener("click", function () {
-    const seleccionados = [];
-    document.querySelectorAll('input[name="riesgo"]:checked').forEach((input) => {
-        seleccionados.push(input.value);
+// Mostrar clasificación después de seleccionar riesgos
+document.querySelectorAll('input[name="riesgo"]').forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+        const seleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(
+            (input) => input.value
+        );
+
+        guardarEnLocalStorage("modulo2", { riesgos: seleccionados });
+
+        if (seleccionados.length > 0) {
+            clasificacionFieldset.style.display = "block"; // Mostrar clasificación
+            clasificacionFieldset.scrollIntoView({ behavior: "smooth" });
+        }
     });
+});
+
+// Validar y continuar al siguiente módulo
+nextButton.addEventListener("click", () => {
+    const seleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(
+        (input) => input.value
+    );
+    const clasificacion = document.querySelector('input[name="clasificacion"]:checked')?.value;
 
     if (!imagenSeleccionada) {
         alert("Por favor carga una imagen antes de continuar.");
@@ -115,10 +129,16 @@ nextButton.addEventListener("click", function () {
         return;
     }
 
+    if (!clasificacion) {
+        alert("Por favor selecciona una clasificación antes de continuar.");
+        return;
+    }
+
     guardarEnLocalStorage("modulo2", {
         imagen: imagenSeleccionada.src,
         riesgos: seleccionados,
         detalleOtros: otrosDetalleInput.value.trim(),
+        clasificacionSeleccionada: clasificacion,
     });
 
     window.location.href = "/modulos/modulo3-detener/index.html";
