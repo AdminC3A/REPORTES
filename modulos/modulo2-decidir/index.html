@@ -23,83 +23,73 @@
         <!-- Contenedor para previsualización de la foto -->
         <canvas id="fotoContainer" width="200" height="200" style="display: none;"></canvas>
 
-                
         <!-- Opciones de selección -->
         <fieldset id="riesgoOpciones" style="display: none;">
-    <legend>1. Decidir: Riesgo Potencial</legend>
-    <div>
-        <input type="checkbox" id="trabajo-alturas" name="riesgo" value="Trabajo en alturas">
-        <label for="trabajo-alturas">1. Trabajo en alturas</label>
-        <span class="tooltip" data-tooltip="Trabajo realizado a más de 1.8 metros de altura.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="epp" name="riesgo" value="EPP">
-        <label for="epp">2. EPP</label>
-        <span class="tooltip" data-tooltip="Equipos de Protección Personal como casco, guantes, etc.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="trabajos-calientes" name="riesgo" value="Trabajos calientes">
-        <label for="trabajos-calientes">3. Trabajos calientes</label>
-        <span class="tooltip" data-tooltip="Trabajos que generan calor, como soldadura o corte.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="espacio-confinado" name="riesgo" value="Espacio confinado">
-        <label for="espacio-confinado">4. Espacio confinado</label>
-        <span class="tooltip" data-tooltip="Espacios cerrados con acceso limitado y poca ventilación.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="trabajos-electricos" name="riesgo" value="Trabajos eléctricos">
-        <label for="trabajos-electricos">5. Trabajos eléctricos</label>
-        <span class="tooltip" data-tooltip="Trabajos relacionados con sistemas eléctricos o equipos energizados.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="excavaciones" name="riesgo" value="Excavaciones">
-        <label for="excavaciones">6. Excavaciones</label>
-        <span class="tooltip" data-tooltip="Actividades que implican perforar, cavar o manipular suelos.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="orden-limpieza" name="riesgo" value="Orden y limpieza">
-        <label for="orden-limpieza">7. Orden y limpieza</label>
-        <span class="tooltip" data-tooltip="Condiciones de desorden o suciedad que incrementan riesgos.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="peatonal" name="riesgo" value="Peatonal">
-        <label for="peatonal">8. Peatonal</label>
-        <span class="tooltip" data-tooltip="Riesgos asociados con el movimiento de peatones en el área.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="ambiental" name="riesgo" value="Ambiental">
-        <label for="ambiental">9. Ambiental</label>
-        <span class="tooltip" data-tooltip="Condiciones climáticas o ambientales que afectan la seguridad.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="ayudas-visuales" name="riesgo" value="Ayudas visuales">
-        <label for="ayudas-visuales">10. Ayudas visuales</label>
-        <span class="tooltip" data-tooltip="Señalamientos, letreros o indicaciones visuales de seguridad.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="buenas-practicas" name="riesgo" value="Buenas prácticas">
-        <label for="buenas-practicas">11. Buenas prácticas</label>
-        <span class="tooltip" data-tooltip="Prácticas que fomentan un ambiente seguro y saludable.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="actitud" name="riesgo" value="Actitud">
-        <label for="actitud">12. Actitud</label>
-        <span class="tooltip" data-tooltip="Comportamiento del personal que puede aumentar riesgos.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="izaje" name="riesgo" value="Izaje">
-        <label for="izaje">13. Izaje</label>
-        <span class="tooltip" data-tooltip="Uso de grúas, polipastos o equipos para levantar cargas.">?</span>
-    </div>
-    <div>
-        <input type="checkbox" id="herramientas" name="riesgo" value="Herramientas/Equipos">
-        <label for="herramientas">14. Herramientas/Equipos</label>
-        <span class="tooltip" data-tooltip="Uso de herramientas manuales o equipos sin las condiciones adecuadas.">?</span>
-    </div>
-    <!-- Cuadro permanente para "Otros" -->
-            <div id="otros-detalle-container" style="margin-left: 20px; margin-top: 10px;">
-                <textarea id="otros-detalle" name="otros-detalle" placeholder="Especifique..." style="width: 90%; height: 80px; font-size: 1.5rem;"></textarea>
+            <legend>1. Decidir: Riesgo Potencial</legend>
+            <!-- Lista de riesgos -->
+            <div>
+                <input type="checkbox" id="trabajo-alturas" name="riesgo" value="Trabajo en alturas">
+                <label for="trabajo-alturas">1. Trabajo en alturas</label>
+            </div>
+            <div>
+                <input type="checkbox" id="epp" name="riesgo" value="EPP">
+                <label for="epp">2. EPP</label>
+            </div>
+            <div>
+                <input type="checkbox" id="trabajos-calientes" name="riesgo" value="Trabajos calientes">
+                <label for="trabajos-calientes">3. Trabajos Calientes</label>
+            </div>
+            <div>
+                <input type="checkbox" id="espacio-confinado" name="riesgo" value="Espacio confinado">
+                <label for="espacio-confinado">4. Esp. Confinado</label>
+            </div>
+            <div>
+                <input type="checkbox" id="trabajos-electricos" name="riesgo" value="Trabajos eléctricos">
+                <label for="trabajos-electricos">5. Trabajos Eléctricos</label>
+            </div>
+            <div>
+                <input type="checkbox" id="excavaciones" name="riesgo" value="Excavaciones">
+                <label for="excavaciones">6. Excavaciones</label>
+            </div>
+            <div>
+                <input type="checkbox" id="orden-limpieza" name="riesgo" value="Orden y limpieza">
+                <label for="orden-limpieza">7. Orden y limpieza</label>
+            </div>
+            <div>
+                <input type="checkbox" id="peatonal" name="riesgo" value="Peatonal">
+                <label for="peatonal">8. Peatonal</label>
+            </div>
+            <div>
+                <input type="checkbox" id="ambiental" name="riesgo" value="Ambiental">
+                <label for="ambiental">9. Ambiental</label>
+            </div>
+            <div>
+                <input type="checkbox" id="ayudas-visuales" name="riesgo" value="Ayudas visuales">
+                <label for="ayudas-visuales">10. Ayudas Visuales</label>
+            </div>
+            <div>
+                <input type="checkbox" id="buenas-practicas" name="riesgo" value="Buenas prácticas">
+                <label for="buenas-practicas">11. Buenas Prácticas</label>
+            </div>
+            <div>
+                <input type="checkbox" id="actitud" name="riesgo" value="Actitud">
+                <label for="actitud">12. Actitud</label>
+            </div>
+            <div>
+                <input type="checkbox" id="izaje" name="riesgo" value="Izaje">
+                <label for="izaje">13. Izaje</label>
+            </div>
+            <div>
+                <input type="checkbox" id="herramientas" name="riesgo" value="Herramientas/Equipos">
+                <label for="herramientas">14. Herramientas/Equipos</label>
+            </div>
+            <!-- Opción 15 con especificación -->
+            <div>
+                <input type="checkbox" id="otros" name="riesgo" value="Otros">
+                <label for="otros">15. Otros (Especifique)</label>
+            </div>
+            <div id="otros-detalle-container" style="margin-left: 20px; margin-top: 10px; display: none;">
+                <input type="text" id="otros-detalle" name="otros-detalle" placeholder="Especifique..." required>
             </div>
         </fieldset>
 
@@ -109,26 +99,21 @@
             <div>
                 <input type="radio" id="acto-inseguro" name="clasificacion" value="Acto Inseguro">
                 <label for="acto-inseguro">Acto Inseguro</label>
-                <span class="tooltip" data-tooltip="Acción peligrosa realizada por una persona.">?</span>
             </div>
             <div>
                 <input type="radio" id="condicion-insegura" name="clasificacion" value="Condición Insegura">
                 <label for="condicion-insegura">Condición Insegura</label>
-                <span class="tooltip" data-tooltip="Situación física que representa un riesgo.">?</span>
             </div>
             <div>
                 <input type="radio" id="falla-administrativa" name="clasificacion" value="Falla Administrativa">
                 <label for="falla-administrativa">Falla Administrativa</label>
-                <span class="tooltip" data-tooltip="Error en la gestión o supervisión de seguridad.">?</span>
             </div>
             <div>
                 <input type="radio" id="otra-clasificacion" name="clasificacion" value="Otra Clasificación">
                 <label for="otra-clasificacion">Otra Clasificación</label>
-                <span class="tooltip" data-tooltip="Especifica una clasificación diferente.">?</span>
             </div>
-            <!-- Cuadro permanente para "Otra Clasificación" -->
-            <div id="otra-clasificacion-detalle-container" style="margin-left: 20px; margin-top: 10px;">
-                <textarea id="otra-clasificacion-detalle" placeholder="Especifique la clasificación..." style="width: 90%; height: 80px; font-size: 1.5rem;"></textarea>
+            <div id="otra-clasificacion-detalle-container" style="display: none; margin-left: 20px;">
+                <input type="text" id="otra-clasificacion-detalle" placeholder="Especifique la clasificación...">
             </div>
         </fieldset>
 
