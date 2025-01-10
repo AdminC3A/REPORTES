@@ -1,107 +1,108 @@
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
-    font-size: 1.6rem; /* Aumentar tamaño de texto */
+    background-color: #f4f4f4; /* Fondo gris claro */
 }
 
+/* Header Styles */
 header {
-    background-color: #007bff;
+    background-color: #007bff; /* Azul principal */
     color: white;
     padding: 20px;
     text-align: center;
 }
 
+/* Main Content Styles */
 main {
     padding: 20px;
 }
 
+/* Fieldset Styles */
 fieldset {
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 5px; /* Bordes redondeados */
     padding: 15px;
     margin-bottom: 20px;
-    background-color: white;
+    background-color: white; /* Fondo blanco */
 }
 
+/* Legend Styles */
 legend {
     font-weight: bold;
-    color: #333;
+    color: #333; /* Texto gris oscuro */
 }
 
-textarea {
-    width: 90%;
-    height: 80px; /* Duplicar tamaño */
-    font-size: 1.5rem; /* Aumentar tamaño de texto */
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-textarea:focus {
-    border-color: #007bff;
-    outline: none;
-}
-
+/* Button Container */
 .btn-container {
     display: flex;
-    flex-direction: column; /* Botones apilados verticalmente */
-    gap: 10px; /* Espaciado entre botones */
-    margin-top: 20px;
+    justify-content: space-evenly;
+    margin: 20px 0;
 }
 
+/* General Button Styles */
 button {
     padding: 10px 20px;
-    font-size: 1.6rem;
+    font-size: 16px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    background-color: #007bff;
+}
+
+/* Specific Buttons */
+button#cargarFotoArchivoBtn,
+button#cargarFotoCamaraBtn {
+    background-color: #007bff; /* Azul principal */
     color: white;
 }
 
-button:hover {
-    background-color: #0056b3;
+button#cargarFotoArchivoBtn:hover,
+button#cargarFotoCamaraBtn:hover {
+    background-color: #0056b3; /* Azul más oscuro */
 }
 
+/* Canvas Styles for Photo Preview */
 canvas#fotoContainer {
     display: block;
-    margin: 20px auto;
+    margin: 20px auto; /* Centrado */
     border: 1px solid #ccc;
     border-radius: 5px;
+    width: 200px;
+    height: 200px;
 }
 
+/* Tooltip Styles */
 .tooltip {
     display: inline-block;
-    background-color: #007bff;
+    background-color: #007bff; /* Azul principal */
     color: white;
-    font-size: 1.4rem;
+    font-size: 12px;
     font-weight: bold;
-    width: 24px;
-    height: 24px;
+    width: 18px;
+    height: 18px;
     text-align: center;
-    line-height: 24px;
-    border-radius: 50%;
+    line-height: 18px;
+    border-radius: 50%; /* Forma circular */
     cursor: pointer;
     margin-left: 10px;
 }
 
 .tooltip:hover {
-    background-color: #0056b3;
+    background-color: #0056b3; /* Azul más oscuro */
 }
 
+/* Tooltip Text on Hover */
 .tooltip::after {
-    content: attr(data-tooltip);
+    content: attr(data-tooltip); /* Texto del atributo data-tooltip */
     display: none;
     position: absolute;
     background-color: #333;
     color: white;
-    font-size: 1.4rem;
+    font-size: 12px;
     padding: 5px 10px;
     border-radius: 5px;
-    top: 35px;
+    top: 25px;
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -109,13 +110,14 @@ canvas#fotoContainer {
 }
 
 .tooltip:hover::after {
-    display: block;
+    display: block; /* Mostrar texto en hover */
 }
 
+/* Next Button Styles */
 button#next {
-    display: none;
-    background-color: #28a745;
-    font-size: 1.8rem;
+    display: none; /* Oculto por defecto */
+    background-color: #28a745; /* Verde principal */
+    font-size: 18px;
     margin-top: 20px;
     padding: 10px 20px;
     border-radius: 5px;
@@ -123,5 +125,28 @@ button#next {
 }
 
 button#next:hover {
-    background-color: #218838;
+    background-color: #218838; /* Verde más oscuro */
 }
+
+/* Detalle del campo "Otros" */
+#otros-detalle-container {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+/* Campo de texto dentro de "Otros" */
+#otros-detalle {
+    width: 100%; /* Ancho completo */
+    padding: 10px;
+    border: 1px solid #ccc; /* Borde gris claro */
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Campo de texto en focus */
+#otros-detalle:focus {
+    border-color: #007bff; /* Borde azul al enfocar */
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Resplandor azul */
+}
+
