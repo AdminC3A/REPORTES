@@ -1,76 +1,82 @@
-// script.js para el Módulo 4: Mostrar acciones A (Corregir) y B (Retroalimentar)
+document.addEventListener("DOMContentLoaded", () => {
+    const infoContenido = document.getElementById("info-contenido");
+    const nextButton = document.getElementById("next");
 
-// Recuperar datos de los módulos anteriores desde localStorage
-let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {};
+    // Función para cargar y mostrar información acumulada
+    function cargarInformacion() {
+        const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+        let contenidoHTML = "";
 
-// Asignar valores predeterminados si faltan datos
-if (!datosAcumulados.accionSeleccionada) {
-    console.warn("Acción seleccionada faltante. Usando valor predeterminado.");
-    datosAcumulados.accionSeleccionada = "Acción No Especificada";
-}
-if (!datosAcumulados.clasificacionSeleccionada) {
-    console.warn("Clasificación seleccionada faltante. Usando valor predeterminado.");
-    datosAcumulados.clasificacionSeleccionada = "Clasificación No Especificada";
-}
+        // Verificar si hay datos del módulo 1
+        if (reporte.modulo1) {
+            contenidoHTML += `
+                <h3>Módulo 1: Información Inicial</h3>
+                <p><strong>Datos del QR:</strong> ${JSON.stringify(reporte.modulo1)}</p>
+            `;
+        }
 
-// Guardar datos corregidos en localStorage
-localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+        // Verificar si hay datos del módulo 2
+        if (reporte.modulo2) {
+            contenidoHTML += `
+                <h3>Módulo 2: Decisión de Riesgos</h3>
+                <p><strong>Imagen:</strong></p>
+                <img src="${reporte.modulo2.imagen}" alt="Imagen cargada" style="max-width: 100%; height: auto;">
+                <p><strong>Riesgos seleccionados:</strong> ${reporte.modulo2.riesgos.join(", ")}</p>
+                ${
+                    reporte.modulo2.detalleOtros
+                        ? `<p><strong>Detalles de "Otros":</strong> ${reporte.modulo2.detalleOtros}</p>`
+                        : ""
+                }
+            `;
+        }
 
-// Cargar el archivo CSV con las combinaciones
-Papa.parse('/data/combinaciones_botones.csv', {
-    download: true,
-    header: true,
-    complete: function (results) {
-        const combinaciones = results.data;
-        console.log("Combinaciones cargadas:", combinaciones);
+        // Verificar si hay datos del módulo 3
+        if (reporte.modulo3) {
+            contenidoHTML += `
+                <h3>Módulo 3: Validación</h3>
+                <p><strong>Rol seleccionado:</strong> ${reporte.modulo3.rolSeleccionado}</p>
+                ${
+                    reporte.modulo3.nombreExterno
+                        ? `<p><strong>Nombre Externo:</strong> ${reporte.modulo3.nombreExterno}</p>`
+                        : ""
+                }
+                ${
+                    reporte.modulo3.telefonoExterno
+                        ? `<p><strong>Teléfono Externo:</strong> ${reporte.modulo3.telefonoExterno}</p>`
+                        : ""
+                }
+                ${
+                    reporte.modulo3.clasificacionSeleccionada
+                        ? `<p><strong>Clasificación seleccionada:</strong> ${reporte.modulo3.clasificacionSeleccionada}</p>`
+                        : ""
+                }
+                ${
+                    reporte.modulo3.descripcion
+                        ? `<p><strong>Descripción:</strong> ${reporte.modulo3.descripcion}</p>`
+                        : ""
+                }
+                ${
+                    reporte.modulo3.observacionesAdicionales
+                        ? `<p><strong>Observaciones Adicionales:</strong> ${reporte.modulo3.observacionesAdicionales}</p>`
+                        : ""
+                }
+            `;
+        }
 
-        // Mostrar acción basada en combinaciones
-        mostrarAccion(combinaciones, datosAcumulados);
-    },
-    error: function (error) {
-        console.error("Error al cargar el CSV:", error);
+        // Si no hay datos, mostrar un mensaje
+        if (contenidoHTML === "") {
+            contenidoHTML = "<p>No se ha recopilado información hasta ahora.</p>";
+        }
+
+        // Insertar contenido en la página
+        infoContenido.innerHTML = contenidoHTML;
     }
+
+    // Cargar información al cargar la página
+    cargarInformacion();
+
+    // Continuar al siguiente módulo
+    nextButton.addEventListener("click", () => {
+        window.location.href = "/modulos/modulo5-correcciones/index.html";
+    });
 });
-
-// Función para mostrar la acción
-function mostrarAccion(combinaciones, datos) {
-    const combinacion = combinaciones.find(c => 
-        c.Accion === datos.accionSeleccionada &&
-        c.Clasificacion === datos.clasificacionSeleccionada
-    );
-
-    const contenedor = document.getElementById("contenedor-dinamico");
-
-    if (combinacion) {
-        contenedor.innerHTML = `
-            <h2>Acción Seleccionada: ${combinacion.Accion}</h2>
-            <p>Clasificación: ${combinacion.Clasificacion}</p>
-            <button id="btn-corregir">A. Corregir</button>
-            <button id="btn-retroalimentar">B. Retroalimentar</button>
-        `;
-
-        document.getElementById("btn-corregir").onclick = () => {
-            alert(`Acción Correctiva: ${combinacion.BotonCorregir}`);
-            datosAcumulados.modulo4 = { accion: combinacion.Accion, tipo: "Corregir" };
-            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-            window.location.href = "/modulos/modulo5-corregir/";
-        };
-
-        document.getElementById("btn-retroalimentar").onclick = () => {
-            alert(`Retroalimentación: ${combinacion.BotonRetroalimentar}`);
-            datosAcumulados.modulo4 = { accion: combinacion.Accion, tipo: "Retroalimentar" };
-            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-            window.location.href = "/modulos/modulo5-corregir/";
-        };
-    } else {
-        contenedor.innerHTML = `
-            <p>No se encontraron acciones específicas para los datos proporcionados.</p>
-            <button id="continuar-generico">Continuar</button>
-        `;
-        document.getElementById("continuar-generico").onclick = () => {
-            datosAcumulados.modulo4 = { accion: "Genérica", tipo: "Continuar" };
-            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-            window.location.href = "/modulos/modulo5-corregir/";
-        };
-    }
-}
