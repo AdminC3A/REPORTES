@@ -99,11 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const nombre = nombreExternoInput.value.trim();
         const telefono = telefonoExternoInput.value.trim();
 
-        if (!nombre || !telefono) {
-            alert("Por favor ingresa el nombre y el teléfono antes de continuar.");
-            return;
-        }
-
         clasificacionFieldset.style.display = "block";
         validacionExternoFieldset.style.display = "none";
 
@@ -126,7 +121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Continuar al siguiente módulo (siempre a módulo 4)
+    // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
         const clasificacionSeleccionada = document.querySelector('input[name="clasificacion"]:checked');
         const clasificacion = clasificacionSeleccionada ? clasificacionSeleccionada.value : null;
@@ -138,7 +133,7 @@ document.addEventListener("DOMContentLoaded", () => {
             detalleOtros: clasificacion === "Otros" ? detalleOtros : null,
         });
 
-        // Redirigir al módulo 4
+        // Ir al módulo 4 sin validar
         window.location.href = "/modulos/modulo4-observar/index.html";
     });
 
