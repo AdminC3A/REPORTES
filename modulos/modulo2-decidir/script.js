@@ -14,7 +14,7 @@ function guardarEnLocalStorage(modulo, datos) {
     console.log(`Datos del ${modulo} guardados:`, datos);
 }
 
-// Mostrar las opciones después de cargar la foto
+// Función para mostrar las opciones después de cargar la foto
 function mostrarOpciones() {
     fotoContainer.style.display = "block"; // Mostrar previsualización
     riesgoOpciones.style.display = "block"; // Mostrar opciones de selección
@@ -38,17 +38,56 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    imagenSeleccionada = img;
-                    guardarEnLocalStorage("modulo2", { imagen: e.target.result });
+                    imagenSeleccionada = img; // Guardar la imagen
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result }); // Guardar en Local Storage
+
                     const ctxFoto = fotoContainer.getContext("2d");
-                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
-                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
+                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height); // Limpiar canvas
+                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height); // Ajustar imagen
                     mostrarOpciones();
                 };
                 img.src = e.target.result;
             };
             reader.readAsDataURL(file);
         }
+    });
+});
+
+/**
+ * Cargar foto desde cámara
+ */
+cargarFotoCamaraBtn.addEventListener("click", () => {
+    const cameraInput = document.createElement("input");
+    cameraInput.type = "file";
+    cameraInput.accept = "image/*";
+    cameraInput.capture = "environment"; // Solicita cámara trasera
+
+    document.body.appendChild(cameraInput); // Añadir input temporal al DOM
+    cameraInput.click();
+
+    cameraInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.onload = () => {
+                    imagenSeleccionada = img; // Guardar la imagen
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result }); // Guardar en Local Storage
+
+                    const ctxFoto = fotoContainer.getContext("2d");
+                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height); // Limpiar canvas
+                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height); // Ajustar imagen
+                    mostrarOpciones();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    cameraInput.addEventListener("blur", () => {
+        document.body.removeChild(cameraInput); // Eliminar input del DOM al finalizar
     });
 });
 
