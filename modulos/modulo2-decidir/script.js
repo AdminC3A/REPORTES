@@ -3,6 +3,7 @@ const cargarFotoCamaraBtn = document.getElementById("cargarFotoCamaraBtn");
 const fotoContainer = document.getElementById("fotoContainer");
 const riesgoOpciones = document.getElementById("riesgoOpciones");
 const nextButton = document.getElementById("next");
+const otrosDetalleContainer = document.getElementById("otros-detalle-container");
 const otrosDetalleInput = document.getElementById("otros-detalle");
 let imagenSeleccionada = null;
 
@@ -19,8 +20,6 @@ function mostrarOpciones() {
     fotoContainer.style.display = "block"; // Mostrar previsualización
     riesgoOpciones.style.display = "block"; // Mostrar opciones de selección
     nextButton.style.display = "block"; // Mostrar botón "Continuar"
-
-    // Desplazar pantalla automáticamente hacia las opciones
     riesgoOpciones.scrollIntoView({ behavior: "smooth" });
 }
 
@@ -96,13 +95,11 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
 
 // Mostrar campo adicional si se selecciona "Otros"
 document.getElementById("otros").addEventListener("change", function () {
-    const otrosDetalleContainer = document.getElementById("otros-detalle-container");
-
     if (this.checked) {
         otrosDetalleContainer.style.display = "block"; // Mostrar campo "Otros"
     } else {
         otrosDetalleContainer.style.display = "none"; // Ocultar campo "Otros"
-        document.getElementById("otros-detalle").value = ""; // Limpiar el valor
+        otrosDetalleInput.value = ""; // Limpiar el valor
     }
 });
 
