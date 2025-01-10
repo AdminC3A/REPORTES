@@ -10,6 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
     const nextButton = document.getElementById("next");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
 
+    let llaveValida = false; // Bandera para validar si la llave es válida
+
     // Mostrar campos según el rol seleccionado
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
@@ -17,19 +19,20 @@ document.addEventListener("DOMContentLoaded", () => {
             datosAcumulados.rolSeleccionado = rolSeleccionado;
             localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
 
-            // Mostrar campos según rol
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
                 document.getElementById("nombre-externo").value = "";
                 document.getElementById("telefono-externo").value = "";
+                llaveValida = true; // Externos no necesitan validar llave
             } else {
                 validacionLlaveFieldset.style.display = "block";
                 validacionNombreFieldset.style.display = "none";
+                llaveValida = false; // Reiniciar la validación de llave
             }
             clasificacionFieldset.style.display = "none";
             observacionesFieldset.style.display = "none";
-            nextButton.style.display = "block"; // Permitir avanzar
+            nextButton.style.display = "block";
         });
     });
 
@@ -43,14 +46,22 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const llaveValida = true; // Puedes reemplazarlo por tu lógica de validación real
+        // Lógica de validación de llave (reemplazar con tu lógica real)
+        const supervisores = {
+            "1234": "Empleado 1",
+            "5678": "Empleado 2",
+            "abcd": "Empleado 3"
+        };
 
-        if (llaveValida) {
+        if (supervisores[llave]) {
+            alert(`Llave válida. Identificado: ${supervisores[llave]}`);
             datosAcumulados.llave = llave;
-            alert("Llave válida.");
+            datosAcumulados.nombreEmpleado = supervisores[llave];
+            llaveValida = true; // Bandera de validación
             clasificacionFieldset.style.display = "block";
         } else {
-            alert("Llave no válida.");
+            alert("Llave no válida. Intenta nuevamente.");
+            llaveValida = false; // No se permite avanzar
         }
         localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
     });
@@ -100,22 +111,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
-        if (
-            datosAcumulados.rolSeleccionado ||
-            datosAcumulados.llave ||
-            datosAcumulados.nombreExterno ||
-            datosAcumulados.telefonoExterno ||
-            datosAcumulados.clasificacionSeleccionada ||
-            datosAcumulados.observacionesAdicionales
-        ) {
-            console.log("Datos acumulados hasta el Módulo 3:", datosAcumulados);
-            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-            window.location.href = "/modulos/modulo4-observar/";
-        } else {
-            alert("Por favor, completa al menos un campo antes de avanzar.");
+        const rolSeleccionado = datosAcumulados.rolSeleccionado;
+
+        if (rolSeleccionado !== "Externo" && !llaveValida) {
+            alert("Por favor, valida la llave antes de continuar.");
+            return;
         }
+
+        if (rolSeleccionado === "Externo") {
+            const nombre = datosAcumulados.nombreExterno || "";
+            const telefono = datosAcumulados.telefonoExterno || "";
+            if (!nombre && !telefono) {
+                alert("Por favor, completa al menos el nombre o el teléfono antes de avanzar.");
+                return;
+            }
+        }
+
+        console.log("Datos acumulados hasta el Módulo 3:", datosAcumulados);
+        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+        window.location.href = "/modulos/modulo4-observar/";
     });
 
     // Inicializar el estado
-    nextButton.style.display = "block"; // Mostrar el botón desde el inicio
+    nextButton.style.display = "block";
 });
