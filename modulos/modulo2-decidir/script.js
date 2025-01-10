@@ -5,7 +5,6 @@ const fotoContainer = document.getElementById("fotoContainer");
 const riesgoOpciones = document.getElementById("riesgoOpciones");
 const clasificacionFieldset = document.getElementById("clasificacionFieldset");
 const nextButton = document.getElementById("next");
-const otrosDetalleInput = document.getElementById("otros-detalle");
 let imagenSeleccionada = null;
 
 // Función para guardar datos en Local Storage
@@ -92,77 +91,89 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
     });
 });
 
-// Mostrar clasificación después de seleccionar riesgos
+// Guardar datos de riesgos y sus detalles
 document.querySelectorAll('input[name="riesgo"]').forEach((checkbox) => {
     checkbox.addEventListener("change", () => {
-        const seleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(
-            (input) => input.value
-        );
+        const riesgos = Array.from(document.querySelectorAll('input[name="riesgo"]')).map((input) => {
+            const detalle = document.getElementById(`detalle-${input.id}`).value.trim();
+            return {
+                riesgo: input.value,
+                seleccionado: input.checked,
+                detalle: detalle || null,
+            };
+        });
 
-        guardarEnLocalStorage("modulo2", { riesgos: seleccionados });
+        guardarEnLocalStorage("modulo2", { riesgos });
 
-        if (seleccionados.length > 0) {
+        if (riesgos.some((item) => item.seleccionado)) {
             clasificacionFieldset.style.display = "block";
             clasificacionFieldset.scrollIntoView({ behavior: "smooth" });
         }
     });
 });
 
-// Mostrar botón "Siguiente" después de seleccionar clasificación
+// Guardar datos de clasificación y su detalle
 document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
     radio.addEventListener("change", () => {
         const clasificacion = document.querySelector('input[name="clasificacion"]:checked')?.value;
+        const detalleClasificacion = document.getElementById("detalle-otra-clasificacion").value.trim();
 
-        if (clasificacion) {
-            guardarEnLocalStorage("modulo2", { clasificacionSeleccionada: clasificacion });
-            nextButton.style.display = "block";
-            nextButton.scrollIntoView({ behavior: "smooth" });
-        }
+        guardarEnLocalStorage("modulo2", {
+            clasificacionSeleccionada: clasificacion,
+            detalleClasificacion: clasificacion === "Otra Clasificación" ? detalleClasificacion : null,
+        });
+
+        nextButton.style.display = "block";
+        nextButton.scrollIntoView({ behavior: "smooth" });
     });
 });
 
 // Validar y continuar al siguiente módulo
 nextButton.addEventListener("click", () => {
-    const seleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(
-        (input) => input.value
-    );
-    const clasificacion = document.querySelector('input[name="clasificacion"]:checked')?.value;
+    const riesgos = Array.from(document.querySelectorAll('input[name="riesgo"]')).map((input) => ({
+        riesgo: input.value,
+        seleccionado: input.checked,
+        detalle: document.getElementById(`detalle-${input.id}`).value.trim(),
+    }));
 
-    // Validaciones antes de continuar
+    const clasificacion = document.querySelector('input[name="clasificacion"]:checked')?.value;
+    const detalleClasificacion = document.getElementById("detalle-otra-clasificacion").value.trim();
+
     if (!imagenSeleccionada) {
         alert("Por favor carga una imagen antes de continuar.");
         return;
     }
 
-    if (seleccionados.length === 0) {
+    if (!riesgos.some((item) => item.seleccionado)) {
         alert("Por favor selecciona al menos un riesgo antes de continuar.");
         return;
     }
 
-    if (seleccionados.includes("Otros") && !otrosDetalleInput.value.trim()) {
-        alert("Por favor proporciona detalles para la opción 'Otros'.");
+    if (clasificacion === "Otra Clasificación" && !detalleClasificacion) {
+        alert("Por favor proporciona detalles para 'Otra Clasificación'.");
         return;
     }
 
-    if (!clasificacion) {
-        alert("Por favor selecciona una clasificación antes de continuar.");
-        return;
-    }
-
-    // Guardar datos en Local Storage y redirigir
     guardarEnLocalStorage("modulo2", {
         imagen: imagenSeleccionada.src,
-        riesgos: seleccionados,
-        detalleOtros: otrosDetalleInput.value.trim(),
+        riesgos,
         clasificacionSeleccionada: clasificacion,
+        detalleClasificacion: clasificacion === "Otra Clasificación" ? detalleClasificacion : null,
     });
 
     window.location.href = "/modulos/modulo3-detener/index.html";
 });
 
-// Mostrar tooltips al hacer clic en "?"
+// Mejor interacción para tooltips
 document.querySelectorAll(".tooltip").forEach((tooltip) => {
-    tooltip.addEventListener("click", () => {
-        alert(tooltip.getAttribute("data-tooltip"));
+    tooltip.addEventListener("mouseenter", () => {
+        const message = document.createElement("div");
+        message.className = "tooltip-message";
+        message.textContent = tooltip.getAttribute("data-tooltip");
+        tooltip.appendChild(message);
+    });
+
+    tooltip.addEventListener("mouseleave", () => {
+        tooltip.querySelector(".tooltip-message")?.remove();
     });
 });
