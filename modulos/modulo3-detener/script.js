@@ -1,7 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
-     // Obtener los datos actuales del reporte
-    const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+    const reporte = JSON.parse(localStorage.getItem("reporte")) || {}; // Obtener datos actuales
 
     // Eliminar datos residuales específicos del módulo 3
     if (reporte.modulo3) {
@@ -10,15 +9,14 @@ document.addEventListener("DOMContentLoaded", () => {
         console.log("Datos del módulo 3 eliminados.");
     }
 
-
     // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
     const validacionNombreFieldset = document.getElementById("validacion-nombre");
-    const clasificacionRadios = document.querySelectorAll('input[name="clasificacion"]');
-    const observacionesFieldset = document.getElementById("observaciones-adicionales");
+    const clasificacionFieldset = document.getElementById("clasificacionFieldset");
     const descripcionFieldset = document.getElementById("descripcion");
     const descripcionTexto = document.getElementById("descripcion-texto");
+    const observacionesFieldset = document.getElementById("observaciones-adicionales");
     const observacionesTexto = document.getElementById("observaciones-texto");
     const nextButton = document.getElementById("next");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
@@ -42,11 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
+
+            reporte.modulo3 = {
+                ...reporte.modulo3,
                 rolSeleccionado: rolSeleccionado,
             };
-            localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+
+            localStorage.setItem("reporte", JSON.stringify(reporte));
             console.log("Rol seleccionado guardado:", rolSeleccionado);
 
             if (rolSeleccionado === "Externo") {
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Validar llave
     document.getElementById("validar-llave").addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
-        const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
+        const rolSeleccionado = reporte.modulo3?.rolSeleccionado;
 
         if (!llave) {
             alert("Por favor, ingresa una llave.");
@@ -86,8 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (llaveValida) {
                 alert("Llave válida.");
-                datosAcumulados.modulo3 = {
-                    ...datosAcumulados.modulo3,
+                reporte.modulo3 = {
+                    ...reporte.modulo3,
                     llave: llave,
                 };
                 clasificacionFieldset.style.display = "block";
@@ -98,14 +98,12 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Rol no encontrado en roles.json.");
         }
 
-        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+        localStorage.setItem("reporte", JSON.stringify(reporte));
     });
-
-    
 
     // Validar y continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
-        const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
+        const rolSeleccionado = reporte.modulo3?.rolSeleccionado;
 
         if (rolSeleccionado === "Externo") {
             const nombre = document.getElementById("nombre-externo").value.trim();
@@ -117,10 +115,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
-                nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
-                telefonoExterno: telefono || datosAcumulados.modulo3?.telefonoExterno,
+            reporte.modulo3 = {
+                ...reporte.modulo3,
+                nombreExterno: nombre || reporte.modulo3?.nombreExterno,
+                telefonoExterno: telefono || reporte.modulo3?.telefonoExterno,
             };
         } else {
             if (!llaveValida) {
@@ -135,21 +133,21 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         if (descripcionFieldset.style.display === "block") {
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
+            reporte.modulo3 = {
+                ...reporte.modulo3,
                 descripcion: descripcionTexto.value.trim(),
             };
         }
 
         if (observacionesFieldset.style.display === "block") {
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
+            reporte.modulo3 = {
+                ...reporte.modulo3,
                 observacionesAdicionales: observacionesTexto.value.trim(),
             };
         }
 
-        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
-        console.log("Datos acumulados en módulo 3:", datosAcumulados);
+        localStorage.setItem("reporte", JSON.stringify(reporte));
+        console.log("Datos acumulados en módulo 3:", reporte);
 
         window.location.href = "/modulos/modulo4-observar/";
     });
