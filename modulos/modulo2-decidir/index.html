@@ -23,6 +23,7 @@
         <!-- Contenedor para previsualización de la foto -->
         <canvas id="fotoContainer" width="200" height="200" style="display: none;"></canvas>
 
+        
         <!-- Opciones de selección -->
         <fieldset id="riesgoOpciones" style="display: none;">
     <legend>1. Decidir: Riesgo Potencial</legend>
@@ -107,7 +108,7 @@
 </fieldset>
 
 
-        <!-- Clasificación -->
+         <!-- Clasificación -->
         <fieldset id="clasificacionFieldset" style="display: none;">
             <legend>Clasificación</legend>
             <div>
@@ -124,6 +125,14 @@
                 <input type="radio" id="falla-administrativa" name="clasificacion" value="Falla Administrativa">
                 <label for="falla-administrativa">Falla Administrativa</label>
                 <span class="tooltip" data-tooltip="Error en la gestión o supervisión de seguridad.">?</span>
+            </div>
+            <div>
+                <input type="radio" id="otra-clasificacion" name="clasificacion" value="Otra Clasificación">
+                <label for="otra-clasificacion">Otra Clasificación</label>
+                <span class="tooltip" data-tooltip="Especifica una clasificación diferente.">?</span>
+            </div>
+            <div id="otra-clasificacion-detalle-container" style="display: none; margin-left: 20px;">
+                <input type="text" id="otra-clasificacion-detalle" placeholder="Especifique la clasificación...">
             </div>
         </fieldset>
 
