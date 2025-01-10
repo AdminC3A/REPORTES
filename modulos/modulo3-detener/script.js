@@ -2,14 +2,18 @@ document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
     let datosAcumulados = JSON.parse(localStorage.getItem("reporte")) || {};
 
-    // Referencias al DOM
+    // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
     const validacionNombreFieldset = document.getElementById("validacion-nombre");
+    const clasificacionRadios = document.querySelectorAll('input[name="clasificacion"]');
+    const observacionesFieldset = document.getElementById("observaciones-adicionales");
+    const descripcionFieldset = document.getElementById("descripcion");
+    const descripcionTexto = document.getElementById("descripcion-texto");
+    const observacionesTexto = document.getElementById("observaciones-texto");
     const nextButton = document.getElementById("next");
-    const llaveInput = document.getElementById("llave");
-    const mensajeValidacionLlave = document.getElementById("mensaje-validacion");
-    const mensajeValidacionNombre = document.getElementById("mensaje-validacion-nombre");
+    const mensajeValidacion = document.getElementById("mensaje-validacion");
+
     let llaveValida = false;
 
     // Cargar datos desde roles.json
@@ -25,83 +29,70 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Manejar selección de rol
+    // Mostrar campos según el rol seleccionado
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
-
-            // Guardar selección de rol en Local Storage
-            datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, rolSeleccionado };
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                rolSeleccionado: rolSeleccionado,
+            };
             localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
             console.log("Rol seleccionado guardado:", rolSeleccionado);
 
-            // Mostrar u ocultar secciones basadas en el rol seleccionado
             if (rolSeleccionado === "Externo") {
-                validacionLlaveFieldset.classList.add("hidden");
-                validacionNombreFieldset.classList.remove("hidden");
+                validacionLlaveFieldset.style.display = "none";
+                validacionNombreFieldset.style.display = "block";
                 llaveValida = true; // Externos no requieren validación de llave
             } else {
-                validacionLlaveFieldset.classList.remove("hidden");
-                validacionNombreFieldset.classList.add("hidden");
+                validacionLlaveFieldset.style.display = "block";
+                validacionNombreFieldset.style.display = "none";
                 llaveValida = false; // Requieren validación de llave
             }
 
-            // Ocultar mensajes de validación
-            mensajeValidacionLlave.classList.add("hidden");
-            mensajeValidacionNombre.classList.add("hidden");
-            nextButton.classList.add("hidden");
+            clasificacionFieldset.style.display = "none";
+            observacionesFieldset.style.display = "none";
         });
     });
 
     // Validar llave
-   document.getElementById("validar-llave").addEventListener("click", () => {
-    const llave = document.getElementById("llave").value.trim();
-    const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
+    document.getElementById("validar-llave").addEventListener("click", () => {
+        const llave = document.getElementById("llave").value.trim();
+        const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
 
-    if (!llave) {
-        alert("Por favor, ingresa una llave.");
-        return;
-    }
+        if (!llave) {
+            alert("Por favor, ingresa una llave.");
+            return;
+        }
 
-    // Buscar el rol correspondiente en roles.json
-    const rolKey = Object.keys(rolesYllaves).find(
-        (key) => rolesYllaves[key].rol === rolSeleccionado
-    );
-
-    if (rolKey) {
-        const supervisores = rolesYllaves[rolKey]?.supervisores || {};
-        const supervisor = Object.entries(supervisores).find(([nombre, llaves]) =>
-            llaves.includes(llave)
+        const rolKey = Object.keys(rolesYllaves).find(
+            (key) => rolesYllaves[key].rol === rolSeleccionado
         );
 
-        if (supervisor) {
-            // Si se encuentra el propietario, guárdalo en localStorage
-            llaveValida = true;
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
-                llave: llave,
-                propietarioLlave: supervisor[0], // Guardar el nombre del propietario
-            };
-            localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+        if (rolKey) {
+            const supervisores = rolesYllaves[rolKey]?.supervisores || {};
+            llaveValida = Object.entries(supervisores).some(([nombre, llaves]) =>
+                llaves.includes(llave)
+            );
 
-            // Mostrar el propietario en el DOM
-            const nombreSupervisorElemento = document.getElementById("nombre-supervisor");
-            const nombreSupervisorTexto = document.getElementById("nombre-supervisor-texto");
-            if (nombreSupervisorElemento && nombreSupervisorTexto) {
-                nombreSupervisorElemento.classList.remove("hidden");
-                nombreSupervisorTexto.textContent = supervisor[0];
+            if (llaveValida) {
+                alert("Llave válida.");
+                datosAcumulados.modulo3 = {
+                    ...datosAcumulados.modulo3,
+                    llave: llave,
+                };
+                clasificacionFieldset.style.display = "block";
+            } else {
+                alert("Llave no válida. Intenta nuevamente.");
             }
-
-            alert("Llave válida.");
-            document.getElementById("next").classList.remove("hidden");
         } else {
-            alert("Llave no válida. Intenta nuevamente.");
+            alert("Rol no encontrado en roles.json.");
         }
-    } else {
-        alert("Rol no encontrado en roles.json.");
-    }
-});
 
+        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+    });
+
+    
 
     // Validar y continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
@@ -112,8 +103,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const telefono = document.getElementById("telefono-externo").value.trim();
 
             if (!nombre && !telefono) {
-                mensajeValidacionNombre.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
-                mensajeValidacionNombre.classList.remove("hidden");
+                mensajeValidacion.style.display = "block";
+                mensajeValidacion.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
                 return;
             }
 
@@ -122,19 +113,38 @@ document.addEventListener("DOMContentLoaded", () => {
                 nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
                 telefonoExterno: telefono || datosAcumulados.modulo3?.telefonoExterno,
             };
+        } else {
+            if (!llaveValida) {
+                alert("Por favor, valida la llave antes de continuar.");
+                return;
+            }
         }
 
-        if (!llaveValida && rolSeleccionado !== "Externo") {
-            alert("Por favor, valida la llave antes de continuar.");
+        if (descripcionFieldset.style.display === "block" && !descripcionTexto.value.trim()) {
+            alert("Por favor, completa la descripción.");
             return;
         }
 
-        // Guardar datos acumulados en Local Storage
+        if (descripcionFieldset.style.display === "block") {
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                descripcion: descripcionTexto.value.trim(),
+            };
+        }
+
+        if (observacionesFieldset.style.display === "block") {
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                observacionesAdicionales: observacionesTexto.value.trim(),
+            };
+        }
+
         localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
-        console.log("Datos guardados en módulo 3:", datosAcumulados);
+        console.log("Datos acumulados en módulo 3:", datosAcumulados);
 
         window.location.href = "/modulos/modulo4-observar/";
     });
 
     loadRolesAndKeys();
+    nextButton.style.display = "block";
 });
