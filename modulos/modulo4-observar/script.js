@@ -1,113 +1,94 @@
-document.addEventListener("DOMContentLoaded", () => {
-    let rolesYllaves = {};
-    let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {};
+// script.js para el Módulo 4: Mostrar acciones A (Corregir) y B (Retroalimentar)
 
-    const rolRadios = document.querySelectorAll('input[name="rol"]');
-    const validacionLlaveFieldset = document.getElementById("validacion-llave");
-    const validacionNombreFieldset = document.getElementById("validacion-nombre");
-    const clasificacionFieldset = document.getElementById("clasificacion");
-    const observacionesFieldset = document.getElementById("observaciones-adicionales");
-    const nextButton = document.getElementById("next");
+// Recuperar datos de los módulos anteriores desde localStorage
+let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {};
 
-    // Cargar roles y llaves desde JSON
-    async function loadRolesAndKeys() {
-        try {
-            const response = await fetch("/data/roles.json");
-            if (!response.ok) throw new Error("Error al cargar roles.json");
-            rolesYllaves = await response.json();
-            console.log("Roles y llaves cargados:", rolesYllaves);
-        } catch (error) {
-            console.error("Error al cargar roles y llaves:", error);
-            alert("No se pudieron cargar los roles y llaves. Verifica la conexión.");
-        }
+// Verificar si faltan datos acumulados y asignar valores predeterminados
+if (!datosAcumulados.accionSeleccionada) {
+    console.warn("Acción seleccionada faltante. Usando valor predeterminado.");
+    datosAcumulados.accionSeleccionada = "Acción No Especificada";
+}
+
+if (!datosAcumulados.clasificacionSeleccionada) {
+    console.warn("Clasificación seleccionada faltante. Usando valor predeterminado.");
+    datosAcumulados.clasificacionSeleccionada = "Clasificación No Especificada";
+}
+
+// Guardar los datos corregidos nuevamente en localStorage (si es necesario)
+localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+
+// Cargar el archivo CSV con las combinaciones
+Papa.parse('/data/combinaciones_botones.csv', {
+    download: true,
+    header: true, // Usar las cabeceras como claves
+    complete: function (results) {
+        const combinaciones = results.data; // Datos cargados del CSV
+        console.log("Combinaciones cargadas:", combinaciones);
+
+        // Procesar las combinaciones basadas en los datos acumulados
+        mostrarAccion(combinaciones, datosAcumulados);
+    },
+    error: function (error) {
+        console.error("Error al cargar el CSV:", error);
     }
-
-    // Mostrar campos según el rol seleccionado
-    rolRadios.forEach((radio) => {
-        radio.addEventListener("change", () => {
-            const rolSeleccionado = radio.value;
-            datosAcumulados.rolSeleccionado = rolSeleccionado;
-            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-
-            if (rolSeleccionado === "Externo") {
-                validacionLlaveFieldset.style.display = "none";
-                validacionNombreFieldset.style.display = "block";
-            } else {
-                validacionLlaveFieldset.style.display = "block";
-                validacionNombreFieldset.style.display = "none";
-            }
-            clasificacionFieldset.style.display = "none";
-            nextButton.style.display = "none";
-        });
-    });
-
-    // Validar llave
-    document.getElementById("validar-llave").addEventListener("click", () => {
-        const llave = document.getElementById("llave").value.trim();
-        const rolSeleccionado = datosAcumulados.rolSeleccionado;
-
-        if (!llave) {
-            alert("Por favor, ingresa una llave.");
-            return;
-        }
-
-        const supervisores = rolesYllaves[`${rolSeleccionado.toLowerCase().replace(/ /g, "")}`]?.supervisores || {};
-        let llaveValida = false;
-
-        Object.values(supervisores).forEach((llaves) => {
-            if (llaves.includes(llave)) {
-                llaveValida = true;
-            }
-        });
-
-        if (llaveValida) {
-            alert("Llave válida.");
-            clasificacionFieldset.style.display = "block";
-        } else {
-            alert("Llave no válida. Intenta nuevamente.");
-        }
-    });
-
-    // Continuar con nombre para externos
-    document.getElementById("continuar-externo").addEventListener("click", () => {
-        const nombre = document.getElementById("nombre-externo").value.trim();
-        if (!nombre) {
-            alert("Por favor, ingresa tu nombre.");
-            return;
-        }
-        datosAcumulados.nombreExterno = nombre;
-        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-        clasificacionFieldset.style.display = "block";
-    });
-
-    // Manejar selección de clasificación
-    document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
-        radio.addEventListener("change", (e) => {
-            const clasificacion = e.target.value;
-            datosAcumulados.clasificacionSeleccionada = clasificacion;
-            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-
-            if (clasificacion === "Otros") {
-                document.getElementById("otros-detalle").style.display = "block";
-            } else {
-                document.getElementById("otros-detalle").style.display = "none";
-            }
-            observacionesFieldset.style.display = "block";
-            nextButton.style.display = "block";
-        });
-    });
-
-    // Guardar observaciones adicionales
-    document.getElementById("observaciones-texto").addEventListener("input", (e) => {
-        datosAcumulados.observacionesAdicionales = e.target.value;
-        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-    });
-
-    // Continuar al siguiente módulo
-    nextButton.addEventListener("click", () => {
-        window.location.href = "/modulos/modulo4-observar/";
-    });
-
-    // Inicialización
-    loadRolesAndKeys();
 });
+
+// Función para mostrar la acción a implementar
+function mostrarAccion(combinaciones, datos) {
+    // Buscar la combinación relevante basada en los datos acumulados
+    const combinacion = combinaciones.find(c => 
+        c.Accion === datos.accionSeleccionada &&
+        c.Clasificacion === datos.clasificacionSeleccionada
+    );
+
+    // Si se encuentra una combinación válida, mostrar las opciones
+    if (combinacion) {
+        console.log("Combinación seleccionada:", combinacion);
+
+        // Actualizar contenido dinámico con las acciones
+        actualizarContenido(combinacion);
+    } else {
+        console.warn("No se encontró una combinación para los datos seleccionados.");
+        const contenedor = document.getElementById("contenedor-dinamico");
+        contenedor.innerHTML = `
+            <p>No se encontraron acciones específicas para los datos proporcionados.</p>
+            <button id="continuar-generico">Continuar</button>
+        `;
+
+        // Botón genérico para continuar
+        document.getElementById("continuar-generico").onclick = () => {
+            // Continuar al siguiente módulo con datos actuales
+            datosAcumulados.modulo4 = { accion: "Genérica", tipo: "Continuar" };
+            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+            window.location.href = "/modulos/modulo5-corregir/";
+        };
+    }
+}
+
+// Función para actualizar el contenido dinámico
+function actualizarContenido(combinacion) {
+    const contenedor = document.getElementById("contenedor-dinamico");
+    contenedor.innerHTML = `
+        <h2>Acción Seleccionada: ${combinacion.Accion}</h2>
+        <p>Clasificación: ${combinacion.Clasificacion}</p>
+        <button id="btn-corregir">A. Corregir</button>
+        <button id="btn-retroalimentar">B. Retroalimentar</button>
+    `;
+
+    // Configurar botones
+    document.getElementById("btn-corregir").onclick = () => {
+        alert(`Acción Correctiva: ${combinacion.BotonCorregir}`);
+        // Guardar la elección en localStorage y continuar
+        datosAcumulados.modulo4 = { accion: combinacion.Accion, tipo: "Corregir" };
+        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+        window.location.href = "/modulos/modulo5-corregir/";
+    };
+
+    document.getElementById("btn-retroalimentar").onclick = () => {
+        alert(`Retroalimentación: ${combinacion.BotonRetroalimentar}`);
+        // Guardar la elección en localStorage y continuar
+        datosAcumulados.modulo4 = { accion: combinacion.Accion, tipo: "Retroalimentar" };
+        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+        window.location.href = "/modulos/modulo5-corregir/";
+    };
+}
