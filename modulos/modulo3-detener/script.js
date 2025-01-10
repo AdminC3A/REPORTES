@@ -2,14 +2,14 @@ document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
     let datosAcumulados = JSON.parse(localStorage.getItem("reporte")) || {};
 
-    // Elementos del DOM
+    // Referencias al DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
-    const llaveInput = document.getElementById("llave");
-    const validarLlaveBtn = document.getElementById("validar-llave");
-    const mensajeValidacion = document.getElementById("mensaje-validacion");
-    const supervisorNombre = document.getElementById("supervisor-nombre");
+    const validacionNombreFieldset = document.getElementById("validacion-nombre");
     const nextButton = document.getElementById("next");
+    const llaveInput = document.getElementById("llave");
+    const mensajeValidacionLlave = document.getElementById("mensaje-validacion");
+    const mensajeValidacionNombre = document.getElementById("mensaje-validacion-nombre");
 
     let llaveValida = false;
 
@@ -30,29 +30,31 @@ document.addEventListener("DOMContentLoaded", () => {
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
-                rolSeleccionado: rolSeleccionado,
-            };
+            datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, rolSeleccionado };
             localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
 
             if (rolSeleccionado === "Externo") {
-                validacionLlaveFieldset.style.display = "none";
-                llaveValida = true; // Externos no requieren validación de llave
+                validacionLlaveFieldset.classList.add("hidden");
+                validacionNombreFieldset.classList.remove("hidden");
+                llaveValida = true; // No requiere validación de llave
             } else {
-                validacionLlaveFieldset.style.display = "block";
-                llaveValida = false;
+                validacionLlaveFieldset.classList.remove("hidden");
+                validacionNombreFieldset.classList.add("hidden");
+                llaveValida = false; // Requiere validación de llave
             }
+
+            nextButton.classList.add("hidden");
         });
     });
 
     // Validar llave
-    validarLlaveBtn.addEventListener("click", () => {
+    document.getElementById("validar-llave").addEventListener("click", () => {
         const llave = llaveInput.value.trim();
         const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
 
         if (!llave) {
-            alert("Por favor, ingresa una llave.");
+            mensajeValidacionLlave.textContent = "Por favor, ingresa una llave.";
+            mensajeValidacionLlave.classList.remove("hidden");
             return;
         }
 
@@ -62,42 +64,54 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (rolKey) {
             const supervisores = rolesYllaves[rolKey]?.supervisores || {};
-            const supervisor = Object.entries(supervisores).find(([nombre, llaves]) =>
+            llaveValida = Object.entries(supervisores).some(([nombre, llaves]) =>
                 llaves.includes(llave)
             );
 
-            if (supervisor) {
-                llaveValida = true;
-                datosAcumulados.modulo3 = {
-                    ...datosAcumulados.modulo3,
-                    llave: llave,
-                    supervisor: supervisor[0],
-                };
-                localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
-                mensajeValidacion.style.display = "none";
-                supervisorNombre.style.display = "block";
-                supervisorNombre.querySelector("span").textContent = supervisor[0];
+            if (llaveValida) {
+                mensajeValidacionLlave.classList.add("hidden");
                 alert("Llave válida.");
-                nextButton.style.display = "block";
+                nextButton.classList.remove("hidden");
             } else {
-                llaveValida = false;
-                mensajeValidacion.style.display = "block";
-                mensajeValidacion.textContent = "Llave no válida. Intenta nuevamente.";
+                mensajeValidacionLlave.textContent = "Llave no válida. Intenta nuevamente.";
+                mensajeValidacionLlave.classList.remove("hidden");
             }
         } else {
             alert("Rol no encontrado en roles.json.");
         }
+
+        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
     });
 
-    // Continuar al siguiente módulo
+    // Validar y continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
-        if (!llaveValida) {
+        const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
+
+        if (rolSeleccionado === "Externo") {
+            const nombre = document.getElementById("nombre-externo").value.trim();
+            const telefono = document.getElementById("telefono-externo").value.trim();
+
+            if (!nombre && !telefono) {
+                mensajeValidacionNombre.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
+                mensajeValidacionNombre.classList.remove("hidden");
+                return;
+            }
+
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
+                telefonoExterno: telefono || datosAcumulados.modulo3?.telefonoExterno,
+            };
+        }
+
+        if (!llaveValida && rolSeleccionado !== "Externo") {
             alert("Por favor, valida la llave antes de continuar.");
             return;
         }
+
+        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
         window.location.href = "/modulos/modulo4-observar/";
     });
 
-    // Inicializar datos
     loadRolesAndKeys();
 });
