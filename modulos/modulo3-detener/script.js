@@ -4,15 +4,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Elementos del DOM
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
-    const validacionExternoFieldset = document.getElementById("validacion-externo");
+    const validacionNombreFieldset = document.getElementById("validacion-nombre");
     const clasificacionFieldset = document.getElementById("clasificacion");
+    const observacionesFieldset = document.getElementById("observaciones-adicionales");
     const validarLlaveButton = document.getElementById("validar-llave");
+    const continuarExternoButton = document.getElementById("continuar-externo");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
     const nextButton = document.getElementById("next");
     const nombreExternoInput = document.getElementById("nombre-externo");
-    const telefonoExternoInput = document.getElementById("telefono-externo");
-    const continuarExternoButton = document.getElementById("continuar-externo");
     const otrosDetalle = document.getElementById("otros-detalle");
+    const observacionesTexto = document.getElementById("observaciones-texto");
 
     // Cargar roles y llaves desde el JSON
     async function loadRolesAndKeys() {
@@ -34,13 +35,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.style.display = "none";
-                validacionExternoFieldset.style.display = "block";
+                validacionNombreFieldset.style.display = "block";
                 clasificacionFieldset.style.display = "none";
+                observacionesFieldset.style.display = "none";
                 nextButton.style.display = "none";
             } else {
                 validacionLlaveFieldset.style.display = "block";
-                validacionExternoFieldset.style.display = "none";
+                validacionNombreFieldset.style.display = "none";
                 clasificacionFieldset.style.display = "none";
+                observacionesFieldset.style.display = "none";
                 nextButton.style.display = "none";
             }
 
@@ -72,22 +75,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
         // Validar la llave ingresada
         let llaveValida = false;
-        let nombreSupervisor = "";
 
-        Object.entries(supervisores).forEach(([nombre, llaves]) => {
+        Object.values(supervisores).forEach((llaves) => {
             if (llaves.includes(llave)) {
                 llaveValida = true;
-                nombreSupervisor = nombre;
             }
         });
 
         if (llaveValida) {
-            console.log(`Llave válida para ${nombreSupervisor}`);
             mensajeValidacion.style.display = "none";
             clasificacionFieldset.style.display = "block";
             validacionLlaveFieldset.style.display = "none";
-
-            guardarEnLocalStorage("modulo3", { rol, llave, supervisor: nombreSupervisor });
         } else {
             mensajeValidacion.style.display = "block";
             mensajeValidacion.innerText = "Llave no válida. Intenta nuevamente.";
@@ -97,54 +95,51 @@ document.addEventListener("DOMContentLoaded", () => {
     // Continuar con "Externo"
     continuarExternoButton.addEventListener("click", () => {
         const nombre = nombreExternoInput.value.trim();
-        const telefono = telefonoExternoInput.value.trim();
 
+        if (!nombre) {
+            mensajeValidacion.style.display = "block";
+            mensajeValidacion.innerText = "Por favor ingresa tu nombre.";
+            return;
+        }
+
+        mensajeValidacion.style.display = "none";
         clasificacionFieldset.style.display = "block";
-        validacionExternoFieldset.style.display = "none";
-
-        guardarEnLocalStorage("modulo3", { rol: "Externo", nombreExterno: nombre, telefonoExterno: telefono });
+        validacionNombreFieldset.style.display = "none";
     });
 
-    // Mostrar campo de texto para "Otros"
+    // Mostrar el textarea para "Otros"
     document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
-        radio.addEventListener("change", (event) => {
-            const seleccion = event.target.value;
-
-            if (seleccion === "Otros") {
+        radio.addEventListener("change", () => {
+            if (radio.value === "Otros") {
                 otrosDetalle.style.display = "block";
             } else {
                 otrosDetalle.style.display = "none";
             }
-
-            // Mostrar botón "Continuar" al seleccionar cualquier clasificación
+            observacionesFieldset.style.display = "block";
             nextButton.style.display = "block";
         });
     });
 
     // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
-        const clasificacionSeleccionada = document.querySelector('input[name="clasificacion"]:checked');
-        const clasificacion = clasificacionSeleccionada ? clasificacionSeleccionada.value : null;
-        const detalleOtros = otrosDetalle.value.trim();
+        const clasificacion = document.querySelector('input[name="clasificacion"]:checked');
+        const otros = otrosDetalle.value.trim();
+        const observaciones = observacionesTexto.value.trim();
 
         // Guardar datos en Local Storage
-        guardarEnLocalStorage("modulo3", {
-            clasificacion,
-            detalleOtros: clasificacion === "Otros" ? detalleOtros : null,
-        });
+        const datos = {
+            rol: document.querySelector('input[name="rol"]:checked').value,
+            clasificacion: clasificacion ? clasificacion.value : null,
+            otros: otros || null,
+            observaciones: observaciones || null,
+        };
 
-        // Ir al módulo 4 sin validar
+        localStorage.setItem("datosModulo3", JSON.stringify(datos));
+
+        // Redirigir al módulo 4
         window.location.href = "/modulos/modulo4-observar/index.html";
     });
 
-    // Guardar en Local Storage
-    function guardarEnLocalStorage(modulo, datos) {
-        let reporte = JSON.parse(localStorage.getItem("reporte")) || {};
-        reporte[modulo] = { ...reporte[modulo], ...datos };
-        localStorage.setItem("reporte", JSON.stringify(reporte));
-        console.log(`Datos guardados en ${modulo}:`, datos);
-    }
-
-    // Inicialización
+    // Inicializar
     loadRolesAndKeys();
 });
