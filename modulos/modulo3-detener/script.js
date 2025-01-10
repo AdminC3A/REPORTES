@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
+    let rolesYllaves = {}; // Datos cargados desde roles.json
     let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {};
 
     // Elementos del DOM
@@ -12,6 +13,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let llaveValida = false;
 
+    // Cargar datos desde roles.json
+    async function loadRolesAndKeys() {
+        try {
+            const response = await fetch("/data/roles.json");
+            if (!response.ok) throw new Error("Error al cargar roles.json");
+            rolesYllaves = await response.json();
+            console.log("Roles y llaves cargados:", rolesYllaves);
+        } catch (error) {
+            console.error("Error al cargar roles.json:", error);
+            alert("No se pudieron cargar los datos de roles y llaves. Verifica la conexión.");
+        }
+    }
+
     // Mostrar campos según el rol seleccionado
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
@@ -20,19 +34,16 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
 
             if (rolSeleccionado === "Externo") {
-                // Mostrar campos de nombre y teléfono para "Externo"
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
 
-                // Reiniciar valores
                 document.getElementById("nombre-externo").value = "";
                 document.getElementById("telefono-externo").value = "";
-                llaveValida = true; // No requiere llave
+                llaveValida = true; // Externos no requieren validación de llave
             } else {
-                // Mostrar validación de llave para otros roles
                 validacionLlaveFieldset.style.display = "block";
                 validacionNombreFieldset.style.display = "none";
-                llaveValida = false; // Requiere validación de llave
+                llaveValida = false; // Requieren validación de llave
             }
 
             clasificacionFieldset.style.display = "none";
@@ -43,27 +54,34 @@ document.addEventListener("DOMContentLoaded", () => {
     // Validar llave
     document.getElementById("validar-llave").addEventListener("click", () => {
         const llave = document.getElementById("llave").value.trim();
+        const rolSeleccionado = datosAcumulados.rolSeleccionado;
+
         if (!llave) {
             alert("Por favor, ingresa una llave.");
             return;
         }
 
-        // Lógica de validación de llave (reemplazar con lógica real)
-        const supervisores = {
-            "1234": "Empleado 1",
-            "5678": "Empleado 2",
-            "abcd": "Empleado 3"
-        };
+        // Buscar el rol seleccionado en roles.json
+        const rolKey = Object.keys(rolesYllaves).find(
+            (key) => rolesYllaves[key].rol === rolSeleccionado
+        );
 
-        if (supervisores[llave]) {
-            alert(`Llave válida. Identificado: ${supervisores[llave]}`);
-            datosAcumulados.llave = llave;
-            datosAcumulados.nombreEmpleado = supervisores[llave];
-            llaveValida = true;
-            clasificacionFieldset.style.display = "block";
+        if (rolKey) {
+            // Buscar llave en los supervisores del rol seleccionado
+            const supervisores = rolesYllaves[rolKey]?.supervisores || {};
+            llaveValida = Object.entries(supervisores).some(([nombre, llaves]) =>
+                llaves.includes(llave)
+            );
+
+            if (llaveValida) {
+                alert("Llave válida.");
+                datosAcumulados.llave = llave;
+                clasificacionFieldset.style.display = "block";
+            } else {
+                alert("Llave no válida. Intenta nuevamente.");
+            }
         } else {
-            alert("Llave no válida. Intenta nuevamente.");
-            llaveValida = false;
+            alert("Rol no encontrado en roles.json.");
         }
 
         localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
@@ -79,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!nombre && !telefono) {
                 mensajeValidacion.style.display = "block";
-                mensajeValidacion.textContent = "Por favor ingresa al menos tu nombre o teléfono.";
+                mensajeValidacion.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
                 return;
             }
 
@@ -98,5 +116,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Inicializar el estado
+    loadRolesAndKeys();
     nextButton.style.display = "block";
 });
