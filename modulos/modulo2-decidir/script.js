@@ -7,6 +7,7 @@ const clasificacionFieldset = document.getElementById("clasificacionFieldset");
 const nextButton = document.getElementById("next");
 const detalleRiesgoInput = document.getElementById("detalle-riesgo");
 const detalleClasificacionInput = document.getElementById("detalle-otra-clasificacion");
+let imagenSeleccionada = null;
 
 // Tooltips
 const tooltipComments = document.createElement("div");
@@ -22,7 +23,7 @@ document.querySelectorAll(".tooltip").forEach((tooltip) => {
     });
 });
 
-// Función para mostrar secciones
+// Función para mostrar secciones dinámicamente
 function mostrarSeccion(seccion) {
     seccion.classList.remove("hidden");
     seccion.scrollIntoView({ behavior: "smooth" });
@@ -46,6 +47,7 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
                     ctx.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
                     ctx.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
                     fotoContainer.style.display = "block";
+                    imagenSeleccionada = img;
                     mostrarSeccion(riesgoOpciones);
                 };
                 img.src = e.target.result;
@@ -53,6 +55,51 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
             reader.readAsDataURL(file);
         }
     });
+});
+
+// Cargar Foto desde Cámara
+cargarFotoCamaraBtn.addEventListener("click", async () => {
+    try {
+        const videoStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        const videoElement = document.createElement("video");
+        videoElement.srcObject = videoStream;
+        videoElement.autoplay = true;
+
+        const captureCanvas = document.createElement("canvas");
+        const captureContext = captureCanvas.getContext("2d");
+
+        // Crear un botón para tomar la foto
+        const captureButton = document.createElement("button");
+        captureButton.textContent = "Tomar Foto";
+        captureButton.style.display = "block";
+        document.body.appendChild(videoElement);
+        document.body.appendChild(captureButton);
+
+        captureButton.addEventListener("click", () => {
+            captureCanvas.width = videoElement.videoWidth;
+            captureCanvas.height = videoElement.videoHeight;
+            captureContext.drawImage(videoElement, 0, 0, captureCanvas.width, captureCanvas.height);
+
+            const imgData = captureCanvas.toDataURL("image/png");
+            guardarEnLocalStorage("modulo2", { imagen: imgData });
+
+            const img = new Image();
+            img.src = imgData;
+            img.onload = () => {
+                const ctxFoto = fotoContainer.getContext("2d");
+                ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
+                ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
+                fotoContainer.style.display = "block";
+
+                videoStream.getTracks().forEach((track) => track.stop());
+                videoElement.remove();
+                captureButton.remove();
+                mostrarSeccion(riesgoOpciones);
+            };
+        });
+    } catch (error) {
+        alert("No se pudo acceder a la cámara. Por favor, verifica los permisos.");
+    }
 });
 
 // Manejo de la sección de Riesgos
@@ -74,6 +121,7 @@ document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
         nextButton.scrollIntoView({ behavior: "smooth" });
     });
 });
+
 // Validar y continuar al siguiente módulo
 nextButton.addEventListener("click", () => {
     const riesgosSeleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(
@@ -111,6 +159,14 @@ nextButton.addEventListener("click", () => {
         detalleClasificacion: clasificacionSeleccionada === "Otra Clasificación" ? detalleClasificacionInput.value.trim() : null,
     });
 
+    console.log("Redirigiendo al módulo 3...");
     window.location.href = "/modulos/modulo3-detener/index.html";
 });
 
+// Función para guardar en Local Storage
+function guardarEnLocalStorage(modulo, datos) {
+    const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+    reporte[modulo] = { ...reporte[modulo], ...datos };
+    localStorage.setItem("reporte", JSON.stringify(reporte));
+    console.log(`Datos del ${modulo} guardados:`, datos);
+}
