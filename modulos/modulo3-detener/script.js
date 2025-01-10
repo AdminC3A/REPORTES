@@ -2,6 +2,13 @@ document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
     let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {}; // Recuperar datos almacenados
 
+    // Tabla de mapeo de roles a claves de JSON
+    const roleKeyMapping = {
+        "Supervisor de Seguridad": "supervisoresSeguridad",
+        "Supervisor de Obra": "supervisoresObra",
+        "Guardia en Turno": "guardiasTurno"
+    };
+
     // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
@@ -17,6 +24,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const response = await fetch("/data/roles.json");
             if (!response.ok) throw new Error("Error al cargar roles.json");
             rolesYllaves = await response.json();
+
+            // Validar estructura esperada
+            const rolesEsperados = Object.values(roleKeyMapping);
+            rolesEsperados.forEach((rol) => {
+                if (!rolesYllaves[rol]) {
+                    console.warn(`Rol faltante: ${rol} en roles.json`);
+                }
+            });
+
             console.log("Roles y llaves cargados:", rolesYllaves);
         } catch (error) {
             console.error("Error al cargar roles y llaves:", error);
@@ -36,9 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
 
-                // Asegurar que ambos campos sean visibles para Externo
-                document.getElementById("nombre-externo").value = ""; // Reiniciar el campo
-                document.getElementById("telefono-externo").value = ""; // Reiniciar el teléfono
+                // Reiniciar campos para Externo
+                document.getElementById("nombre-externo").value = "";
+                document.getElementById("telefono-externo").value = "";
             } else {
                 validacionLlaveFieldset.style.display = "block";
                 validacionNombreFieldset.style.display = "none";
@@ -59,13 +75,23 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const rolKey = `${rolSeleccionado.toLowerCase().replace(/ /g, "")}`; // Convertir el rol a la clave correspondiente en JSON
-        const supervisores = rolesYllaves[rolKey]?.supervisores || {}; // Obtener los supervisores para el rol seleccionado
+        if (!rolSeleccionado || !roleKeyMapping[rolSeleccionado]) {
+            alert("Rol no válido o no seleccionado.");
+            return;
+        }
+
+        const rolKey = roleKeyMapping[rolSeleccionado]; // Obtener la clave mapeada
+        const supervisores = rolesYllaves[rolKey]?.supervisores || {};
+
+        if (!supervisores || Object.keys(supervisores).length === 0) {
+            alert("No se encontraron supervisores para el rol seleccionado.");
+            return;
+        }
 
         let llaveValida = false;
 
         Object.entries(supervisores).forEach(([nombre, llaves]) => {
-            if (llaves.includes(llave)) {
+            if (Array.isArray(llaves) && llaves.includes(llave)) {
                 llaveValida = true;
             }
         });
