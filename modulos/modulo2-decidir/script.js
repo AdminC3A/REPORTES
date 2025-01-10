@@ -1,13 +1,3 @@
-document.addEventListener("DOMContentLoaded", () => {
-    // Obtener los datos actuales del reporte
-    const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
-
-    // Eliminar datos residuales específicos del módulo 2
-    if (reporte.modulo2) {
-        delete reporte.modulo2; // Eliminar los datos del módulo 2
-        localStorage.setItem("reporte", JSON.stringify(reporte)); // Guardar el reporte actualizado
-        console.log("Datos del módulo 2 eliminados.");
-    }
 // Referencias al DOM
 const cargarFotoArchivoBtn = document.getElementById("cargarFotoArchivoBtn");
 const cargarFotoCamaraBtn = document.getElementById("cargarFotoCamaraBtn");
@@ -19,6 +9,16 @@ const detalleRiesgoInput = document.getElementById("detalle-riesgo");
 const detalleClasificacionInput = document.getElementById("detalle-otra-clasificacion");
 let imagenSeleccionada = null;
 
+document.addEventListener("DOMContentLoaded", () => {
+    // Obtener los datos actuales del reporte
+    const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+
+    // Eliminar datos residuales específicos del módulo 2
+    if (reporte.modulo2) {
+        delete reporte.modulo2; // Eliminar los datos del módulo 2
+        localStorage.setItem("reporte", JSON.stringify(reporte)); // Guardar el reporte actualizado
+        console.log("Datos del módulo 2 eliminados.");
+    }
 // Función para guardar en Local Storage
 function guardarEnLocalStorage(modulo, datos) {
     const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
