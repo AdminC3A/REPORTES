@@ -44,7 +44,11 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
                 img.onload = () => {
                     const ctx = fotoContainer.getContext("2d");
                     ctx.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
-                    ctx.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
+                    ctx.drawImage(
+                        img,
+                        0, 0,
+                        fotoContainer.width, fotoContainer.height
+                    ); // Imagen centrada en forma de cuadro
                     fotoContainer.style.display = "block";
                     imagenSeleccionada = img;
                     guardarImagenEnLocalStorage(e.target.result);
@@ -77,16 +81,16 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    imagenSeleccionada = img;
-                    guardarImagenEnLocalStorage(e.target.result);
-
                     const ctxFoto = fotoContainer.getContext("2d");
                     ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
-                    ctxFoto.beginPath();
-                    ctxFoto.arc(75, 75, 75, 0, Math.PI * 2, true);
-                    ctxFoto.closePath();
-                    ctxFoto.clip();
-                    ctxFoto.drawImage(img, 0, 0, 150, 150);
+                    ctxFoto.drawImage(
+                        img,
+                        0, 0,
+                        fotoContainer.width, fotoContainer.height
+                    ); // Imagen centrada en forma de cuadro
+                    fotoContainer.style.display = "block";
+                    imagenSeleccionada = img;
+                    guardarImagenEnLocalStorage(e.target.result);
                     mostrarOpciones();
                 };
                 img.src = e.target.result;
@@ -100,9 +104,46 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
     });
 });
 
+// Manejo de selección de riesgos
+document.querySelectorAll('input[name="riesgo"]').forEach((checkbox) => {
+    checkbox.addEventListener("change", () => {
+        const seleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(
+            (input) => input.value
+        );
+
+        if (seleccionados.includes("Otros")) {
+            otrosDetalleInput.style.display = "block";
+        } else {
+            otrosDetalleInput.style.display = "none";
+        }
+
+        // Mostrar clasificación si hay al menos un riesgo seleccionado
+        if (seleccionados.length > 0) {
+            clasificacionFieldset.style.display = "block";
+            clasificacionFieldset.scrollIntoView({ behavior: "smooth" });
+        }
+    });
+});
+
+// Manejo de selección de clasificación
+document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+        const clasificacionSeleccionada = document.querySelector('input[name="clasificacion"]:checked')?.value;
+        if (clasificacionSeleccionada === "Otra Clasificación") {
+            detalleClasificacionInput.style.display = "block";
+        } else {
+            detalleClasificacionInput.style.display = "none";
+        }
+        nextButton.style.display = "block";
+        nextButton.scrollIntoView({ behavior: "smooth" });
+    });
+});
+
 // Validar y continuar al siguiente módulo
 nextButton.addEventListener("click", () => {
-    const seleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(input => input.value);
+    const seleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(
+        (input) => input.value
+    );
     const clasificacionSeleccionada = document.querySelector('input[name="clasificacion"]:checked')?.value;
 
     if (!imagenSeleccionada) {
