@@ -2,11 +2,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const reporteContainer = document.getElementById("reporte-container");
     const finalizarReporteBtn = document.getElementById("finalizar-reporte");
 
-    // Función para enmascarar llaves
-    function enmascararLlave(llave) {
-        if (!llave) return "No disponible";
-        return llave.slice(0, -4).replace(/./g, "*") + llave.slice(-4);
-    }
+  // Función para enmascarar completamente la llave
+function enmascararLlave(llave) {
+    if (!llave) return "No disponible";
+    return llave.replace(/./g, "*"); // Reemplazar cada carácter con un asterisco
+}
 
     // Función para cargar y mostrar el reporte
     function cargarReporte() {
