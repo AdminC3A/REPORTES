@@ -6,8 +6,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
     const validacionNombreFieldset = document.getElementById("validacion-nombre");
-    const clasificacionFieldset = document.getElementById("clasificacion");
+    const clasificacionRadios = document.querySelectorAll('input[name="clasificacion"]');
     const observacionesFieldset = document.getElementById("observaciones-adicionales");
+    const descripcionFieldset = document.getElementById("descripcion");
+    const descripcionTexto = document.getElementById("descripcion-texto");
+    const observacionesTexto = document.getElementById("observaciones-texto");
     const nextButton = document.getElementById("next");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
 
@@ -34,13 +37,16 @@ document.addEventListener("DOMContentLoaded", () => {
             localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
 
             if (rolSeleccionado === "Externo") {
+                // Mostrar campos de nombre y teléfono para "Externo"
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
 
+                // Reiniciar valores
                 document.getElementById("nombre-externo").value = "";
                 document.getElementById("telefono-externo").value = "";
                 llaveValida = true; // Externos no requieren validación de llave
             } else {
+                // Mostrar validación de llave para otros roles
                 validacionLlaveFieldset.style.display = "block";
                 validacionNombreFieldset.style.display = "none";
                 llaveValida = false; // Requieren validación de llave
@@ -87,10 +93,35 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
     });
 
-    // Continuar al siguiente módulo
+    // Manejar selección de clasificación
+    clasificacionRadios.forEach((radio) => {
+        radio.addEventListener("change", (e) => {
+            const clasificacion = e.target.value;
+            datosAcumulados.clasificacionSeleccionada = clasificacion;
+            localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+
+            // Mostrar campos según la selección
+            if (clasificacion === "Otros") {
+                // Mostrar descripción (obligatoria)
+                descripcionFieldset.style.display = "block";
+                observacionesFieldset.style.display = "none";
+                descripcionTexto.required = true; // Hacer obligatorio
+                observacionesTexto.required = false; // Quitar obligatoriedad
+            } else {
+                // Mostrar observaciones adicionales (opcional)
+                descripcionFieldset.style.display = "none";
+                observacionesFieldset.style.display = "block";
+                descripcionTexto.required = false; // Quitar obligatoriedad
+                observacionesTexto.required = false; // Sigue siendo opcional
+            }
+        });
+    });
+
+    // Validar campos antes de avanzar
     nextButton.addEventListener("click", () => {
         const rolSeleccionado = datosAcumulados.rolSeleccionado;
 
+        // Validar "Externo" con nombre o teléfono
         if (rolSeleccionado === "Externo") {
             const nombre = document.getElementById("nombre-externo").value.trim();
             const telefono = document.getElementById("telefono-externo").value.trim();
@@ -110,8 +141,26 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
 
-        console.log("Datos acumulados hasta el Módulo 3:", datosAcumulados);
+        // Validar descripción si es visible y requerida
+        if (descripcionFieldset.style.display === "block" && !descripcionTexto.value.trim()) {
+            alert("Por favor, completa la descripción.");
+            descripcionTexto.focus();
+            return;
+        }
+
+        // Guardar observaciones o descripción según el caso
+        if (observacionesFieldset.style.display === "block" && observacionesTexto.value.trim()) {
+            datosAcumulados.observacionesAdicionales = observacionesTexto.value.trim();
+        }
+
+        if (descripcionFieldset.style.display === "block" && descripcionTexto.value.trim()) {
+            datosAcumulados.descripcion = descripcionTexto.value.trim();
+        }
+
         localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+        console.log("Datos acumulados:", datosAcumulados);
+
+        // Redirigir al siguiente módulo
         window.location.href = "/modulos/modulo4-observar/";
     });
 
