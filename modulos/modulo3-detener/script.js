@@ -43,15 +43,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Mostrar u ocultar secciones basadas en el rol seleccionado
             if (rolSeleccionado === "Externo") {
-                validacionLlaveFieldset.style.display = "none";
-                validacionNombreFieldset.style.display = "block";
+                validacionLlaveFieldset.classList.add("hidden");
+                validacionNombreFieldset.classList.remove("hidden");
                 llaveValida = true; // No requiere validación de llave
             } else {
-                validacionLlaveFieldset.style.display = "block";
-                validacionNombreFieldset.style.display = "none";
+                validacionLlaveFieldset.classList.remove("hidden");
+                validacionNombreFieldset.classList.add("hidden");
                 llaveValida = false; // Requiere validación de llave
             }
 
+            // Ocultar mensaje de error al cambiar de rol
+            mensajeValidacionLlave.classList.add("hidden");
+            mensajeValidacionLlave.textContent = "";
             nextButton.classList.add("hidden");
         });
     });
@@ -79,6 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (llaveValida) {
                 mensajeValidacionLlave.classList.add("hidden");
+                mensajeValidacionLlave.textContent = "";
 
                 // Guardar llave en Local Storage
                 datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, llave };
