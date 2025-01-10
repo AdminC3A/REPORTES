@@ -3,6 +3,7 @@ body {
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
+    font-size: 1.6rem; /* Aumentar tamaño de texto */
 }
 
 header {
@@ -31,26 +32,22 @@ legend {
 
 .btn-container {
     display: flex;
-    justify-content: space-evenly;
-    margin: 20px 0;
+    flex-direction: column; /* Botones apilados verticalmente */
+    gap: 10px; /* Espaciado entre botones */
+    margin-top: 20px;
 }
 
 button {
     padding: 10px 20px;
-    font-size: 16px;
+    font-size: 1.6rem;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-}
-
-button#cargarFotoArchivoBtn,
-button#cargarFotoCamaraBtn {
     background-color: #007bff;
     color: white;
 }
 
-button#cargarFotoArchivoBtn:hover,
-button#cargarFotoCamaraBtn:hover {
+button:hover {
     background-color: #0056b3;
 }
 
@@ -59,20 +56,18 @@ canvas#fotoContainer {
     margin: 20px auto;
     border: 1px solid #ccc;
     border-radius: 5px;
-    width: 200px;
-    height: 200px;
 }
 
 .tooltip {
     display: inline-block;
     background-color: #007bff;
     color: white;
-    font-size: 12px;
+    font-size: 1.4rem;
     font-weight: bold;
-    width: 18px;
-    height: 18px;
+    width: 24px;
+    height: 24px;
     text-align: center;
-    line-height: 18px;
+    line-height: 24px;
     border-radius: 50%;
     cursor: pointer;
     margin-left: 10px;
@@ -88,10 +83,10 @@ canvas#fotoContainer {
     position: absolute;
     background-color: #333;
     color: white;
-    font-size: 12px;
+    font-size: 1.4rem;
     padding: 5px 10px;
     border-radius: 5px;
-    top: 25px;
+    top: 35px;
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -105,7 +100,7 @@ canvas#fotoContainer {
 button#next {
     display: none;
     background-color: #28a745;
-    font-size: 18px;
+    font-size: 1.8rem;
     margin-top: 20px;
     padding: 10px 20px;
     border-radius: 5px;
