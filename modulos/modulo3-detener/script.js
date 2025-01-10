@@ -67,23 +67,30 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Continuar con nombre y teléfono para externos
-    document.getElementById("continuar-externo").addEventListener("click", () => {
-        const nombre = document.getElementById("nombre-externo").value.trim();
-        const telefono = document.getElementById("telefono-externo").value.trim();
+document.getElementById("continuar-externo").addEventListener("click", () => {
+    const nombre = document.getElementById("nombre-externo").value.trim();
+    const telefono = document.getElementById("telefono-externo").value.trim();
 
-        if (!nombre && !telefono) {
-            mensajeValidacion.style.display = "block";
-            mensajeValidacion.textContent = "Por favor, ingresa al menos un dato para continuar.";
-            return;
-        }
+    // Validación de teléfono
+    const regexTelefono = /^[0-9]{10}$/;
+    if (telefono && !regexTelefono.test(telefono)) {
+        alert("Por favor, ingresa un número de teléfono válido con 10 dígitos.");
+        return;
+    }
 
-        if (nombre) datosAcumulados.nombreExterno = nombre;
-        if (telefono) datosAcumulados.telefonoExterno = telefono;
+    if (!nombre && !telefono) {
+        mensajeValidacion.style.display = "block";
+        mensajeValidacion.textContent = "Por favor, ingresa al menos un dato para continuar.";
+        return;
+    }
 
-        mensajeValidacion.style.display = "none";
-        clasificacionFieldset.style.display = "block";
-        localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
-    });
+    if (nombre) datosAcumulados.nombreExterno = nombre;
+    if (telefono) datosAcumulados.telefonoExterno = telefono;
+
+    mensajeValidacion.style.display = "none";
+    clasificacionFieldset.style.display = "block";
+    localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
+});
 
     // Manejar selección de clasificación
     document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
