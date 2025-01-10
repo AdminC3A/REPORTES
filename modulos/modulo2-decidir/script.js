@@ -3,6 +3,8 @@ const cargarFotoCamaraBtn = document.getElementById("cargarFotoCamaraBtn");
 const fotoContainer = document.getElementById("fotoContainer");
 const riesgoOpciones = document.getElementById("riesgoOpciones");
 const nextButton = document.getElementById("next");
+const observacionesFieldset = document.getElementById("observaciones-adicionales");
+const descripcionFieldset = document.getElementById("descripcion");
 const otrosDetalleInput = document.getElementById("otros-detalle");
 const baseDeDatosQR = JSON.parse(localStorage.getItem("baseDeDatosQR"));
 let imagenSeleccionada = null;
@@ -20,6 +22,9 @@ function mostrarOpciones() {
     fotoContainer.style.display = "block"; // Mostrar previsualización
     riesgoOpciones.style.display = "block"; // Mostrar opciones de selección
     nextButton.style.display = "block"; // Mostrar botón "Continuar"
+
+    // Desplazar pantalla automáticamente hacia abajo
+    fotoContainer.scrollIntoView({ behavior: "smooth" });
 }
 
 /**
@@ -93,12 +98,16 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
 });
 
 // Mostrar campo adicional si se selecciona "Otros"
-document.getElementById("otros").addEventListener("change", function () {
-    if (this.checked) {
-        otrosDetalleInput.style.display = "block";
-    } else {
-        otrosDetalleInput.style.display = "none";
-    }
+document.querySelectorAll('input[name="riesgo"]').forEach((input) => {
+    input.addEventListener("change", function () {
+        if (this.value === "Otros") {
+            descripcionFieldset.style.display = "block"; // Mostrar descripción obligatoria
+            observacionesFieldset.style.display = "none"; // Ocultar observaciones adicionales
+        } else {
+            descripcionFieldset.style.display = "none"; // Ocultar descripción
+            observacionesFieldset.style.display = "block"; // Mostrar observaciones opcionales
+        }
+    });
 });
 
 // Validar y continuar al siguiente módulo
