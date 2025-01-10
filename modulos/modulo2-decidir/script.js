@@ -1,3 +1,4 @@
+// Referencias a elementos del DOM
 const cargarFotoArchivoBtn = document.getElementById("cargarFotoArchivoBtn");
 const cargarFotoCamaraBtn = document.getElementById("cargarFotoCamaraBtn");
 const fotoContainer = document.getElementById("fotoContainer");
@@ -7,7 +8,7 @@ const nextButton = document.getElementById("next");
 const otrosDetalleInput = document.getElementById("otros-detalle");
 let imagenSeleccionada = null;
 
-// Función para guardar en Local Storage
+// Función para guardar datos en Local Storage
 function guardarEnLocalStorage(modulo, datos) {
     let reporte = JSON.parse(localStorage.getItem("reporte")) || {};
     reporte[modulo] = { ...reporte[modulo], ...datos };
@@ -15,7 +16,7 @@ function guardarEnLocalStorage(modulo, datos) {
     console.log(`Datos del ${modulo} guardados:`, datos);
 }
 
-// Función para mostrar las opciones después de cargar la foto
+// Función para mostrar opciones de riesgos después de cargar una foto
 function mostrarOpciones() {
     fotoContainer.style.display = "block";
     riesgoOpciones.style.display = "block";
@@ -127,6 +128,7 @@ nextButton.addEventListener("click", () => {
     );
     const clasificacion = document.querySelector('input[name="clasificacion"]:checked')?.value;
 
+    // Validaciones antes de continuar
     if (!imagenSeleccionada) {
         alert("Por favor carga una imagen antes de continuar.");
         return;
@@ -147,6 +149,7 @@ nextButton.addEventListener("click", () => {
         return;
     }
 
+    // Guardar datos en Local Storage y redirigir
     guardarEnLocalStorage("modulo2", {
         imagen: imagenSeleccionada.src,
         riesgos: seleccionados,
