@@ -74,3 +74,43 @@ document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
         nextButton.scrollIntoView({ behavior: "smooth" });
     });
 });
+// Validar y continuar al siguiente módulo
+nextButton.addEventListener("click", () => {
+    const riesgosSeleccionados = Array.from(document.querySelectorAll('input[name="riesgo"]:checked')).map(
+        (input) => input.value
+    );
+    const clasificacionSeleccionada = document.querySelector('input[name="clasificacion"]:checked')?.value;
+
+    // Validaciones antes de continuar
+    if (!imagenSeleccionada) {
+        alert("Por favor carga una imagen antes de continuar.");
+        return;
+    }
+
+    if (riesgosSeleccionados.length === 0) {
+        alert("Por favor selecciona al menos un riesgo antes de continuar.");
+        return;
+    }
+
+    if (riesgosSeleccionados.includes("Otros") && !detalleRiesgoInput.value.trim()) {
+        alert("Por favor proporciona detalles adicionales para 'Otros'.");
+        return;
+    }
+
+    if (clasificacionSeleccionada === "Otra Clasificación" && !detalleClasificacionInput.value.trim()) {
+        alert("Por favor proporciona detalles para 'Otra Clasificación'.");
+        return;
+    }
+
+    // Guardar datos en Local Storage y redirigir
+    guardarEnLocalStorage("modulo2", {
+        imagen: imagenSeleccionada.src,
+        riesgosSeleccionados,
+        detalleRiesgo: detalleRiesgoInput.value.trim(),
+        clasificacionSeleccionada,
+        detalleClasificacion: clasificacionSeleccionada === "Otra Clasificación" ? detalleClasificacionInput.value.trim() : null,
+    });
+
+    window.location.href = "/modulos/modulo3-detener/index.html";
+});
+
