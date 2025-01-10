@@ -37,10 +37,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Manejo del botón para finalizar el reporte
     finalizarReporteBtn.addEventListener("click", () => {
-        const confirmar = confirm("¿Estás seguro de que quieres finalizar el reporte? Esto borrará los datos almacenados.");
+        const confirmar = confirm("¿Estás seguro de que quieres finalizar el reporte? Esto enviara el reporte para su tratamiento.");
         if (confirmar) {
             localStorage.removeItem("reporte");
-            alert("Reporte finalizado y datos eliminados.");
+            alert("Se procede a registrar.");
             window.location.href = "/"; // Redirigir a la página inicial
         }
     });
