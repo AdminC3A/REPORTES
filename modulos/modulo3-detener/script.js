@@ -1,15 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
-
-    // Limpia solo los datos del módulo 3 en Local Storage
     let datosAcumulados = JSON.parse(localStorage.getItem("reporte")) || {};
-    if (datosAcumulados.modulo3) {
-        delete datosAcumulados.modulo3; // Eliminar datos del módulo 3
-        localStorage.setItem("reporte", JSON.stringify(datosAcumulados)); // Actualizar almacenamiento
-        console.log("Datos del módulo 3 eliminados.");
-    }
 
-    // Referencias al DOM
+    // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
     const validacionNombreFieldset = document.getElementById("validacion-nombre");
@@ -19,6 +12,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const mensajeValidacionNombre = document.getElementById("mensaje-validacion-nombre");
 
     let llaveValida = false;
+
+    // Limpia solo los datos del módulo 3 en Local Storage
+    if (datosAcumulados.modulo3) {
+        delete datosAcumulados.modulo3; // Eliminar datos del módulo 3
+        localStorage.setItem("reporte", JSON.stringify(datosAcumulados)); // Actualizar almacenamiento
+    }
 
     // Cargar datos desde roles.json
     async function loadRolesAndKeys() {
@@ -38,16 +37,18 @@ document.addEventListener("DOMContentLoaded", () => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
 
+            // Guardar selección de rol en Local Storage
             datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, rolSeleccionado };
             localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
 
+            // Mostrar u ocultar secciones basadas en el rol seleccionado
             if (rolSeleccionado === "Externo") {
-                validacionLlaveFieldset.classList.add("hidden");
-                validacionNombreFieldset.classList.remove("hidden");
+                validacionLlaveFieldset.style.display = "none";
+                validacionNombreFieldset.style.display = "block";
                 llaveValida = true; // No requiere validación de llave
             } else {
-                validacionLlaveFieldset.classList.remove("hidden");
-                validacionNombreFieldset.classList.add("hidden");
+                validacionLlaveFieldset.style.display = "block";
+                validacionNombreFieldset.style.display = "none";
                 llaveValida = false; // Requiere validación de llave
             }
 
@@ -78,8 +79,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (llaveValida) {
                 mensajeValidacionLlave.classList.add("hidden");
+
+                // Guardar llave en Local Storage
                 datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, llave };
                 localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+
+                alert("Llave válida.");
                 nextButton.classList.remove("hidden");
             } else {
                 mensajeValidacionLlave.textContent = "Llave no válida. Intenta nuevamente.";
@@ -104,17 +109,23 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Guardar datos de "Externo" en Local Storage
             datosAcumulados.modulo3 = {
                 ...datosAcumulados.modulo3,
                 nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
                 telefonoExterno: telefono || datosAcumulados.modulo3?.telefonoExterno,
             };
-        } else if (!llaveValida) {
+        }
+
+        if (!llaveValida && rolSeleccionado !== "Externo") {
             alert("Por favor, valida la llave antes de continuar.");
             return;
         }
 
+        // Guardar datos acumulados en Local Storage
         localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+        console.log("Datos guardados en módulo 3:", datosAcumulados);
+
         window.location.href = "/modulos/modulo4-observar/";
     });
 
