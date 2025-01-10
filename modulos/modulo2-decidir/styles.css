@@ -1,98 +1,106 @@
-/* Estilo base */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
     background-color: #f4f4f4;
-    color: #333;
-    font-size: 1.5rem;
 }
 
 header {
-    background-color: #4914db;
-    color: #fff;
-    padding: 10px 0;
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
     text-align: center;
-    font-size: 2rem;
 }
 
 main {
     padding: 20px;
-    max-width: 600px;
-    margin: auto;
-    font-size: 1.5rem;
 }
 
 fieldset {
     border: 1px solid #ccc;
+    border-radius: 5px;
     padding: 15px;
     margin-bottom: 20px;
-    font-size: 1.4rem;
+    background-color: white;
 }
 
 legend {
-    font-size: 1.6rem;
     font-weight: bold;
+    color: #333;
 }
 
-canvas {
-    margin: 20px auto;
-    display: block;
-    width: 100%; /* Ajuste dinámico */
-    max-width: 300px; /* Limitar tamaño en móviles */
-}
-
-/* Estilo para los botones */
 button {
-    background-color: #4914db;
-    color: #fff;
+    padding: 10px 20px;
+    font-size: 16px;
     border: none;
-    padding: 15px 20px;
-    font-size: 1.2rem;
-    cursor: pointer;
     border-radius: 5px;
-    margin: 10px 0;
-    width: 100%; /* Botones ocupan todo el ancho */
-    box-sizing: border-box;
+    cursor: pointer;
+    background-color: #007bff;
+    color: white;
 }
 
 button:hover {
-    background-color: #3711a3;
+    background-color: #0056b3;
 }
 
-/* Contenedor para los botones */
-.btn-container {
-    display: flex;
-    flex-direction: column; /* En móviles, los botones estarán apilados */
-    align-items: center;
-    gap: 10px; /* Espaciado entre botones */
+canvas#fotoContainer {
+    display: block;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 200px;
+    height: 200px;
 }
 
-/* Ajuste del detalle de "Otros" */
-#otros-detalle {
-    margin-top: 10px;
-    padding: 10px;
-    width: calc(100% - 20px);
-    font-size: 1.2rem;
+.tooltip {
+    display: inline-block;
+    background-color: #007bff;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    line-height: 18px;
+    border-radius: 50%;
+    cursor: pointer;
+    margin-left: 10px;
 }
 
-/* Media Query para pantallas pequeñas */
-@media screen and (max-width: 768px) {
-    header {
-        font-size: 1.8rem; /* Reduce ligeramente el tamaño del título */
-        padding: 15px;
-    }
+.tooltip:hover {
+    background-color: #0056b3;
+}
 
-    button {
-        font-size: 1.5rem; /* Botones más grandes en móviles */
-        padding: 20px 15px;
-    }
+.tooltip::after {
+    content: attr(data-tooltip);
+    display: none;
+    position: absolute;
+    background-color: #333;
+    color: white;
+    font-size: 12px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    top: 25px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    z-index: 10;
+}
 
-    legend {
-        font-size: 1.5rem;
-    }
+.tooltip:hover::after {
+    display: block;
+}
 
-    main {
-        padding: 15px;
-    }
+button#next {
+    display: none;
+    background-color: #28a745;
+    font-size: 18px;
+    margin-top: 20px;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button#next:hover {
+    background-color: #218838;
 }
