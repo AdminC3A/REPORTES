@@ -2,23 +2,15 @@ document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
     let datosAcumulados = JSON.parse(localStorage.getItem("reporte")) || {};
 
-    // Elementos del DOM
+    // Referencias al DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
     const validacionNombreFieldset = document.getElementById("validacion-nombre");
     const nextButton = document.getElementById("next");
     const llaveInput = document.getElementById("llave");
-    const validacionMensaje = document.createElement("p");
-    validacionMensaje.className = "error hidden";
-    validacionLlaveFieldset.appendChild(validacionMensaje);
-
+    const mensajeValidacionLlave = document.getElementById("mensaje-validacion");
+    const mensajeValidacionNombre = document.getElementById("mensaje-validacion-nombre");
     let llaveValida = false;
-
-    // Limpia solo los datos del módulo 3 en Local Storage
-    if (datosAcumulados.modulo3) {
-        delete datosAcumulados.modulo3; // Eliminar datos del módulo 3
-        localStorage.setItem("reporte", JSON.stringify(datosAcumulados)); // Actualizar almacenamiento
-    }
 
     // Cargar datos desde roles.json
     async function loadRolesAndKeys() {
@@ -41,20 +33,22 @@ document.addEventListener("DOMContentLoaded", () => {
             // Guardar selección de rol en Local Storage
             datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, rolSeleccionado };
             localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+            console.log("Rol seleccionado guardado:", rolSeleccionado);
 
             // Mostrar u ocultar secciones basadas en el rol seleccionado
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.classList.add("hidden");
                 validacionNombreFieldset.classList.remove("hidden");
-                llaveValida = true; // No requiere validación de llave
+                llaveValida = true; // Externos no requieren validación de llave
             } else {
                 validacionLlaveFieldset.classList.remove("hidden");
                 validacionNombreFieldset.classList.add("hidden");
-                llaveValida = false; // Requiere validación de llave
+                llaveValida = false; // Requieren validación de llave
             }
 
-            validacionMensaje.classList.add("hidden");
-            validacionMensaje.textContent = "";
+            // Ocultar mensajes de validación
+            mensajeValidacionLlave.classList.add("hidden");
+            mensajeValidacionNombre.classList.add("hidden");
             nextButton.classList.add("hidden");
         });
     });
@@ -65,8 +59,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
 
         if (!llave) {
-            validacionMensaje.textContent = "Por favor, ingresa una llave.";
-            validacionMensaje.classList.remove("hidden");
+            mensajeValidacionLlave.textContent = "Por favor, ingresa una llave.";
+            mensajeValidacionLlave.classList.remove("hidden");
             return;
         }
 
@@ -76,23 +70,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (rolKey) {
             const supervisores = rolesYllaves[rolKey]?.supervisores || {};
-            llaveValida = Object.entries(supervisores).some(([nombre, llaves]) =>
+            const supervisor = Object.entries(supervisores).find(([nombre, llaves]) =>
                 llaves.includes(llave)
             );
 
-            if (llaveValida) {
-                validacionMensaje.classList.add("hidden");
-                validacionMensaje.textContent = "";
+            if (supervisor) {
+                const [nombreSupervisor] = supervisor;
+                mensajeValidacionLlave.classList.add("hidden");
 
-                // Guardar llave en Local Storage
-                datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, llave };
+                // Mostrar el nombre del propietario de la llave
+                alert(`Llave válida. Propietario: ${nombreSupervisor}`);
+
+                // Guardar datos en Local Storage
+                datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, llave, supervisor: nombreSupervisor };
                 localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
 
-                alert("Llave válida.");
+                llaveValida = true;
                 nextButton.classList.remove("hidden");
             } else {
-                validacionMensaje.textContent = "Llave no válida.";
-                validacionMensaje.classList.remove("hidden");
+                mensajeValidacionLlave.textContent = "Llave no válida. Intenta nuevamente.";
+                mensajeValidacionLlave.classList.remove("hidden");
+                llaveValida = false;
             }
         } else {
             alert("Rol no encontrado en roles.json.");
@@ -108,23 +106,21 @@ document.addEventListener("DOMContentLoaded", () => {
             const telefono = document.getElementById("telefono-externo").value.trim();
 
             if (!nombre && !telefono) {
-                const mensajeNombre = document.getElementById("mensaje-validacion-nombre");
-                mensajeNombre.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
-                mensajeNombre.classList.remove("hidden");
+                mensajeValidacionNombre.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
+                mensajeValidacionNombre.classList.remove("hidden");
                 return;
             }
 
-            // Guardar datos de "Externo" en Local Storage
             datosAcumulados.modulo3 = {
                 ...datosAcumulados.modulo3,
                 nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
                 telefonoExterno: telefono || datosAcumulados.modulo3?.telefonoExterno,
             };
-        } else {
-            if (!llaveValida) {
-                alert("Por favor, valida la llave antes de continuar.");
-                return;
-            }
+        }
+
+        if (!llaveValida && rolSeleccionado !== "Externo") {
+            alert("Por favor, valida la llave antes de continuar.");
+            return;
         }
 
         // Guardar datos acumulados en Local Storage
