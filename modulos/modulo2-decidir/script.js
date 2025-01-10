@@ -3,7 +3,6 @@ const cargarFotoCamaraBtn = document.getElementById("cargarFotoCamaraBtn");
 const fotoContainer = document.getElementById("fotoContainer");
 const riesgoOpciones = document.getElementById("riesgoOpciones");
 const nextButton = document.getElementById("next");
-const otrosDetalleContainer = document.getElementById("otros-detalle-container");
 const otrosDetalleInput = document.getElementById("otros-detalle");
 let imagenSeleccionada = null;
 
@@ -15,12 +14,12 @@ function guardarEnLocalStorage(modulo, datos) {
     console.log(`Datos del ${modulo} guardados:`, datos);
 }
 
-// Función para mostrar las opciones después de cargar la foto
+// Mostrar las opciones después de cargar la foto
 function mostrarOpciones() {
     fotoContainer.style.display = "block"; // Mostrar previsualización
     riesgoOpciones.style.display = "block"; // Mostrar opciones de selección
     nextButton.style.display = "block"; // Mostrar botón "Continuar"
-    riesgoOpciones.scrollIntoView({ behavior: "smooth" });
+    riesgoOpciones.scrollIntoView({ behavior: "smooth" }); // Desplazar automáticamente
 }
 
 /**
@@ -39,12 +38,11 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    imagenSeleccionada = img; // Guardar la imagen
-                    guardarEnLocalStorage("modulo2", { imagen: e.target.result }); // Guardar en Local Storage
-
+                    imagenSeleccionada = img;
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result });
                     const ctxFoto = fotoContainer.getContext("2d");
-                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height); // Limpiar canvas
-                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height); // Ajustar imagen
+                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
+                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
                     mostrarOpciones();
                 };
                 img.src = e.target.result;
@@ -55,55 +53,8 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
 });
 
 /**
- * Cargar foto desde cámara
+ * Validar y continuar al siguiente módulo
  */
-cargarFotoCamaraBtn.addEventListener("click", () => {
-    const cameraInput = document.createElement("input");
-    cameraInput.type = "file";
-    cameraInput.accept = "image/*";
-    cameraInput.capture = "environment"; // Solicita cámara trasera
-    cameraInput.style.display = "none";
-
-    document.body.appendChild(cameraInput);
-    cameraInput.click();
-
-    cameraInput.addEventListener("change", (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = () => {
-                    imagenSeleccionada = img;
-                    guardarEnLocalStorage("modulo2", { imagen: e.target.result }); // Guardar en Local Storage
-
-                    const ctxFoto = fotoContainer.getContext("2d");
-                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height); // Limpiar canvas
-                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height); // Ajustar imagen
-                    mostrarOpciones();
-                };
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    cameraInput.addEventListener("blur", () => {
-        document.body.removeChild(cameraInput);
-    });
-});
-
-// Mostrar campo adicional si se selecciona "Otros"
-document.getElementById("otros").addEventListener("change", function () {
-    if (this.checked) {
-        otrosDetalleContainer.style.display = "block"; // Mostrar campo "Otros"
-    } else {
-        otrosDetalleContainer.style.display = "none"; // Ocultar campo "Otros"
-        otrosDetalleInput.value = ""; // Limpiar el valor
-    }
-});
-
-// Validar y continuar al siguiente módulo
 nextButton.addEventListener("click", function () {
     const seleccionados = [];
     document.querySelectorAll('input[name="riesgo"]:checked').forEach((input) => {
