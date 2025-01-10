@@ -3,106 +3,63 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4; /* Fondo gris claro */
+    font-size: 1.5rem; /* Aumentar tamaño general */
+    background-color: #f4f4f4;
 }
 
-/* Header Styles */
-header {
-    background-color: #007bff; /* Azul principal */
-    color: white;
-    padding: 20px;
-    text-align: center;
-}
-
-/* Main Content Styles */
-main {
-    padding: 20px;
-}
-
-/* Fieldset Styles */
-fieldset {
-    border: 1px solid #ccc; /* Borde gris claro */
-    border-radius: 5px; /* Bordes redondeados */
-    padding: 15px;
-    margin-bottom: 20px;
-    background-color: white; /* Fondo blanco */
-}
-
-/* Legend Styles */
-legend {
-    font-weight: bold;
-    color: #333; /* Texto gris oscuro */
-}
-
-/* Button Container */
+/* Botones apilados uno debajo del otro */
 .btn-container {
     display: flex;
-    justify-content: space-evenly;
-    margin: 20px 0;
+    flex-direction: column;
+    gap: 10px; /* Espaciado entre botones */
 }
 
-/* General Button Styles */
 button {
-    padding: 10px 20px;
-    font-size: 16px;
+    padding: 15px;
+    font-size: 1.25rem; /* Tamaño de letra ajustado */
     border: none;
     border-radius: 5px;
     cursor: pointer;
-}
-
-/* Specific Buttons */
-button#cargarFotoArchivoBtn,
-button#cargarFotoCamaraBtn {
-    background-color: #007bff; /* Azul principal */
+    background-color: #007bff;
     color: white;
 }
 
-button#cargarFotoArchivoBtn:hover,
-button#cargarFotoCamaraBtn:hover {
-    background-color: #0056b3; /* Azul más oscuro */
-}
-
-/* Canvas Styles for Photo Preview */
-canvas#fotoContainer {
-    display: block;
-    margin: 20px auto; /* Centrado */
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    width: 200px;
-    height: 200px;
+button:hover {
+    background-color: #0056b3;
 }
 
 /* Tooltip Styles */
 .tooltip {
     display: inline-block;
-    background-color: #007bff; /* Azul principal */
+    background-color: #007bff;
     color: white;
-    font-size: 12px;
+    font-size: 1.2rem; /* Tamaño proporcional */
     font-weight: bold;
-    width: 18px;
-    height: 18px;
+    width: 25px; /* Tamaño del círculo */
+    height: 25px;
     text-align: center;
-    line-height: 18px;
+    line-height: 25px;
     border-radius: 50%; /* Forma circular */
     cursor: pointer;
     margin-left: 10px;
+    position: relative;
 }
 
 .tooltip:hover {
-    background-color: #0056b3; /* Azul más oscuro */
+    background-color: #0056b3;
 }
 
-/* Tooltip Text on Hover */
+/* Tooltip Text */
 .tooltip::after {
-    content: attr(data-tooltip); /* Texto del atributo data-tooltip */
+    content: attr(data-tooltip);
     display: none;
     position: absolute;
-    background-color: #333;
+    background-color: black;
     color: white;
-    font-size: 12px;
+    font-size: 1rem;
     padding: 5px 10px;
     border-radius: 5px;
-    top: 25px;
+    top: 30px; /* Ajustar para que aparezca debajo del círculo */
     left: 50%;
     transform: translateX(-50%);
     white-space: nowrap;
@@ -110,43 +67,5 @@ canvas#fotoContainer {
 }
 
 .tooltip:hover::after {
-    display: block; /* Mostrar texto en hover */
+    display: block;
 }
-
-/* Next Button Styles */
-button#next {
-    display: none; /* Oculto por defecto */
-    background-color: #28a745; /* Verde principal */
-    font-size: 18px;
-    margin-top: 20px;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button#next:hover {
-    background-color: #218838; /* Verde más oscuro */
-}
-
-/* Detalle del campo "Otros" */
-#otros-detalle-container {
-    margin-left: 20px;
-    margin-top: 10px;
-}
-
-/* Campo de texto dentro de "Otros" */
-#otros-detalle {
-    width: 100%; /* Ancho completo */
-    padding: 10px;
-    border: 1px solid #ccc; /* Borde gris claro */
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-/* Campo de texto en focus */
-#otros-detalle:focus {
-    border-color: #007bff; /* Borde azul al enfocar */
-    outline: none;
-    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* Resplandor azul */
-}
-
