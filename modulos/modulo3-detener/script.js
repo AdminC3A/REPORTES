@@ -5,14 +5,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
-    const validacionNombreFieldset = document.getElementById("validacion-nombre");
-    const clasificacionRadios = document.querySelectorAll('input[name="clasificacion"]');
-    const observacionesFieldset = document.getElementById("observaciones-adicionales");
-    const descripcionFieldset = document.getElementById("descripcion");
-    const descripcionTexto = document.getElementById("descripcion-texto");
-    const observacionesTexto = document.getElementById("observaciones-texto");
-    const nextButton = document.getElementById("next");
+    const llaveInput = document.getElementById("llave");
+    const validarLlaveBtn = document.getElementById("validar-llave");
     const mensajeValidacion = document.getElementById("mensaje-validacion");
+    const supervisorNombre = document.getElementById("supervisor-nombre");
+    const nextButton = document.getElementById("next");
 
     let llaveValida = false;
 
@@ -29,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Mostrar campos según el rol seleccionado
+    // Manejar selección de rol
     rolRadios.forEach((radio) => {
         radio.addEventListener("change", () => {
             const rolSeleccionado = radio.value;
@@ -38,26 +35,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 rolSeleccionado: rolSeleccionado,
             };
             localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
-            console.log("Rol seleccionado guardado:", rolSeleccionado);
 
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.style.display = "none";
-                validacionNombreFieldset.style.display = "block";
                 llaveValida = true; // Externos no requieren validación de llave
             } else {
                 validacionLlaveFieldset.style.display = "block";
-                validacionNombreFieldset.style.display = "none";
-                llaveValida = false; // Requieren validación de llave
+                llaveValida = false;
             }
-
-            clasificacionFieldset.style.display = "none";
-            observacionesFieldset.style.display = "none";
         });
     });
 
     // Validar llave
-    document.getElementById("validar-llave").addEventListener("click", () => {
-        const llave = document.getElementById("llave").value.trim();
+    validarLlaveBtn.addEventListener("click", () => {
+        const llave = llaveInput.value.trim();
         const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
 
         if (!llave) {
@@ -71,100 +62,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (rolKey) {
             const supervisores = rolesYllaves[rolKey]?.supervisores || {};
-            llaveValida = Object.entries(supervisores).some(([nombre, llaves]) =>
+            const supervisor = Object.entries(supervisores).find(([nombre, llaves]) =>
                 llaves.includes(llave)
             );
 
-            if (llaveValida) {
-                alert("Llave válida.");
+            if (supervisor) {
+                llaveValida = true;
                 datosAcumulados.modulo3 = {
                     ...datosAcumulados.modulo3,
                     llave: llave,
+                    supervisor: supervisor[0],
                 };
-                clasificacionFieldset.style.display = "block";
+                localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
+                mensajeValidacion.style.display = "none";
+                supervisorNombre.style.display = "block";
+                supervisorNombre.querySelector("span").textContent = supervisor[0];
+                alert("Llave válida.");
+                nextButton.style.display = "block";
             } else {
-                alert("Llave no válida. Intenta nuevamente.");
+                llaveValida = false;
+                mensajeValidacion.style.display = "block";
+                mensajeValidacion.textContent = "Llave no válida. Intenta nuevamente.";
             }
         } else {
             alert("Rol no encontrado en roles.json.");
         }
-
-        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
     });
 
-    // Manejar selección de clasificación
-    clasificacionRadios.forEach((radio) => {
-        radio.addEventListener("change", (e) => {
-            const clasificacion = e.target.value;
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
-                clasificacionSeleccionada: clasificacion,
-            };
-            localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
-
-            if (clasificacion === "Otros") {
-                descripcionFieldset.style.display = "block";
-                observacionesFieldset.style.display = "none";
-                descripcionTexto.required = true;
-            } else {
-                descripcionFieldset.style.display = "none";
-                observacionesFieldset.style.display = "block";
-                descripcionTexto.required = false;
-            }
-        });
-    });
-
-    // Validar y continuar al siguiente módulo
+    // Continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
-        const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
-
-        if (rolSeleccionado === "Externo") {
-            const nombre = document.getElementById("nombre-externo").value.trim();
-            const telefono = document.getElementById("telefono-externo").value.trim();
-
-            if (!nombre && !telefono) {
-                mensajeValidacion.style.display = "block";
-                mensajeValidacion.textContent = "Por favor, ingresa al menos tu nombre o teléfono.";
-                return;
-            }
-
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
-                nombreExterno: nombre || datosAcumulados.modulo3?.nombreExterno,
-                telefonoExterno: telefono || datosAcumulados.modulo3?.telefonoExterno,
-            };
-        } else {
-            if (!llaveValida) {
-                alert("Por favor, valida la llave antes de continuar.");
-                return;
-            }
-        }
-
-        if (descripcionFieldset.style.display === "block" && !descripcionTexto.value.trim()) {
-            alert("Por favor, completa la descripción.");
+        if (!llaveValida) {
+            alert("Por favor, valida la llave antes de continuar.");
             return;
         }
-
-        if (descripcionFieldset.style.display === "block") {
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
-                descripcion: descripcionTexto.value.trim(),
-            };
-        }
-
-        if (observacionesFieldset.style.display === "block") {
-            datosAcumulados.modulo3 = {
-                ...datosAcumulados.modulo3,
-                observacionesAdicionales: observacionesTexto.value.trim(),
-            };
-        }
-
-        localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
-        console.log("Datos acumulados en módulo 3:", datosAcumulados);
-
         window.location.href = "/modulos/modulo4-observar/";
     });
 
+    // Inicializar datos
     loadRolesAndKeys();
-    nextButton.style.display = "block";
 });
