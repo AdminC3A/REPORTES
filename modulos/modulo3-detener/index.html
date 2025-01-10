@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,16 +33,27 @@
         </fieldset>
 
         <!-- Validación de Llave -->
-        <fieldset id="validacion-llave" style="display: none;">
+        <fieldset id="validacion-llave" class="hidden">
             <legend>Valida tu llave</legend>
             <input type="text" id="llave" placeholder="Ingresa tu llave única">
             <button id="validar-llave">Validar</button>
-            <p id="mensaje-validacion" class="error" style="display: none;">Llave no válida. Intenta nuevamente.</p>
-            <p id="supervisor-nombre" style="display: none;">Supervisor: <span></span></p>
+            <p id="mensaje-validacion" class="error hidden">Llave no válida. Intenta nuevamente.</p>
+        </fieldset>
+
+        <!-- Validación de Nombre y Teléfono para Externos -->
+        <fieldset id="validacion-nombre" class="hidden">
+            <legend>Ingresa tus datos</legend>
+            <label for="nombre-externo">Nombre:</label>
+            <input type="text" id="nombre-externo" placeholder="Ingresa tu nombre completo">
+
+            <label for="telefono-externo" style="margin-top: 10px;">Teléfono:</label>
+            <input type="tel" id="telefono-externo" placeholder="Ingresa tu teléfono">
+            
+            <p id="mensaje-validacion-nombre" class="error hidden">Por favor ingresa al menos tu nombre o teléfono.</p>
         </fieldset>
 
         <!-- Botón para continuar -->
-        <button id="next" style="display: none;">Continuar al Módulo 4</button>
+        <button id="next" class="hidden">Continuar al Módulo 4</button>
     </main>
     <script src="/modulos/modulo3-detener/script.js"></script>
 </body>
