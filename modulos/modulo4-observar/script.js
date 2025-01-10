@@ -2,7 +2,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const reporteContainer = document.getElementById("reporte-container");
     const finalizarReporteBtn = document.getElementById("finalizar-reporte");
 
-    // Cargar datos desde Local Storage
+    // Función para enmascarar llaves
+    function enmascararLlave(llave) {
+        if (!llave) return "No disponible";
+        return llave.slice(0, -4).replace(/./g, "*") + llave.slice(-4);
+    }
+
+    // Función para cargar y mostrar el reporte
     function cargarReporte() {
         const reporte = JSON.parse(localStorage.getItem("reporte"));
 
@@ -11,20 +17,24 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        // Generar contenido del reporte
-        let contenidoHTML = "<ul>";
+        let contenidoHTML = "";
+
+        // Iterar sobre los módulos del reporte
         for (const [modulo, datos] of Object.entries(reporte)) {
-            contenidoHTML += `<li><h3>${modulo.toUpperCase()}</h3><ul>`;
+            contenidoHTML += `<div class="modulo"><h3>${modulo.toUpperCase()}</h3><ul>`;
             for (const [clave, valor] of Object.entries(datos)) {
-                if (typeof valor === "object") {
-                    contenidoHTML += `<li>${clave}: ${JSON.stringify(valor)}</li>`;
+                if (valor === null || valor === undefined || valor === "") continue; // Omitir valores nulos o vacíos
+
+                if (clave === "llave") {
+                    contenidoHTML += `<li><strong>${clave}:</strong> ${enmascararLlave(valor)}</li>`;
+                } else if (clave === "imagen" && valor.startsWith("data:image")) {
+                    contenidoHTML += `<li><strong>${clave}:</strong><br><img src="${valor}" alt="Imagen cargada" class="imagen-reporte"></li>`;
                 } else {
-                    contenidoHTML += `<li>${clave}: ${valor}</li>`;
+                    contenidoHTML += `<li><strong>${clave}:</strong> ${Array.isArray(valor) ? valor.join(", ") : valor}</li>`;
                 }
             }
-            contenidoHTML += "</ul></li>";
+            contenidoHTML += "</ul></div>";
         }
-        contenidoHTML += "</ul>";
 
         reporteContainer.innerHTML = contenidoHTML;
     }
@@ -39,6 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Inicializar el módulo cargando el reporte
+    // Inicializar el módulo
     cargarReporte();
 });
