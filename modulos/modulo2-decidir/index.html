@@ -23,7 +23,7 @@
         <!-- Contenedor para previsualización de la foto -->
         <canvas id="fotoContainer" width="200" height="200" style="display: none;"></canvas>
 
-        
+                
         <!-- Opciones de selección -->
         <fieldset id="riesgoOpciones" style="display: none;">
     <legend>1. Decidir: Riesgo Potencial</legend>
@@ -97,18 +97,13 @@
         <label for="herramientas">14. Herramientas/Equipos</label>
         <span class="tooltip" data-tooltip="Uso de herramientas manuales o equipos sin las condiciones adecuadas.">?</span>
     </div>
-    <div>
-        <input type="checkbox" id="otros" name="riesgo" value="Otros">
-        <label for="otros">15. Otros</label>
-        <span class="tooltip" data-tooltip="Cualquier riesgo no incluido en las categorías anteriores.">?</span>
-    </div>
-    <div id="otros-detalle-container" style="margin-left: 20px; margin-top: 10px;">
-        <input type="text" id="otros-detalle" name="otros-detalle" placeholder="Especifique...">
-    </div>
-</fieldset>
+    <!-- Cuadro permanente para "Otros" -->
+            <div id="otros-detalle-container" style="margin-left: 20px; margin-top: 10px;">
+                <textarea id="otros-detalle" name="otros-detalle" placeholder="Especifique..." style="width: 90%; height: 80px; font-size: 1.5rem;"></textarea>
+            </div>
+        </fieldset>
 
-
-         <!-- Clasificación -->
+        <!-- Clasificación -->
         <fieldset id="clasificacionFieldset" style="display: none;">
             <legend>Clasificación</legend>
             <div>
@@ -131,8 +126,9 @@
                 <label for="otra-clasificacion">Otra Clasificación</label>
                 <span class="tooltip" data-tooltip="Especifica una clasificación diferente.">?</span>
             </div>
-            <div id="otra-clasificacion-detalle-container" style="display: none; margin-left: 20px;">
-                <input type="text" id="otra-clasificacion-detalle" placeholder="Especifique la clasificación...">
+            <!-- Cuadro permanente para "Otra Clasificación" -->
+            <div id="otra-clasificacion-detalle-container" style="margin-left: 20px; margin-top: 10px;">
+                <textarea id="otra-clasificacion-detalle" placeholder="Especifique la clasificación..." style="width: 90%; height: 80px; font-size: 1.5rem;"></textarea>
             </div>
         </fieldset>
 
