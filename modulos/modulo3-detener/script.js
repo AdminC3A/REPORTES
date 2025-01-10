@@ -1,6 +1,15 @@
 document.addEventListener("DOMContentLoaded", () => {
     let rolesYllaves = {}; // Datos cargados desde roles.json
-    let datosAcumulados = JSON.parse(localStorage.getItem("reporte")) || {};
+     // Obtener los datos actuales del reporte
+    const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+
+    // Eliminar datos residuales específicos del módulo 3
+    if (reporte.modulo3) {
+        delete reporte.modulo3; // Eliminar los datos del módulo 3
+        localStorage.setItem("reporte", JSON.stringify(reporte)); // Guardar el reporte actualizado
+        console.log("Datos del módulo 3 eliminados.");
+    }
+
 
     // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
