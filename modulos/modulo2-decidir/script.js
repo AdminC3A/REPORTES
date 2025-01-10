@@ -5,7 +5,7 @@ const fotoContainer = document.getElementById("fotoContainer");
 const riesgoOpciones = document.getElementById("riesgoOpciones");
 const clasificacionFieldset = document.getElementById("clasificacionFieldset");
 const nextButton = document.getElementById("next");
-const otrosDetalleInput = document.getElementById("otros-detalle");
+const detalleRiesgoInput = document.getElementById("detalle-riesgo");
 const detalleClasificacionInput = document.getElementById("detalle-otra-clasificacion");
 let imagenSeleccionada = null;
 
@@ -16,16 +16,10 @@ function guardarEnLocalStorage(modulo, datos) {
     localStorage.setItem("reporte", JSON.stringify(reporte));
 }
 
-// Función para mostrar las opciones después de cargar la foto
-function mostrarOpciones() {
-    fotoContainer.style.display = "block";
-    riesgoOpciones.style.display = "block";
-    riesgoOpciones.scrollIntoView({ behavior: "smooth" });
-}
-
-// Función para guardar la imagen en Local Storage
-function guardarImagenEnLocalStorage(imagenData) {
-    guardarEnLocalStorage("modulo2", { imagen: imagenData });
+// Función para mostrar una sección
+function mostrarSeccion(seccion) {
+    seccion.classList.remove("hidden");
+    seccion.scrollIntoView({ behavior: "smooth" });
 }
 
 // Cargar Foto desde Archivo
@@ -44,15 +38,11 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
                 img.onload = () => {
                     const ctx = fotoContainer.getContext("2d");
                     ctx.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
-                    ctx.drawImage(
-                        img,
-                        0, 0,
-                        fotoContainer.width, fotoContainer.height
-                    ); // Imagen centrada en forma de cuadro
+                    ctx.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
                     fotoContainer.style.display = "block";
                     imagenSeleccionada = img;
-                    guardarImagenEnLocalStorage(e.target.result);
-                    mostrarOpciones();
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result });
+                    mostrarSeccion(riesgoOpciones);
                 };
                 img.src = e.target.result;
             };
@@ -61,14 +51,12 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
     });
 });
 
-/**
- * Cargar foto desde cámara
- */
+// Cargar Foto desde Cámara
 cargarFotoCamaraBtn.addEventListener("click", () => {
     const cameraInput = document.createElement("input");
     cameraInput.type = "file";
     cameraInput.accept = "image/*";
-    cameraInput.capture = "environment"; // Solicita cámara trasera
+    cameraInput.capture = "environment";
     cameraInput.style.display = "none";
 
     document.body.appendChild(cameraInput);
@@ -81,17 +69,13 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    const ctxFoto = fotoContainer.getContext("2d");
-                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
-                    ctxFoto.drawImage(
-                        img,
-                        0, 0,
-                        fotoContainer.width, fotoContainer.height
-                    ); // Imagen centrada en forma de cuadro
+                    const ctx = fotoContainer.getContext("2d");
+                    ctx.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
+                    ctx.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
                     fotoContainer.style.display = "block";
                     imagenSeleccionada = img;
-                    guardarImagenEnLocalStorage(e.target.result);
-                    mostrarOpciones();
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result });
+                    mostrarSeccion(riesgoOpciones);
                 };
                 img.src = e.target.result;
             };
@@ -112,15 +96,13 @@ document.querySelectorAll('input[name="riesgo"]').forEach((checkbox) => {
         );
 
         if (seleccionados.includes("Otros")) {
-            otrosDetalleInput.style.display = "block";
+            detalleRiesgoInput.style.display = "block";
         } else {
-            otrosDetalleInput.style.display = "none";
+            detalleRiesgoInput.style.display = "none";
         }
 
-        // Mostrar clasificación si hay al menos un riesgo seleccionado
         if (seleccionados.length > 0) {
-            clasificacionFieldset.style.display = "block";
-            clasificacionFieldset.scrollIntoView({ behavior: "smooth" });
+            mostrarSeccion(clasificacionFieldset);
         }
     });
 });
@@ -134,8 +116,7 @@ document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
         } else {
             detalleClasificacionInput.style.display = "none";
         }
-        nextButton.style.display = "block";
-        nextButton.scrollIntoView({ behavior: "smooth" });
+        mostrarSeccion(nextButton);
     });
 });
 
@@ -156,7 +137,7 @@ nextButton.addEventListener("click", () => {
         return;
     }
 
-    if (seleccionados.includes("Otros") && !otrosDetalleInput.value.trim()) {
+    if (seleccionados.includes("Otros") && !detalleRiesgoInput.value.trim()) {
         alert("Por favor proporciona detalles para 'Otros'.");
         return;
     }
@@ -169,7 +150,7 @@ nextButton.addEventListener("click", () => {
     guardarEnLocalStorage("modulo2", {
         imagen: imagenSeleccionada.src,
         riesgos: seleccionados,
-        detalleOtros: otrosDetalleInput.value.trim(),
+        detalleOtros: detalleRiesgoInput.value.trim(),
         clasificacionSeleccionada,
         detalleClasificacion: clasificacionSeleccionada === "Otra Clasificación" ? detalleClasificacionInput.value.trim() : null,
     });
