@@ -26,6 +26,7 @@
         <!-- Opciones de selección -->
         <fieldset id="riesgoOpciones" style="display: none;">
             <legend>1. Decidir: Riesgo Potencial</legend>
+            <!-- Opciones 1 a 14 -->
             <div>
                 <input type="checkbox" id="trabajo-alturas" name="riesgo" value="Trabajo en alturas">
                 <label for="trabajo-alturas">1. Trabajo en alturas</label>
@@ -82,13 +83,15 @@
                 <input type="checkbox" id="herramientas" name="riesgo" value="Herramientas/Equipos">
                 <label for="herramientas">14. Herramientas/Equipos</label>
             </div>
+
+            <!-- Opción 15 "Otros" -->
             <div>
                 <input type="checkbox" id="otros" name="riesgo" value="Otros">
                 <label for="otros">15. Otros</label>
             </div>
-            <!-- Campo para detalles de "Otros" -->
-            <div id="otros-detalle-container" style="display: none; margin-left: 20px;">
-                <input type="text" id="otros-detalle" name="otros-detalle" placeholder="Especifique..." style="width: 90%;">
+            <!-- Campo para detalles siempre visible -->
+            <div id="otros-detalle-container" style="margin-left: 20px; margin-top: 10px;">
+                <input type="text" id="otros-detalle" name="otros-detalle" placeholder="Especifique...">
             </div>
         </fieldset>
 
