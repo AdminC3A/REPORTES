@@ -54,48 +54,54 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Validar llave
-    document.getElementById("validar-llave").addEventListener("click", () => {
-        const llave = llaveInput.value.trim();
-        const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
+   document.getElementById("validar-llave").addEventListener("click", () => {
+    const llave = document.getElementById("llave").value.trim();
+    const rolSeleccionado = datosAcumulados.modulo3?.rolSeleccionado;
 
-        if (!llave) {
-            mensajeValidacionLlave.textContent = "Por favor, ingresa una llave.";
-            mensajeValidacionLlave.classList.remove("hidden");
-            return;
-        }
+    if (!llave) {
+        alert("Por favor, ingresa una llave.");
+        return;
+    }
 
-        const rolKey = Object.keys(rolesYllaves).find(
-            (key) => rolesYllaves[key].rol === rolSeleccionado
+    // Buscar el rol correspondiente en roles.json
+    const rolKey = Object.keys(rolesYllaves).find(
+        (key) => rolesYllaves[key].rol === rolSeleccionado
+    );
+
+    if (rolKey) {
+        const supervisores = rolesYllaves[rolKey]?.supervisores || {};
+        const supervisor = Object.entries(supervisores).find(([nombre, llaves]) =>
+            llaves.includes(llave)
         );
 
-        if (rolKey) {
-            const supervisores = rolesYllaves[rolKey]?.supervisores || {};
-            const supervisor = Object.entries(supervisores).find(([nombre, llaves]) =>
-                llaves.includes(llave)
-            );
+        if (supervisor) {
+            // Si se encuentra el propietario, guárdalo en localStorage
+            llaveValida = true;
+            datosAcumulados.modulo3 = {
+                ...datosAcumulados.modulo3,
+                llave: llave,
+                propietarioLlave: supervisor[0], // Guardar el nombre del propietario
+            };
+            localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
 
-            if (supervisor) {
-                const [nombreSupervisor] = supervisor;
-                mensajeValidacionLlave.classList.add("hidden");
-
-                // Mostrar el nombre del propietario de la llave
-                alert(`Llave válida. Propietario: ${nombreSupervisor}`);
-
-                // Guardar datos en Local Storage
-                datosAcumulados.modulo3 = { ...datosAcumulados.modulo3, llave, supervisor: nombreSupervisor };
-                localStorage.setItem("reporte", JSON.stringify(datosAcumulados));
-
-                llaveValida = true;
-                nextButton.classList.remove("hidden");
-            } else {
-                mensajeValidacionLlave.textContent = "Llave no válida. Intenta nuevamente.";
-                mensajeValidacionLlave.classList.remove("hidden");
-                llaveValida = false;
+            // Mostrar el propietario en el DOM
+            const nombreSupervisorElemento = document.getElementById("nombre-supervisor");
+            const nombreSupervisorTexto = document.getElementById("nombre-supervisor-texto");
+            if (nombreSupervisorElemento && nombreSupervisorTexto) {
+                nombreSupervisorElemento.classList.remove("hidden");
+                nombreSupervisorTexto.textContent = supervisor[0];
             }
+
+            alert("Llave válida.");
+            document.getElementById("next").classList.remove("hidden");
         } else {
-            alert("Rol no encontrado en roles.json.");
+            alert("Llave no válida. Intenta nuevamente.");
         }
-    });
+    } else {
+        alert("Rol no encontrado en roles.json.");
+    }
+});
+
 
     // Validar y continuar al siguiente módulo
     nextButton.addEventListener("click", () => {
