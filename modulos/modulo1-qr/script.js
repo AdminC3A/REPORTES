@@ -59,8 +59,11 @@ function onScanSuccess(decodedText) {
         validationImage.src = "images/Permitido.png";
         validationImage.style.display = "block";
 
+        // Guardar el código QR en Local Storage
+        guardarEnLocalStorage("modulo1", { codigoQR: normalizedText });
+
         resultContainer.innerHTML = `
-            Código detectado: ${decodedText} - Codigo Registrado<br>
+            Código detectado: ${decodedText} - Código Registrado<br>
             <button id="continueButton" style="font-size: 24px; padding: 20px 40px; margin-top: 10px;">Continuar con Reporte</button>
         `;
 
@@ -84,6 +87,14 @@ function onScanSuccess(decodedText) {
             resetScanner();
         }, 5000);
     }
+}
+
+// Función para guardar datos en Local Storage
+function guardarEnLocalStorage(modulo, datos) {
+    let reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+    reporte[modulo] = { ...reporte[modulo], ...datos }; // Combinar datos nuevos con los existentes
+    localStorage.setItem("reporte", JSON.stringify(reporte));
+    console.log(`Datos del ${modulo} guardados:`, datos);
 }
 
 // Función para reiniciar el escáner
