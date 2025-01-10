@@ -1,7 +1,8 @@
 document.addEventListener("DOMContentLoaded", () => {
-    let rolesYllaves = {};
-    let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {};
+    let rolesYllaves = {}; // Datos cargados desde roles.json
+    let datosAcumulados = JSON.parse(localStorage.getItem("datosAcumulados")) || {}; // Recuperar datos almacenados
 
+    // Elementos del DOM
     const rolRadios = document.querySelectorAll('input[name="rol"]');
     const validacionLlaveFieldset = document.getElementById("validacion-llave");
     const validacionNombreFieldset = document.getElementById("validacion-nombre");
@@ -29,10 +30,12 @@ document.addEventListener("DOMContentLoaded", () => {
             datosAcumulados.rolSeleccionado = rolSeleccionado;
             localStorage.setItem("datosAcumulados", JSON.stringify(datosAcumulados));
 
+            // Mostrar campo correspondiente según el rol
             if (rolSeleccionado === "Externo") {
                 validacionLlaveFieldset.style.display = "none";
                 validacionNombreFieldset.style.display = "block";
-                document.getElementById("telefono-externo").style.display = "block"; // Mostrar campo de teléfono
+                document.getElementById("nombre-externo").value = ""; // Reiniciar el campo
+                document.getElementById("telefono-externo").value = ""; // Reiniciar el teléfono
             } else {
                 validacionLlaveFieldset.style.display = "block";
                 validacionNombreFieldset.style.display = "none";
@@ -53,10 +56,13 @@ document.addEventListener("DOMContentLoaded", () => {
             return;
         }
 
-        const supervisores = rolesYllaves[`${rolSeleccionado.toLowerCase().replace(/ /g, "")}`]?.supervisores || {};
+        const rolKey = `${rolSeleccionado.toLowerCase().replace(/ /g, "")}`; // Convertir el rol a la clave correspondiente en JSON
+        const supervisores = rolesYllaves[rolKey]?.supervisores || {}; // Obtener los supervisores para el rol seleccionado
+        console.log("Supervisores para validación:", supervisores);
+
         let llaveValida = false;
 
-        Object.values(supervisores).forEach((llaves) => {
+        Object.entries(supervisores).forEach(([nombre, llaves]) => {
             if (llaves.includes(llave)) {
                 llaveValida = true;
             }
@@ -70,13 +76,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Continuar con nombre para externos
+    // Continuar con nombre y teléfono para externos
     document.getElementById("continuar-externo").addEventListener("click", () => {
         const nombre = document.getElementById("nombre-externo").value.trim();
         const telefono = document.getElementById("telefono-externo").value.trim();
 
         if (!nombre || !telefono) {
-            alert("Por favor, ingresa tu nombre y teléfono.");
+            alert("Por favor, completa el nombre y el teléfono.");
             return;
         }
 
