@@ -10,16 +10,16 @@ let imagenSeleccionada = null;
 // Función para guardar en Local Storage
 function guardarEnLocalStorage(modulo, datos) {
     let reporte = JSON.parse(localStorage.getItem("reporte")) || {};
-    reporte[modulo] = { ...reporte[modulo], ...datos }; // Combina datos nuevos con existentes
+    reporte[modulo] = { ...reporte[modulo], ...datos };
     localStorage.setItem("reporte", JSON.stringify(reporte));
     console.log(`Datos del ${modulo} guardados:`, datos);
 }
 
 // Función para mostrar las opciones después de cargar la foto
 function mostrarOpciones() {
-    fotoContainer.style.display = "block"; // Mostrar previsualización
-    riesgoOpciones.style.display = "block"; // Mostrar opciones de selección
-    riesgoOpciones.scrollIntoView({ behavior: "smooth" }); // Desplazar automáticamente
+    fotoContainer.style.display = "block";
+    riesgoOpciones.style.display = "block";
+    riesgoOpciones.scrollIntoView({ behavior: "smooth" });
 }
 
 /**
@@ -38,12 +38,12 @@ cargarFotoArchivoBtn.addEventListener("click", () => {
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    imagenSeleccionada = img; // Guardar la imagen
-                    guardarEnLocalStorage("modulo2", { imagen: e.target.result }); // Guardar en Local Storage
+                    imagenSeleccionada = img;
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result });
 
                     const ctxFoto = fotoContainer.getContext("2d");
-                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height); // Limpiar canvas
-                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height); // Ajustar imagen
+                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
+                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
                     mostrarOpciones();
                 };
                 img.src = e.target.result;
@@ -60,9 +60,9 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
     const cameraInput = document.createElement("input");
     cameraInput.type = "file";
     cameraInput.accept = "image/*";
-    cameraInput.capture = "environment"; // Solicita cámara trasera
+    cameraInput.capture = "environment";
 
-    document.body.appendChild(cameraInput); // Añadir input temporal al DOM
+    document.body.appendChild(cameraInput);
     cameraInput.click();
 
     cameraInput.addEventListener("change", (event) => {
@@ -72,12 +72,12 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = () => {
-                    imagenSeleccionada = img; // Guardar la imagen
-                    guardarEnLocalStorage("modulo2", { imagen: e.target.result }); // Guardar en Local Storage
+                    imagenSeleccionada = img;
+                    guardarEnLocalStorage("modulo2", { imagen: e.target.result });
 
                     const ctxFoto = fotoContainer.getContext("2d");
-                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height); // Limpiar canvas
-                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height); // Ajustar imagen
+                    ctxFoto.clearRect(0, 0, fotoContainer.width, fotoContainer.height);
+                    ctxFoto.drawImage(img, 0, 0, fotoContainer.width, fotoContainer.height);
                     mostrarOpciones();
                 };
                 img.src = e.target.result;
@@ -87,7 +87,7 @@ cargarFotoCamaraBtn.addEventListener("click", () => {
     });
 
     cameraInput.addEventListener("blur", () => {
-        document.body.removeChild(cameraInput); // Eliminar input del DOM al finalizar
+        document.body.removeChild(cameraInput);
     });
 });
 
@@ -101,8 +101,21 @@ document.querySelectorAll('input[name="riesgo"]').forEach((checkbox) => {
         guardarEnLocalStorage("modulo2", { riesgos: seleccionados });
 
         if (seleccionados.length > 0) {
-            clasificacionFieldset.style.display = "block"; // Mostrar clasificación
+            clasificacionFieldset.style.display = "block";
             clasificacionFieldset.scrollIntoView({ behavior: "smooth" });
+        }
+    });
+});
+
+// Mostrar botón "Siguiente" después de seleccionar clasificación
+document.querySelectorAll('input[name="clasificacion"]').forEach((radio) => {
+    radio.addEventListener("change", () => {
+        const clasificacion = document.querySelector('input[name="clasificacion"]:checked')?.value;
+
+        if (clasificacion) {
+            guardarEnLocalStorage("modulo2", { clasificacionSeleccionada: clasificacion });
+            nextButton.style.display = "block";
+            nextButton.scrollIntoView({ behavior: "smooth" });
         }
     });
 });
@@ -142,4 +155,11 @@ nextButton.addEventListener("click", () => {
     });
 
     window.location.href = "/modulos/modulo3-detener/index.html";
+});
+
+// Mostrar tooltips al hacer clic en "?"
+document.querySelectorAll(".tooltip").forEach((tooltip) => {
+    tooltip.addEventListener("click", () => {
+        alert(tooltip.getAttribute("data-tooltip"));
+    });
 });
