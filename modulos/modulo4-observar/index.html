@@ -1,15 +1,21 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Módulo 4: Resumen del Reporte</title>
-    <link rel="stylesheet" href="/modulos/modulo4-observar/styles.css">
+
+    <!-- Estilos -->
+    <link rel="stylesheet" href="/modulos/modulo4-observar/styles.css" />
+
+    <!-- Librería para generar PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
     <header>
         <h1>Módulo 4: Resumen del Reporte</h1>
     </header>
+
     <main>
         <section id="reporte">
             <h2>Datos del Reporte</h2>
@@ -17,8 +23,16 @@
                 <p>Cargando reporte...</p>
             </div>
         </section>
+
+        <!-- ✅ Botón para descargar PDF -->
+        <button id="descargar-pdf">Descargar PDF del Reporte</button>
+
+        <!-- ✅ Botón para finalizar reporte -->
         <button id="finalizar-reporte">Finalizar Reporte</button>
     </main>
+
+    <!-- Script principal -->
     <script src="/modulos/modulo4-observar/script.js"></script>
 </body>
 </html>
+
