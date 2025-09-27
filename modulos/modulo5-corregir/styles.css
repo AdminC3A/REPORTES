@@ -1,76 +1,47 @@
 body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f9f9f9;
-    color: #333;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+  color: #333;
 }
 
 header {
-    background-color: #4914db;
-    color: #fff;
-    text-align: center;
-    padding: 20px 0;
-    font-size: 2rem;
+  background-color: #4914db;
+  color: white;
+  padding: 20px;
+  text-align: center;
 }
 
 main {
-    max-width: 800px;
-    margin: 20px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  margin: 30px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-h2 {
-    text-align: center;
-    margin-top: 0;
-}
-
-.modulo {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    background: #f7f7f7;
-}
-
-.modulo h3 {
-    margin-top: 0;
-    color: #4914db;
-}
-
-ul {
-    list-style: none;
-    padding: 0;
-}
-
-ul li {
-    margin-bottom: 10px;
-    font-size: 1.2rem;
-}
-
-.imagen-reporte {
-    display: block;
-    margin: 15px auto;
-    max-width: 90%;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+section#acciones p {
+  font-size: 1.2rem;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 button {
-    display: block;
-    margin: 20px auto;
-    padding: 15px 20px;
-    background-color: #4914db;
-    color: #fff;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.3rem;
-    cursor: pointer;
+  display: block;
+  width: 100%;
+  margin: 15px auto;
+  padding: 15px;
+  font-size: 1.2rem;
+  background-color: #4914db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 button:hover {
-    background-color: #3711a3;
+  background-color: #3711a3;
 }
