@@ -2,11 +2,11 @@ document.addEventListener("DOMContentLoaded", () => {
     const reporteContainer = document.getElementById("reporte-container");
     const finalizarReporteBtn = document.getElementById("finalizar-reporte");
     const descargarPDFBtn = document.getElementById("descargar-pdf");
+    const agregarFotoBtn = document.getElementById("agregar-foto");
 
-    // Función para cargar y mostrar el reporte
+    // Mostrar datos del reporte
     function cargarReporte() {
         const reporte = JSON.parse(localStorage.getItem("reporte"));
-
         if (!reporte || Object.keys(reporte).length === 0) {
             reporteContainer.innerHTML = "<p>No se encontró información del reporte.</p>";
             return;
@@ -14,131 +14,194 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let contenidoHTML = "";
 
-        for (const [modulo, datos] of Object.entries(reporte)) {
-            contenidoHTML += `<div class="modulo"><h3>${modulo.toUpperCase()}</h3><ul>`;
+        if (reporte.modulo1?.codigoQR) {
+            contenidoHTML += `<div class="modulo"><h3>Código QR Escaneado</h3><ul>`;
+            contenidoHTML += `<li><strong>QR:</strong> ${reporte.modulo1.codigoQR}</li></ul></div>`;
+        }
 
-            for (const [clave, valor] of Object.entries(datos)) {
-                if (valor === null || valor === undefined || valor === "") continue;
+        if (reporte.modulo2) {
+            contenidoHTML += `<div class="modulo"><h3>Riesgos Detectados</h3><ul>`;
+            if (reporte.modulo2.riesgos) {
+                contenidoHTML += `<li><strong>Riesgos:</strong> ${reporte.modulo2.riesgos.join(", ")}</li>`;
+            }
+            if (reporte.modulo2.detalleOtros) {
+                contenidoHTML += `<li><strong>Detalle de "Otros":</strong> ${reporte.modulo2.detalleOtros}</li>`;
+            }
+            if (reporte.modulo2.clasificacionSeleccionada) {
+                contenidoHTML += `<li><strong>Clasificación:</strong> ${reporte.modulo2.clasificacionSeleccionada}</li>`;
+            }
+            contenidoHTML += `</ul></div>`;
 
-                if (clave === "imagen" && valor.startsWith("data:image")) {
-                    contenidoHTML += `<li><strong>${clave}:</strong><br><img src="${valor}" alt="Imagen cargada" class="imagen-reporte"></li>`;
-                } else if (modulo === "modulo3" && clave === "llave") {
-                    contenidoHTML += `<li><strong>${clave}:</strong> VALIDADA</li>`;
+            const imagenes = Array.isArray(reporte.modulo2.imagenes)
+                ? reporte.modulo2.imagenes
+                : reporte.modulo2.imagen
+                ? [reporte.modulo2.imagen]
+                : [];
+
+            imagenes.forEach((img, index) => {
+                contenidoHTML += `<img src="${img}" alt="Imagen ${index + 1}" class="imagen-reporte" />`;
+            });
+        }
+
+        if (reporte.modulo3) {
+            contenidoHTML += `<div class="modulo"><h3>Información del Reportante</h3><ul>`;
+            contenidoHTML += `<li><strong>Rol de quien reporta:</strong> ${reporte.modulo3.rolSeleccionado}</li>`;
+
+            if (reporte.modulo3.rolSeleccionado !== "Externo") {
+                if ("llave" in reporte.modulo3) {
+                    contenidoHTML += `<li><strong>Llave:</strong> VALIDADA</li>`;
                 } else {
-                    contenidoHTML += `<li><strong>${clave}:</strong> ${Array.isArray(valor) ? valor.join(", ") : valor}</li>`;
+                    contenidoHTML += `<li><strong>Llave:</strong> NO VALIDADO</li>`;
                 }
             }
 
-            // Mostrar "NO VALIDADO" si no hay llave y no es Externo
-            if (
-                modulo === "modulo3" &&
-                !("llave" in datos) &&
-                datos.rolSeleccionado !== "Externo"
-            ) {
-                contenidoHTML += `<li><strong>llave:</strong> NO VALIDADO</li>`;
+            if (reporte.modulo3.descripcion) {
+                contenidoHTML += `<li><strong>Descripción:</strong> ${reporte.modulo3.descripcion}</li>`;
             }
 
-            contenidoHTML += "</ul></div>";
+            if (reporte.modulo3.observacionesAdicionales) {
+                contenidoHTML += `<li><strong>Observaciones:</strong> ${reporte.modulo3.observacionesAdicionales}</li>`;
+            }
+
+            contenidoHTML += `</ul></div>`;
+        }
+
+        if (reporte.fotosAdicionales && Array.isArray(reporte.fotosAdicionales)) {
+            reporte.fotosAdicionales.forEach((img, i) => {
+                contenidoHTML += `<img src="${img}" alt="Foto adicional ${i + 1}" class="imagen-reporte" />`;
+            });
         }
 
         reporteContainer.innerHTML = contenidoHTML;
     }
 
-    // Botón para finalizar el reporte y regresar a Módulo 1
-    finalizarReporteBtn.addEventListener("click", () => {
-        const confirmar = confirm("¿Estás seguro de que quieres finalizar el reporte? Esto enviará el reporte para su tratamiento.");
-        if (confirmar) {
-            localStorage.removeItem("reporte");
-            alert("Se procede a registrar.");
-            window.location.href = "/modulos/modulo1-qr/"; // Ajusta si tienes otra ruta
-        }
+    // Agregar foto adicional
+    agregarFotoBtn.addEventListener("click", () => {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.click();
+
+        input.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+                    if (!reporte.fotosAdicionales) {
+                        reporte.fotosAdicionales = [];
+                    }
+                    reporte.fotosAdicionales.push(e.target.result);
+                    localStorage.setItem("reporte", JSON.stringify(reporte));
+                    cargarReporte();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
     });
 
-    // Botón para descargar PDF
+    // Descargar PDF
     descargarPDFBtn.addEventListener("click", async () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
-
         const reporte = JSON.parse(localStorage.getItem("reporte"));
-
-        if (!reporte || Object.keys(reporte).length === 0) {
-            alert("No hay información para generar el PDF.");
-            return;
-        }
+        if (!reporte) return;
 
         let y = 10;
-        doc.setFontSize(14);
-        doc.text("📋 Reporte de Seguridad - Bitácora", 10, y);
+        doc.setFontSize(16);
+        doc.text("📋 Reporte de Seguridad", 10, y);
         y += 10;
 
         doc.setFontSize(10);
+        doc.text(`Fecha: ${new Date().toLocaleString()}`, 10, y);
+        y += 10;
 
-        for (const [modulo, datos] of Object.entries(reporte)) {
+        if (reporte.modulo1?.codigoQR) {
             doc.setFont(undefined, "bold");
-            doc.text(`${modulo.toUpperCase()}`, 10, y);
-            y += 7;
-
+            doc.text("Código QR Escaneado", 10, y);
+            y += 6;
             doc.setFont(undefined, "normal");
+            doc.text(`QR: ${reporte.modulo1.codigoQR}`, 10, y);
+            y += 6;
+        }
 
-            for (const [clave, valor] of Object.entries(datos)) {
-                if (!valor) continue;
-
-                if (clave === "imagen" && valor.startsWith("data:image")) {
-                    try {
-                        const imgProps = await new Promise((resolve) => {
-                            const img = new Image();
-                            img.onload = () => {
-                                const canvas = document.createElement("canvas");
-                                canvas.width = img.width;
-                                canvas.height = img.height;
-                                const ctx = canvas.getContext("2d");
-                                ctx.drawImage(img, 0, 0);
-                                const imgData = canvas.toDataURL("image/jpeg", 0.5);
-                                resolve({ imgData });
-                            };
-                            img.src = valor;
-                        });
-
-                        doc.addImage(imgProps.imgData, "JPEG", 10, y, 50, 30);
-                        y += 35;
-                        continue;
-                    } catch (err) {
-                        console.warn("Error al procesar imagen para PDF:", err);
-                        continue;
-                    }
-                }
-
-                if (modulo === "modulo3" && clave === "llave") {
-                    doc.text("llave: VALIDADA", 10, y);
-                    y += 6;
-                    continue;
-                }
-
-                const texto = `${clave}: ${Array.isArray(valor) ? valor.join(", ") : valor}`;
-                doc.text(texto, 10, y);
-                y += 6;
-
-                if (y > 270) {
-                    doc.addPage();
-                    y = 10;
-                }
-            }
-
-            if (
-                modulo === "modulo3" &&
-                !("llave" in datos) &&
-                datos.rolSeleccionado !== "Externo"
-            ) {
-                doc.text("llave: NO VALIDADO", 10, y);
+        if (reporte.modulo2) {
+            doc.setFont(undefined, "bold");
+            doc.text("Riesgos Detectados", 10, y);
+            y += 6;
+            doc.setFont(undefined, "normal");
+            if (reporte.modulo2.riesgos) {
+                doc.text(`Riesgos: ${reporte.modulo2.riesgos.join(", ")}`, 10, y);
                 y += 6;
             }
+            if (reporte.modulo2.detalleOtros) {
+                doc.text(`Detalle de "Otros": ${reporte.modulo2.detalleOtros}`, 10, y);
+                y += 6;
+            }
+            if (reporte.modulo2.clasificacionSeleccionada) {
+                doc.text(`Clasificación: ${reporte.modulo2.clasificacionSeleccionada}`, 10, y);
+                y += 6;
+            }
+        }
 
-            y += 4;
+        if (reporte.modulo3) {
+            doc.setFont(undefined, "bold");
+            doc.text("Información del Reportante", 10, y);
+            y += 6;
+            doc.setFont(undefined, "normal");
+            doc.text(`Rol: ${reporte.modulo3.rolSeleccionado}`, 10, y);
+            y += 6;
+            if (reporte.modulo3.rolSeleccionado !== "Externo") {
+                doc.text(`Llave: ${"llave" in reporte.modulo3 ? "VALIDADA" : "NO VALIDADO"}`, 10, y);
+                y += 6;
+            }
+            if (reporte.modulo3.descripcion) {
+                doc.text(`Descripción: ${reporte.modulo3.descripcion}`, 10, y);
+                y += 6;
+            }
+            if (reporte.modulo3.observacionesAdicionales) {
+                doc.text(`Observaciones: ${reporte.modulo3.observacionesAdicionales}`, 10, y);
+                y += 6;
+            }
+        }
+
+        const imagenesM2 = Array.isArray(reporte.modulo2?.imagenes)
+            ? reporte.modulo2.imagenes
+            : reporte.modulo2?.imagen
+            ? [reporte.modulo2.imagen]
+            : [];
+
+        const imagenesExtras = reporte.fotosAdicionales || [];
+        const todas = [...imagenesM2, ...imagenesExtras];
+
+        for (const img of todas) {
+            const image = new Image();
+            image.src = img;
+            await new Promise((res) => (image.onload = res));
+            const canvas = document.createElement("canvas");
+            canvas.width = image.width;
+            canvas.height = image.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(image, 0, 0);
+            const resized = canvas.toDataURL("image/jpeg", 0.5);
+            doc.addImage(resized, "JPEG", 10, y, 60, 40);
+            y += 45;
+            if (y > 270) {
+                doc.addPage();
+                y = 10;
+            }
         }
 
         doc.save("ReporteSeguridad_QR.pdf");
     });
 
-    // Iniciar carga del reporte al abrir la página
+    // Finalizar y reiniciar
+    finalizarReporteBtn.addEventListener("click", () => {
+        localStorage.removeItem("reporte");
+        alert("Reporte finalizado.");
+        window.location.href = "/modulos/modulo1-qr/";
+    });
+
+    // Iniciar
     cargarReporte();
 });
