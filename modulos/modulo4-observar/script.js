@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             }
 
-            // Si no hay "llave" y el rol no es Externo
+            // Mostrar "NO VALIDADO" si no hay llave y no es Externo
             if (
                 modulo === "modulo3" &&
                 !("llave" in datos) &&
@@ -44,17 +44,17 @@ document.addEventListener("DOMContentLoaded", () => {
         reporteContainer.innerHTML = contenidoHTML;
     }
 
-    // Botón para finalizar el reporte
+    // Botón para finalizar el reporte y regresar a Módulo 1
     finalizarReporteBtn.addEventListener("click", () => {
         const confirmar = confirm("¿Estás seguro de que quieres finalizar el reporte? Esto enviará el reporte para su tratamiento.");
         if (confirmar) {
             localStorage.removeItem("reporte");
             alert("Se procede a registrar.");
-            window.location.href = "/";
+            window.location.href = "/modulos/modulo1-qr/"; // Ajusta si tienes otra ruta
         }
     });
 
-    // Botón para descargar el PDF
+    // Botón para descargar PDF
     descargarPDFBtn.addEventListener("click", async () => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
@@ -139,5 +139,6 @@ document.addEventListener("DOMContentLoaded", () => {
         doc.save("ReporteSeguridad_QR.pdf");
     });
 
+    // Iniciar carga del reporte al abrir la página
     cargarReporte();
 });
