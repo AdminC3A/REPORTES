@@ -23,8 +23,9 @@ main {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-h1, h2 {
+h2 {
     text-align: center;
+    margin-top: 0;
 }
 
 .modulo {
@@ -52,8 +53,8 @@ ul li {
 
 .imagen-reporte {
     display: block;
-    margin: 10px 0;
-    max-width: 100%;
+    margin: 15px auto;
+    max-width: 90%;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
@@ -66,7 +67,7 @@ button {
     color: #fff;
     border: none;
     border-radius: 5px;
-    font-size: 1.5rem;
+    font-size: 1.3rem;
     cursor: pointer;
 }
 
