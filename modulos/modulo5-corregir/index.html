@@ -1,27 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 4: Observar</title>
-    <link rel="stylesheet" href="/modulos/modulo4-observar/styles.css">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Módulo 5: Enviar Reporte</title>
+    <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <header>
-        <h1>Módulo 4: Resumen de Información</h1>
+        <h1>Módulo 5: Enviar Reporte</h1>
     </header>
-    <main>
-        <!-- Contenedor para mostrar la información acumulada -->
-        <section id="resumen-info">
-            <h2>Información recopilada hasta ahora:</h2>
-            <div id="info-contenido">
-                <!-- Aquí se mostrarán los datos dinámicamente -->
-            </div>
-        </section>
 
-        <!-- Botón para continuar -->
-        <button id="next">Continuar al Módulo 5</button>
+    <main>
+        <p>Elige cómo quieres enviar el reporte:</p>
+
+        <button id="btn-whatsapp">Enviar por WhatsApp</button>
+        <button id="btn-correo">Enviar por Correo</button>
+        <button id="btn-ambos">Enviar por Ambos</button>
+        <button id="btn-finalizar">Finalizar y Volver al Escáner</button>
     </main>
-    <script src="/modulos/modulo4-observar/script.js"></script>
+
+    <script>
+        // ✅ WhatsApp (abre chat con mensaje)
+        document.getElementById("btn-whatsapp").addEventListener("click", () => {
+            const numero = "521XXXXXXXXXX"; // ← tu número con código país sin +
+            const mensaje = encodeURIComponent("🛡️ Nuevo reporte de seguridad generado. Revisa el PDF descargado.");
+            const url = `https://wa.me/${numero}?text=${mensaje}`;
+            window.open(url, "_blank");
+        });
+
+        // ✅ Correo (estructura para usar luego EmailJS o mailto)
+        document.getElementById("btn-correo").addEventListener("click", () => {
+            const email = "tucorreo@dominio.com"; // ← tu correo
+            const asunto = encodeURIComponent("📋 Nuevo Reporte de Seguridad");
+            const cuerpo = encodeURIComponent("Se ha generado un nuevo reporte. Revisa el PDF descargado desde el sistema.");
+            window.location.href = `mailto:${email}?subject=${asunto}&body=${cuerpo}`;
+        });
+
+        // ✅ Ambos
+        document.getElementById("btn-ambos").addEventListener("click", () => {
+            document.getElementById("btn-whatsapp").click();
+            setTimeout(() => {
+                document.getElementById("btn-correo").click();
+            }, 1000); // pequeña pausa entre acciones
+        });
+
+        // 🔁 Finalizar y volver al Módulo 1
+        document.getElementById("btn-finalizar").addEventListener("click", () => {
+            localStorage.removeItem("reporte");
+            window.location.href = "/modulos/modulo1-qr/"; // Ajusta si tu módulo 1 tiene otra ruta
+        });
+    </script>
 </body>
 </html>
