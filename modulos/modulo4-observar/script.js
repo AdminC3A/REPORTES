@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let html = "";
-
     const fechaActual = new Date().toLocaleString();
     html += `<p><strong>Fecha:</strong> ${fechaActual}</p>`;
 
@@ -53,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     const imagenes = reporte.modulo2?.imagenes || [];
-    if (imagenes.length) {
+    if (imagenes.length > 0) {
       html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
       imagenes.forEach((img, i) => {
         html += `<img class="imagen-reporte" src="${img}" alt="Imagen ${i + 1}" />`;
@@ -78,7 +77,14 @@ document.addEventListener("DOMContentLoaded", () => {
         const imgBase64 = e.target.result;
         const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
         reporte.modulo2 = reporte.modulo2 || {};
-        reporte.modulo2.imagenes = reporte.modulo2.imagenes || [];
+
+        if (!Array.isArray(reporte.modulo2.imagenes)) {
+          // Si ya hay una imagen suelta, inclúyela como la primera
+          const imagenInicial = reporte.modulo2.imagen;
+          reporte.modulo2.imagenes = imagenInicial ? [imagenInicial] : [];
+          delete reporte.modulo2.imagen;
+        }
+
         reporte.modulo2.imagenes.push(imgBase64);
         localStorage.setItem("reporte", JSON.stringify(reporte));
         cargarReporte();
