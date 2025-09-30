@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ Información de contacto
   const DESTINATARIO_PRINCIPAL = "ctasupervisionnom031@gmail.com";
   const DESTINATARIO_COPIA = "supervision@casatresaguas.com";
-  const NUMERO_WHATSAPP = "526241161190";
+  const NUMERO_WHATSAPP = "525549616817";
 
   /**
    * Crea dinámicamente el HTML completo del reporte para usarlo en el PDF.
