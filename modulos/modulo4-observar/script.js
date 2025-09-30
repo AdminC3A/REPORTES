@@ -6,41 +6,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const agregarFotoBtn = document.getElementById("agregar-foto");
 
   /**
-   * NUEVA FUNCIÓN: Busca en los datos de roles el nombre del portador de una llave.
+   * Busca en los datos de roles el nombre del portador de una llave.
    * @param {string} llave - La llave/ID a buscar (ej. "Gary", "2509").
    * @param {object} rolesData - El objeto JSON con todos los roles y supervisores.
    * @returns {string} - El nombre del portador o un mensaje si no se encuentra.
    */
   function buscarPortadorPorLlave(llave, rolesData) {
-    // Itera sobre cada categoría de rol (ej. "supervisoresSeguridad", "supervisoresObra")
     for (const categoria in rolesData) {
       const supervisores = rolesData[categoria].supervisores;
-      // Itera sobre cada persona en la categoría
       for (const nombre in supervisores) {
-        // Si la llave de la persona coincide, devuelve el nombre
         if (supervisores[nombre] === llave) {
-          return nombre; // ¡Encontrado!
+          return nombre;
         }
       }
     }
-    return "Portador no identificado"; // Si no se encuentra en ningún lado
+    return "Portador no identificado";
   }
 
   /**
-   * Carga y muestra los datos del reporte. Ahora es una función 'async'
-   * para poder esperar la carga del archivo roles.json.
+   * Carga y muestra los datos del reporte.
    */
   async function cargarYRenderizarReporte() {
     try {
-      // 1. Carga el archivo roles.json
-      // ⚠️ ¡IMPORTANTE! Ajusta la ruta si es necesario (ej. '../../data/roles.json')
-      const response = await fetch('../data/roles.json');
+      // ✅ RUTA CORREGIDA
+      const response = await fetch('../../data/roles.json');
       if (!response.ok) {
         throw new Error(`Error al cargar roles.json: ${response.statusText}`);
       }
       const rolesData = await response.json();
 
-      // 2. Carga el reporte desde localStorage
       const reporte = JSON.parse(localStorage.getItem("reporte"));
 
       if (!reporte || Object.keys(reporte).length === 0) {
@@ -117,13 +111,10 @@ document.addEventListener("DOMContentLoaded", () => {
       img.onload = () => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
-
         const MAX_WIDTH = 800;
         const MAX_HEIGHT = 600;
-
         let width = img.width;
         let height = img.height;
-
         if (width > height) {
           if (width > MAX_WIDTH) {
             height = Math.round((height * MAX_WIDTH) / width);
@@ -135,7 +126,6 @@ document.addEventListener("DOMContentLoaded", () => {
             height = MAX_HEIGHT;
           }
         }
-
         canvas.width = width;
         canvas.height = height;
         ctx.drawImage(img, 0, 0, width, height);
@@ -150,16 +140,13 @@ document.addEventListener("DOMContentLoaded", () => {
     input.type = "file";
     input.accept = "image/*";
     input.capture = "environment";
-
     input.onchange = (event) => {
       const file = event.target.files[0];
       if (!file) return;
-
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64Original = e.target.result;
         const base64Redimensionada = await redimensionarImagen(base64Original);
-
         const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
         reporte.modulo2 = reporte.modulo2 || {};
         if (!Array.isArray(reporte.modulo2.imagenes)) {
@@ -187,11 +174,9 @@ document.addEventListener("DOMContentLoaded", () => {
     pdfHeader.style.paddingBottom = "10px";
     pdfContainer.appendChild(pdfHeader);
     pdfContainer.appendChild(reportElement.cloneNode(true));
-
     const fecha = new Date().toISOString().split("T")[0];
     const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
     const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
-    
     const opt = {
       margin: [15, 10, 15, 10],
       filename: nombreArchivo,
@@ -199,7 +184,6 @@ document.addEventListener("DOMContentLoaded", () => {
       html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-
     html2pdf().set(opt).from(pdfContainer).save();
   }
 
@@ -217,10 +201,8 @@ document.addEventListener("DOMContentLoaded", () => {
   
   async function estandarizarImagenesIniciales() {
     const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
-
     if (reporte.modulo2 && reporte.modulo2.imagen) {
       const imgRedimensionada = await redimensionarImagen(reporte.modulo2.imagen);
-      
       if (!Array.isArray(reporte.modulo2.imagenes)) {
         reporte.modulo2.imagenes = [];
       }
@@ -228,11 +210,9 @@ document.addEventListener("DOMContentLoaded", () => {
       delete reporte.modulo2.imagen; 
       localStorage.setItem("reporte", JSON.stringify(reporte));
     }
-    
     await cargarYRenderizarReporte();
   }
 
-  // --- Inicialización y Eventos ---
   estandarizarImagenesIniciales();
   
   agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
