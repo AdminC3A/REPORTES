@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function cargarReporte() {
     const reporte = JSON.parse(localStorage.getItem("reporte"));
-
     if (!reporte || Object.keys(reporte).length === 0) {
       reporteContainer.innerHTML = "<p>No se encontró información del reporte.</p>";
       return;
@@ -15,53 +14,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
     let html = "";
 
-    const fechaActual = new Date();
-    const fecha = fechaActual.toLocaleString();
-
-    html += `<p><strong>Fecha:</strong> ${fecha}</p>`;
+    const fechaActual = new Date().toLocaleString();
+    html += `<p><strong>Fecha:</strong> ${fechaActual}</p>`;
 
     if (reporte.modulo1?.codigoQR) {
-      html += `<h3><strong>Código QR Escaneado</strong></h3>
-               <p>QR: ${reporte.modulo1.codigoQR}</p>`;
+      html += `<h3>📌 Código QR</h3><p>${reporte.modulo1.codigoQR}</p>`;
     }
 
     if (reporte.modulo2) {
-      html += `<h3><strong>Riesgos Detectados</strong></h3>`;
-      if (reporte.modulo2.riesgos?.length) {
-        html += `<p>Riesgos: ${reporte.modulo2.riesgos.join(", ")}</p>`;
-      }
+      html += `<h3>⚠️ Riesgos Detectados</h3>`;
+      html += `<p><strong>Riesgos:</strong> ${reporte.modulo2.riesgos?.join(", ") || "N/A"}</p>`;
       if (reporte.modulo2.detalleOtros) {
-        html += `<p>Detalle de Otros: ${reporte.modulo2.detalleOtros}</p>`;
+        html += `<p><strong>Detalle Otros:</strong> ${reporte.modulo2.detalleOtros}</p>`;
       }
-      if (reporte.modulo2.clasificacionSeleccionada) {
-        html += `<p>Clasificación: ${reporte.modulo2.clasificacionSeleccionada}</p>`;
-        if (reporte.modulo2.detalleClasificacion) {
-          html += `<p>Detalle Clasificación: ${reporte.modulo2.detalleClasificacion}</p>`;
-        }
+      html += `<p><strong>Clasificación:</strong> ${reporte.modulo2.clasificacionSeleccionada || "N/A"}</p>`;
+      if (reporte.modulo2.detalleClasificacion) {
+        html += `<p><strong>Detalle Clasificación:</strong> ${reporte.modulo2.detalleClasificacion}</p>`;
       }
     }
 
     if (reporte.modulo3) {
-      html += `<h3><strong>Información del Reportante</strong></h3>`;
-      html += `<p>Rol: ${reporte.modulo3.rolSeleccionado}</p>`;
+      html += `<h3>🧑‍💼 Rol de quien Reporta</h3>`;
+      html += `<p><strong>Rol:</strong> ${reporte.modulo3.rolSeleccionado}</p>`;
+
       if (reporte.modulo3.rolSeleccionado === "Externo") {
-        html += `<p>Nombre: ${reporte.modulo3.nombreExterno || "N/A"}</p>`;
-        html += `<p>Teléfono: ${reporte.modulo3.telefonoExterno || "N/A"}</p>`;
+        html += `<p><strong>Nombre:</strong> ${reporte.modulo3.nombreExterno || "N/A"}</p>`;
+        html += `<p><strong>Teléfono:</strong> ${reporte.modulo3.telefonoExterno || "N/A"}</p>`;
       } else {
-        html += `<p>Llave: ${reporte.modulo3.llave ? "VALIDADA" : "NO VALIDADO"}</p>`;
+        html += `<p><strong>Llave:</strong> ${reporte.modulo3.llave ? "VALIDADA" : "NO VALIDADO"}</p>`;
       }
+
       if (reporte.modulo3.descripcion) {
-        html += `<p>Descripción: ${reporte.modulo3.descripcion}</p>`;
+        html += `<p><strong>Descripción:</strong> ${reporte.modulo3.descripcion}</p>`;
       }
       if (reporte.modulo3.observacionesAdicionales) {
-        html += `<p>Observaciones: ${reporte.modulo3.observacionesAdicionales}</p>`;
+        html += `<p><strong>Observaciones:</strong> ${reporte.modulo3.observacionesAdicionales}</p>`;
       }
     }
 
     const imagenes = reporte.modulo2?.imagenes || [];
-    imagenes.forEach((img) => {
-      html += `<img class="imagen-reporte" src="${img}" alt="Imagen">`;
-    });
+    if (imagenes.length) {
+      html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
+      imagenes.forEach((img, i) => {
+        html += `<img class="imagen-reporte" src="${img}" alt="Imagen ${i + 1}" />`;
+      });
+    }
 
     reporteContainer.innerHTML = html;
   }
@@ -78,11 +75,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const reader = new FileReader();
       reader.onload = (e) => {
-        const imagenBase64 = e.target.result;
+        const imgBase64 = e.target.result;
         const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
         reporte.modulo2 = reporte.modulo2 || {};
         reporte.modulo2.imagenes = reporte.modulo2.imagenes || [];
-        reporte.modulo2.imagenes.push(imagenBase64);
+        reporte.modulo2.imagenes.push(imgBase64);
         localStorage.setItem("reporte", JSON.stringify(reporte));
         cargarReporte();
       };
@@ -92,66 +89,22 @@ document.addEventListener("DOMContentLoaded", () => {
     input.click();
   }
 
-  function generarPDF() {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const reporte = JSON.parse(localStorage.getItem("reporte"));
-
-    let y = 15;
-    doc.setFontSize(16);
-    doc.text("📋 Reporte de Seguridad", 20, y);
-    y += 10;
-
-    doc.setFontSize(10);
-    doc.text(`Fecha: ${new Date().toLocaleString()}`, 20, y);
-    y += 10;
-
-    function addText(label, text) {
-      doc.setFont(undefined, "bold");
-      doc.text(label, 20, y);
-      doc.setFont(undefined, "normal");
-      doc.text(text, 60, y);
-      y += 8;
-    }
-
-    if (reporte.modulo1?.codigoQR) {
-      addText("QR:", reporte.modulo1.codigoQR);
-    }
-
-    if (reporte.modulo2) {
-      addText("Riesgos:", (reporte.modulo2.riesgos || []).join(", "));
-      if (reporte.modulo2.detalleOtros) addText("Detalle Otros:", reporte.modulo2.detalleOtros);
-      addText("Clasificación:", reporte.modulo2.clasificacionSeleccionada || "");
-      if (reporte.modulo2.detalleClasificacion) {
-        addText("Detalle Clasificación:", reporte.modulo2.detalleClasificacion);
-      }
-    }
-
-    if (reporte.modulo3) {
-      addText("Rol:", reporte.modulo3.rolSeleccionado);
-      if (reporte.modulo3.rolSeleccionado === "Externo") {
-        addText("Nombre:", reporte.modulo3.nombreExterno || "N/A");
-        addText("Teléfono:", reporte.modulo3.telefonoExterno || "N/A");
-      } else {
-        addText("Llave:", reporte.modulo3.llave ? "VALIDADA" : "NO VALIDADO");
-      }
-      if (reporte.modulo3.descripcion) {
-        addText("Descripción:", reporte.modulo3.descripcion);
-      }
-      if (reporte.modulo3.observacionesAdicionales) {
-        addText("Observaciones:", reporte.modulo3.observacionesAdicionales);
-      }
-    }
-
-    const imagenes = reporte.modulo2?.imagenes || [];
-    imagenes.forEach((img, index) => {
-      doc.addPage();
-      doc.addImage(img, "JPEG", 15, 20, 180, 160);
-    });
-
-    const hora = new Date().toLocaleTimeString().replace(/:/g, "-");
+  function descargarPDF() {
+    const element = document.getElementById("reporte");
     const fecha = new Date().toISOString().split("T")[0];
-    doc.save(`ReporteSeguridad_${fecha}_${hora}.pdf`);
+    const hora = new Date().toLocaleTimeString().replace(/:/g, "-");
+    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
+
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: nombreArchivo,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      })
+      .from(element)
+      .save();
   }
 
   function limpiarReporte() {
@@ -165,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   cargarReporte();
   agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
-  descargarBtn.addEventListener("click", generarPDF);
+  descargarBtn.addEventListener("click", descargarPDF);
   finalizarBtn.addEventListener("click", limpiarReporte);
   siguienteBtn.addEventListener("click", siguienteModulo);
 });
