@@ -1,170 +1,76 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const container = document.getElementById("reporte-container");
-  const btnDescargar = document.getElementById("descargar-pdf");
-  const btnFinalizar = document.getElementById("finalizar-reporte");
-  const btnAgregarFoto = document.getElementById("agregar-foto");
-  const btnSiguiente = document.getElementById("siguiente-modulo");
+  const reporteContainer = document.getElementById("reporte-container");
+  const finalizarBtn = document.getElementById("finalizar-reporte");
+  const descargarBtn = document.getElementById("descargar-pdf");
+  const siguienteBtn = document.getElementById("siguiente-modulo");
+  const agregarFotoBtn = document.getElementById("agregar-foto");
 
-  const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
-  if (!reporte || Object.keys(reporte).length === 0) {
-    container.innerHTML = "<p>No se encontró información del reporte.</p>";
-    return;
-  }
+  function cargarReporte() {
+    const reporte = JSON.parse(localStorage.getItem("reporte"));
 
-  let html = "";
-
-  // Módulo 1
-  if (reporte.modulo1) {
-    html += `<div class="modulo"><h3>Código QR Escaneado</h3><ul>`;
-    html += `<li><strong>QR:</strong> ${reporte.modulo1.codigoQR}</li>`;
-    html += `</ul></div>`;
-  }
-
-  // Módulo 2
-  if (reporte.modulo2) {
-    html += `<div class="modulo"><h3>Riesgos Detectados</h3><ul>`;
-    if (reporte.modulo2.riesgos) {
-      html += `<li><strong>Riesgos:</strong> ${reporte.modulo2.riesgos.join(", ")}</li>`;
-    }
-    if (reporte.modulo2.detalleOtros) {
-      html += `<li><strong>Detalle Otros:</strong> ${reporte.modulo2.detalleOtros}</li>`;
-    }
-    if (reporte.modulo2.clasificacionSeleccionada) {
-      html += `<li><strong>Clasificación:</strong> ${reporte.modulo2.clasificacionSeleccionada}</li>`;
-    }
-    if (reporte.modulo2.detalleClasificacion) {
-      html += `<li><strong>Otra Clasificación:</strong> ${reporte.modulo2.detalleClasificacion}</li>`;
-    }
-    html += `</ul>`;
-    if (reporte.modulo2.imagen) {
-      html += `<img src="${reporte.modulo2.imagen}" class="imagen-reporte" />`;
-    }
-    if (reporte.modulo2.fotosAdicionales) {
-      reporte.modulo2.fotosAdicionales.forEach(src => {
-        html += `<img src="${src}" class="imagen-reporte" />`;
-      });
-    }
-    html += `</div>`;
-  }
-
-  // Módulo 3
-  if (reporte.modulo3) {
-    html += `<div class="modulo"><h3>Información del Reportante</h3><ul>`;
-    if (reporte.modulo3.rolSeleccionado) {
-      html += `<li><strong>Rol:</strong> ${reporte.modulo3.rolSeleccionado}</li>`;
-    }
-    if (reporte.modulo3.llave) {
-      html += `<li><strong>Llave:</strong> VALIDADA</li>`;
-    } else if (reporte.modulo3.rolSeleccionado !== "Externo") {
-      html += `<li><strong>Llave:</strong> NO VALIDADA</li>`;
-    }
-    if (reporte.modulo3.nombreExterno) {
-      html += `<li><strong>Nombre:</strong> ${reporte.modulo3.nombreExterno}</li>`;
-    }
-    if (reporte.modulo3.telefonoExterno) {
-      html += `<li><strong>Teléfono:</strong> ${reporte.modulo3.telefonoExterno}</li>`;
-    }
-    if (reporte.modulo3.descripcion) {
-      html += `<li><strong>Descripción:</strong> ${reporte.modulo3.descripcion}</li>`;
-    }
-    if (reporte.modulo3.observacionesAdicionales) {
-      html += `<li><strong>Observaciones:</strong> ${reporte.modulo3.observacionesAdicionales}</li>`;
-    }
-    html += `</ul></div>`;
-  }
-
-  container.innerHTML = html;
-
-  // Descargar PDF
-  btnDescargar.addEventListener("click", async () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    const marginLeft = 15;
-    let y = 20;
-
-    doc.setFontSize(14);
-    doc.text("📋 Reporte de Seguridad", marginLeft, y);
-    y += 10;
-    doc.setFontSize(10);
-    doc.text(`Fecha: ${new Date().toLocaleString()}`, marginLeft, y);
-    y += 10;
-
-    const addSection = (title, data) => {
-      doc.setFont(undefined, "bold");
-      doc.text(title, marginLeft, y);
-      y += 6;
-      doc.setFont(undefined, "normal");
-      data.forEach(line => {
-        doc.text(line, marginLeft, y);
-        y += 6;
-      });
-    };
-
-    const mod1 = reporte.modulo1 || {};
-    const mod2 = reporte.modulo2 || {};
-    const mod3 = reporte.modulo3 || {};
-
-    if (mod1.codigoQR) {
-      addSection("Código QR Escaneado", [`QR: ${mod1.codigoQR}`]);
+    if (!reporte || Object.keys(reporte).length === 0) {
+      reporteContainer.innerHTML = "<p>No se encontró información del reporte.</p>";
+      return;
     }
 
-    if (mod2.riesgos || mod2.clasificacionSeleccionada) {
-      let riesgoLines = [];
-      if (mod2.riesgos) riesgoLines.push(`Riesgos: ${mod2.riesgos.join(", ")}`);
-      if (mod2.detalleOtros) riesgoLines.push(`Detalle Otros: ${mod2.detalleOtros}`);
-      if (mod2.clasificacionSeleccionada) riesgoLines.push(`Clasificación: ${mod2.clasificacionSeleccionada}`);
-      if (mod2.detalleClasificacion) riesgoLines.push(`Otra Clasificación: ${mod2.detalleClasificacion}`);
-      addSection("Riesgos Detectados", riesgoLines);
+    let html = "";
+
+    const fechaActual = new Date();
+    const fecha = fechaActual.toLocaleString();
+
+    html += `<p><strong>Fecha:</strong> ${fecha}</p>`;
+
+    if (reporte.modulo1?.codigoQR) {
+      html += `<h3><strong>Código QR Escaneado</strong></h3>
+               <p>QR: ${reporte.modulo1.codigoQR}</p>`;
     }
 
-    if (mod3.rolSeleccionado) {
-      let infoLines = [`Rol: ${mod3.rolSeleccionado}`];
-      if (mod3.llave) {
-        infoLines.push("Llave: VALIDADA");
-      } else if (mod3.rolSeleccionado !== "Externo") {
-        infoLines.push("Llave: NO VALIDADA");
+    if (reporte.modulo2) {
+      html += `<h3><strong>Riesgos Detectados</strong></h3>`;
+      if (reporte.modulo2.riesgos?.length) {
+        html += `<p>Riesgos: ${reporte.modulo2.riesgos.join(", ")}</p>`;
       }
-      if (mod3.nombreExterno) infoLines.push(`Nombre: ${mod3.nombreExterno}`);
-      if (mod3.telefonoExterno) infoLines.push(`Teléfono: ${mod3.telefonoExterno}`);
-      if (mod3.descripcion) infoLines.push(`Descripción: ${mod3.descripcion}`);
-      if (mod3.observacionesAdicionales) infoLines.push(`Observaciones: ${mod3.observacionesAdicionales}`);
-      addSection("Información del Reportante", infoLines);
-    }
-
-    // Imágenes
-    const addImage = async (src) => {
-      const img = new Image();
-      img.src = src;
-      await new Promise(resolve => img.onload = resolve);
-      const width = 180;
-      const ratio = img.height / img.width;
-      const height = width * ratio;
-      if (y + height > 270) {
-        doc.addPage();
-        y = 20;
+      if (reporte.modulo2.detalleOtros) {
+        html += `<p>Detalle de Otros: ${reporte.modulo2.detalleOtros}</p>`;
       }
-      doc.addImage(img, 'JPEG', marginLeft, y, width, height);
-      y += height + 10;
-    };
-
-    if (mod2.imagen) await addImage(mod2.imagen);
-    if (mod2.fotosAdicionales) {
-      for (const src of mod2.fotosAdicionales) {
-        await addImage(src);
+      if (reporte.modulo2.clasificacionSeleccionada) {
+        html += `<p>Clasificación: ${reporte.modulo2.clasificacionSeleccionada}</p>`;
+        if (reporte.modulo2.detalleClasificacion) {
+          html += `<p>Detalle Clasificación: ${reporte.modulo2.detalleClasificacion}</p>`;
+        }
       }
     }
 
-    const now = new Date();
-    const filename = `ReporteSeguridad_${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}.pdf`;
-    doc.save(filename);
-  });
+    if (reporte.modulo3) {
+      html += `<h3><strong>Información del Reportante</strong></h3>`;
+      html += `<p>Rol: ${reporte.modulo3.rolSeleccionado}</p>`;
+      if (reporte.modulo3.rolSeleccionado === "Externo") {
+        html += `<p>Nombre: ${reporte.modulo3.nombreExterno || "N/A"}</p>`;
+        html += `<p>Teléfono: ${reporte.modulo3.telefonoExterno || "N/A"}</p>`;
+      } else {
+        html += `<p>Llave: ${reporte.modulo3.llave ? "VALIDADA" : "NO VALIDADO"}</p>`;
+      }
+      if (reporte.modulo3.descripcion) {
+        html += `<p>Descripción: ${reporte.modulo3.descripcion}</p>`;
+      }
+      if (reporte.modulo3.observacionesAdicionales) {
+        html += `<p>Observaciones: ${reporte.modulo3.observacionesAdicionales}</p>`;
+      }
+    }
 
-  // Agregar foto adicional
-  btnAgregarFoto.addEventListener("click", () => {
+    const imagenes = reporte.modulo2?.imagenes || [];
+    imagenes.forEach((img) => {
+      html += `<img class="imagen-reporte" src="${img}" alt="Imagen">`;
+    });
+
+    reporteContainer.innerHTML = html;
+  }
+
+  function agregarFotoAdicional() {
     const input = document.createElement("input");
     input.type = "file";
     input.accept = "image/*";
-    input.click();
+    input.capture = "environment";
 
     input.addEventListener("change", (event) => {
       const file = event.target.files[0];
@@ -172,32 +78,94 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const reader = new FileReader();
       reader.onload = (e) => {
-        const img = document.createElement("img");
-        img.src = e.target.result;
-        img.className = "imagen-reporte";
-        container.appendChild(img);
-
+        const imagenBase64 = e.target.result;
         const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
         reporte.modulo2 = reporte.modulo2 || {};
-        reporte.modulo2.fotosAdicionales = reporte.modulo2.fotosAdicionales || [];
-        reporte.modulo2.fotosAdicionales.push(e.target.result);
+        reporte.modulo2.imagenes = reporte.modulo2.imagenes || [];
+        reporte.modulo2.imagenes.push(imagenBase64);
         localStorage.setItem("reporte", JSON.stringify(reporte));
+        cargarReporte();
       };
-
       reader.readAsDataURL(file);
     });
-  });
 
-  // Finalizar reporte (volver al módulo 1)
-  btnFinalizar.addEventListener("click", () => {
-    if (confirm("¿Finalizar reporte y volver al inicio?")) {
-      localStorage.removeItem("reporte");
-      window.location.href = "/modulos/modulo1-escanear/";
+    input.click();
+  }
+
+  function generarPDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const reporte = JSON.parse(localStorage.getItem("reporte"));
+
+    let y = 15;
+    doc.setFontSize(16);
+    doc.text("📋 Reporte de Seguridad", 20, y);
+    y += 10;
+
+    doc.setFontSize(10);
+    doc.text(`Fecha: ${new Date().toLocaleString()}`, 20, y);
+    y += 10;
+
+    function addText(label, text) {
+      doc.setFont(undefined, "bold");
+      doc.text(label, 20, y);
+      doc.setFont(undefined, "normal");
+      doc.text(text, 60, y);
+      y += 8;
     }
-  });
 
-  // Siguiente módulo
-  btnSiguiente.addEventListener("click", () => {
-    window.location.href = "/modulos/modulo6-enviar/";
-  });
+    if (reporte.modulo1?.codigoQR) {
+      addText("QR:", reporte.modulo1.codigoQR);
+    }
+
+    if (reporte.modulo2) {
+      addText("Riesgos:", (reporte.modulo2.riesgos || []).join(", "));
+      if (reporte.modulo2.detalleOtros) addText("Detalle Otros:", reporte.modulo2.detalleOtros);
+      addText("Clasificación:", reporte.modulo2.clasificacionSeleccionada || "");
+      if (reporte.modulo2.detalleClasificacion) {
+        addText("Detalle Clasificación:", reporte.modulo2.detalleClasificacion);
+      }
+    }
+
+    if (reporte.modulo3) {
+      addText("Rol:", reporte.modulo3.rolSeleccionado);
+      if (reporte.modulo3.rolSeleccionado === "Externo") {
+        addText("Nombre:", reporte.modulo3.nombreExterno || "N/A");
+        addText("Teléfono:", reporte.modulo3.telefonoExterno || "N/A");
+      } else {
+        addText("Llave:", reporte.modulo3.llave ? "VALIDADA" : "NO VALIDADO");
+      }
+      if (reporte.modulo3.descripcion) {
+        addText("Descripción:", reporte.modulo3.descripcion);
+      }
+      if (reporte.modulo3.observacionesAdicionales) {
+        addText("Observaciones:", reporte.modulo3.observacionesAdicionales);
+      }
+    }
+
+    const imagenes = reporte.modulo2?.imagenes || [];
+    imagenes.forEach((img, index) => {
+      doc.addPage();
+      doc.addImage(img, "JPEG", 15, 20, 180, 160);
+    });
+
+    const hora = new Date().toLocaleTimeString().replace(/:/g, "-");
+    const fecha = new Date().toISOString().split("T")[0];
+    doc.save(`ReporteSeguridad_${fecha}_${hora}.pdf`);
+  }
+
+  function limpiarReporte() {
+    localStorage.removeItem("reporte");
+    window.location.href = "/modulos/modulo1-qr/";
+  }
+
+  function siguienteModulo() {
+    window.location.href = "/modulos/modulo5-corregir/";
+  }
+
+  cargarReporte();
+  agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
+  descargarBtn.addEventListener("click", generarPDF);
+  finalizarBtn.addEventListener("click", limpiarReporte);
+  siguienteBtn.addEventListener("click", siguienteModulo);
 });
