@@ -5,6 +5,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const siguienteBtn = document.getElementById("siguiente-modulo");
   const agregarFotoBtn = document.getElementById("agregar-foto");
 
+  // Cargar el reporte desde localStorage
   function cargarReporte() {
     const reporte = JSON.parse(localStorage.getItem("reporte"));
     if (!reporte || Object.keys(reporte).length === 0) {
@@ -56,11 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (reporte.modulo2) {
       if (reporte.modulo2.imagen) {
-        imagenes.push(reporte.modulo2.imagen); // Imagen inicial
+        imagenes.push(reporte.modulo2.imagen);
       }
 
       if (Array.isArray(reporte.modulo2.imagenes)) {
-        imagenes = imagenes.concat(reporte.modulo2.imagenes); // Agregar adicionales
+        imagenes = imagenes.concat(reporte.modulo2.imagenes);
       }
 
       if (imagenes.length > 0) {
@@ -71,10 +72,45 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // ✅ Renderizar el HTML al final
     reporteContainer.innerHTML = html;
   }
 
+  // Redimensionar imagen antes de guardar
+  function redimensionarImagen(base64, callback) {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      const MAX_WIDTH = 800;
+      const MAX_HEIGHT = 600;
+
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height = Math.round((height * MAX_WIDTH) / width);
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width = Math.round((width * MAX_HEIGHT) / height);
+          height = MAX_HEIGHT;
+        }
+      }
+
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(img, 0, 0, width, height);
+
+      const imgBase64 = canvas.toDataURL("image/jpeg", 0.8);
+      callback(imgBase64);
+    };
+    img.src = base64;
+  }
+
+  // Agregar foto adicional
   function agregarFotoAdicional() {
     const input = document.createElement("input");
     input.type = "file";
@@ -87,19 +123,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const reader = new FileReader();
       reader.onload = (e) => {
-        const imgBase64 = e.target.result;
-        const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
-        reporte.modulo2 = reporte.modulo2 || {};
+        redimensionarImagen(e.target.result, (imgBase64) => {
+          const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+          reporte.modulo2 = reporte.modulo2 || {};
 
-        if (!Array.isArray(reporte.modulo2.imagenes)) {
-          const imagenInicial = reporte.modulo2.imagen;
-          reporte.modulo2.imagenes = imagenInicial ? [imagenInicial] : [];
-          delete reporte.modulo2.imagen;
-        }
+          if (!Array.isArray(reporte.modulo2.imagenes)) {
+            const imagenInicial = reporte.modulo2.imagen;
+            reporte.modulo2.imagenes = imagenInicial ? [imagenInicial] : [];
+            delete reporte.modulo2.imagen;
+          }
 
-        reporte.modulo2.imagenes.push(imgBase64);
-        localStorage.setItem("reporte", JSON.stringify(reporte));
-        cargarReporte();
+          reporte.modulo2.imagenes.push(imgBase64);
+          localStorage.setItem("reporte", JSON.stringify(reporte));
+
+          cargarReporte();
+        });
       };
       reader.readAsDataURL(file);
     });
@@ -107,40 +145,43 @@ document.addEventListener("DOMContentLoaded", () => {
     input.click();
   }
 
+  // Descargar PDF
   function descargarPDF() {
-  const element = document.getElementById("reporte");
-  const fecha = new Date().toISOString().split("T")[0];
-  const hora = new Date().toLocaleTimeString().replace(/:/g, "-");
-  const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
+    const element = document.getElementById("reporte");
+    const fecha = new Date().toISOString().split("T")[0];
+    const hora = new Date().toLocaleTimeString().replace(/:/g, "-");
+    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
 
-  // Redimensionar imágenes SOLO para el PDF
-  const imgs = element.querySelectorAll(".imagen-reporte");
-  imgs.forEach(img => {
-    img.style.maxWidth = "300px";
-    img.style.height = "auto";
-  });
+    const imgs = element.querySelectorAll(".imagen-reporte");
+    imgs.forEach(img => {
+      img.style.maxWidth = "300px";
+      img.style.height = "auto";
+    });
 
-  html2pdf()
-    .set({
-      margin: 10,
-      filename: nombreArchivo,
-      image: { type: "jpeg", quality: 0.98 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    })
-    .from(element)
-    .save();
-}
+    html2pdf()
+      .set({
+        margin: 10,
+        filename: nombreArchivo,
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+      })
+      .from(element)
+      .save();
+  }
 
+  // Limpiar reporte
   function limpiarReporte() {
     localStorage.removeItem("reporte");
     window.location.href = "/modulos/modulo1-qr/";
   }
 
+  // Ir al siguiente módulo
   function siguienteModulo() {
     window.location.href = "/modulos/modulo5-corregir/";
   }
 
+  // Inicializar
   cargarReporte();
   agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
   descargarBtn.addEventListener("click", descargarPDF);
