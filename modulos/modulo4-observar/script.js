@@ -51,24 +51,29 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Preparar imágenes (soporta imagen inicial y adicionales)
-let imagenes = [];
+    // Mostrar imágenes (inicial + adicionales si existen)
+    let imagenes = [];
 
-if (reporte.modulo2?.imagen) {
-  imagenes.push(reporte.modulo2.imagen); // Imagen original
-}
+    if (reporte.modulo2) {
+      if (reporte.modulo2.imagen) {
+        imagenes.push(reporte.modulo2.imagen); // Imagen inicial
+      }
 
-if (Array.isArray(reporte.modulo2?.imagenes)) {
-  imagenes = imagenes.concat(reporte.modulo2.imagenes); // Agregar adicionales
-}
+      if (Array.isArray(reporte.modulo2.imagenes)) {
+        imagenes = imagenes.concat(reporte.modulo2.imagenes); // Agregar adicionales
+      }
 
-if (imagenes.length > 0) {
-  html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
-  imagenes.forEach((img, i) => {
-    html += `<img class="imagen-reporte" src="${img}" alt="Imagen ${i + 1}" />`;
-  });
-}
+      if (imagenes.length > 0) {
+        html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
+        imagenes.forEach((img, i) => {
+          html += `<img class="imagen-reporte" src="${img}" alt="Imagen ${i + 1}" />`;
+        });
+      }
+    }
 
+    // ✅ Renderizar el HTML al final
+    reporteContainer.innerHTML = html;
+  }
 
   function agregarFotoAdicional() {
     const input = document.createElement("input");
@@ -87,7 +92,6 @@ if (imagenes.length > 0) {
         reporte.modulo2 = reporte.modulo2 || {};
 
         if (!Array.isArray(reporte.modulo2.imagenes)) {
-          // Si ya hay una imagen suelta, inclúyela como la primera
           const imagenInicial = reporte.modulo2.imagen;
           reporte.modulo2.imagenes = imagenInicial ? [imagenInicial] : [];
           delete reporte.modulo2.imagen;
