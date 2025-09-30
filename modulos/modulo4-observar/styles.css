@@ -2,47 +2,50 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f4f4;
+  background: #f7f7f7;
+  color: #333;
 }
 
 header {
   background-color: #4914db;
-  color: white;
+  color: #fff;
   text-align: center;
-  padding: 1rem;
-  font-size: 1.5rem;
+  padding: 20px;
 }
 
 main {
   max-width: 800px;
-  margin: auto;
-  padding: 1rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 20px auto;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+  margin: 0 0 20px;
 }
 
 button {
   display: block;
-  width: 80%;
+  width: 90%;
   margin: 10px auto;
-  padding: 12px;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  padding: 15px;
+  font-size: 1.1rem;
   background-color: #4914db;
   color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
 }
 
 button:hover {
-  background-color: #3610a3;
+  background-color: #3610a0;
 }
 
 .imagen-reporte {
-  display: block;
   max-width: 100%;
-  margin: 10px auto;
-  border-radius: 8px;
+  margin: 10px 0;
   border: 1px solid #ccc;
+  border-radius: 5px;
 }
