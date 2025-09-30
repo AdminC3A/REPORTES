@@ -33,10 +33,11 @@ p {
   margin: 8px 0;
 }
 
+/* Ajuste de imágenes */
 .imagen-reporte {
   display: block;
+  max-width: 300px;   /* 🔑 control estricto del ancho */
   width: 100%;
-  max-width: 400px;
   height: auto;
   margin: 15px auto;
   border-radius: 8px;
@@ -45,6 +46,7 @@ p {
   box-shadow: 0 0 4px rgba(0,0,0,0.2);
 }
 
+/* Botonera */
 .botones {
   display: flex;
   flex-wrap: wrap;
@@ -61,7 +63,9 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  min-width: 180px;
+  min-width: 160px;   /* 🔑 evita que se estiren demasiado */
+  max-width: 200px;   /* 🔑 límite superior */
+  text-align: center;
   transition: background-color 0.3s ease;
 }
 
@@ -69,6 +73,7 @@ button:hover {
   background-color: #3711a3;
 }
 
+/* Bloques de módulos */
 .modulo {
   background-color: #f9f9f9;
   border-left: 4px solid #4914db;
