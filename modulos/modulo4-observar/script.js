@@ -108,22 +108,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function descargarPDF() {
-    const element = document.getElementById("reporte");
-    const fecha = new Date().toISOString().split("T")[0];
-    const hora = new Date().toLocaleTimeString().replace(/:/g, "-");
-    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
+  const element = document.getElementById("reporte");
+  const fecha = new Date().toISOString().split("T")[0];
+  const hora = new Date().toLocaleTimeString().replace(/:/g, "-");
+  const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
 
-    html2pdf()
-      .set({
-        margin: 10,
-        filename: nombreArchivo,
-        image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-      })
-      .from(element)
-      .save();
-  }
+  // Redimensionar imágenes SOLO para el PDF
+  const imgs = element.querySelectorAll(".imagen-reporte");
+  imgs.forEach(img => {
+    img.style.maxWidth = "300px";
+    img.style.height = "auto";
+  });
+
+  html2pdf()
+    .set({
+      margin: 10,
+      filename: nombreArchivo,
+      image: { type: "jpeg", quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    })
+    .from(element)
+    .save();
+}
 
   function limpiarReporte() {
     localStorage.removeItem("reporte");
