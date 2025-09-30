@@ -4,15 +4,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const enviarAmbosBtn = document.getElementById("enviar-ambos");
   const finalizarBtn = document.getElementById("finalizar");
 
-  // ⚙️ Configura esto según tu cuenta de EmailJS
-  const SERVICE_ID = "tu_service_id";
-  const TEMPLATE_ID = "tu_template_id";
-  const PUBLIC_KEY = "tu_public_key";
+  // ⚙️ Configuración de EmailJS (¡COMPLETA!)
+  const SERVICE_ID = "service_m1kpjzd";   // ✅ ¡ACTUALIZADO!
+  const TEMPLATE_ID = "template_0vvcv8r";   // ✅ ¡ACTUALIZADO!
+  const PUBLIC_KEY = "AV0u6cTpjcpnjm3xKO"; // ✅ ¡ACTUALIZADO!
 
-  // ✅ INFORMACIÓN ACTUALIZADA
+  // ✅ Información de contacto
   const DESTINATARIO_PRINCIPAL = "ctasupervisionnom031@gmail.com";
   const DESTINATARIO_COPIA = "supervision@casatresaguas.com";
-  const NUMERO_WHATSAPP = "526241161190"; // Código de país 52 (México) + tu número
+  const NUMERO_WHATSAPP = "526241161190";
 
   /**
    * Crea dinámicamente el HTML completo del reporte para usarlo en el PDF.
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ✅ Enviar por WhatsApp
+  // Enviar por WhatsApp
   enviarWhatsAppBtn.addEventListener("click", () => {
     const reporte = JSON.parse(localStorage.getItem("reporte"));
     let mensajeTexto = "Hola, se ha generado un nuevo reporte de seguridad.";
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.open(url, "_blank");
   });
 
-  // ✅ Enviar por Correo
+  // Enviar por Correo
   enviarCorreoBtn.addEventListener("click", async () => {
     const reporte = JSON.parse(localStorage.getItem("reporte"));
     if (!reporte) return alert("No hay reporte para enviar.");
@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const templateParams = {
         to_email: DESTINATARIO_PRINCIPAL,
-        cc_email: DESTINATARIO_COPIA, // Parámetro para la copia
+        cc_email: DESTINATARIO_COPIA,
         subject: `Reporte de Seguridad - QR ${reporte.modulo1?.codigoQR || ''}`,
         message: "Se adjunta el PDF del reporte generado.",
         attachment: pdfBase64,
@@ -112,13 +112,13 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // ✅ Ambos
+  // Ambos
   enviarAmbosBtn.addEventListener("click", () => {
     enviarWhatsAppBtn.click();
     enviarCorreoBtn.click();
   });
 
-  // ✅ Finalizar
+  // Finalizar
   finalizarBtn.addEventListener("click", () => {
     const confirmacion = confirm("¿Estás seguro de que deseas finalizar? Se borrará el reporte actual.");
     if (confirmacion) {
