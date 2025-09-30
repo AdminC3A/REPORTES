@@ -4,28 +4,29 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Resumen del Reporte</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
-    <h1>Resumen del Reporte</h1>
+    Resumen del Reporte de Seguridad
   </header>
 
   <main>
-    <section id="reporte">
-      <h2>Datos del Reporte</h2>
+    <div id="reporte">
       <div id="reporte-container">
-        <p>Cargando reporte…</p>
+        <p>Cargando el reporte...</p>
       </div>
-    </section>
+    </div>
 
-    <button id="agregar-foto">📸 Agregar Foto Adicional</button>
-    <button id="descargar-pdf">📄 Descargar PDF</button>
-    <button id="siguiente-modulo">📤 Enviar / Siguiente Módulo</button>
-    <button id="finalizar-reporte">✅ Finalizar Reporte</button>
+    <div class="botones">
+      <button id="agregar-foto">📸 Agregar Foto Adicional</button>
+      <button id="descargar-pdf">📄 Descargar PDF</button>
+      <button id="siguiente-modulo">➡️ Siguiente Módulo</button>
+      <button id="finalizar-reporte">✅ Finalizar Reporte</button>
+    </div>
   </main>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
