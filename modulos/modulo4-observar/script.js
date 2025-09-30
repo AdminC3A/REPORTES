@@ -51,16 +51,24 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    const imagenes = reporte.modulo2?.imagenes || [];
-    if (imagenes.length > 0) {
-      html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
-      imagenes.forEach((img, i) => {
-        html += `<img class="imagen-reporte" src="${img}" alt="Imagen ${i + 1}" />`;
-      });
-    }
+    // Preparar imágenes (soporta imagen inicial y adicionales)
+let imagenes = [];
 
-    reporteContainer.innerHTML = html;
-  }
+if (reporte.modulo2?.imagen) {
+  imagenes.push(reporte.modulo2.imagen); // Imagen original
+}
+
+if (Array.isArray(reporte.modulo2?.imagenes)) {
+  imagenes = imagenes.concat(reporte.modulo2.imagenes); // Agregar adicionales
+}
+
+if (imagenes.length > 0) {
+  html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
+  imagenes.forEach((img, i) => {
+    html += `<img class="imagen-reporte" src="${img}" alt="Imagen ${i + 1}" />`;
+  });
+}
+
 
   function agregarFotoAdicional() {
     const input = document.createElement("input");
