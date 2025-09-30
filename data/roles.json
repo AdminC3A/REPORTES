@@ -9,16 +9,16 @@
     "supervisoresObra": {
         "rol": "Supervisor de Obra",
         "supervisores": {
-            "Ana López": ["1234", "mnop"],
-            "Roberto Díaz": ["qrst", "uvwx"]
+            "Arnulfo Sanchez": ["2509"],
+            "Norberto Zamora": ["4568"]
         }
     },
     "guardiasTurno": {
         "rol": "Guardia en Turno",
         "supervisores": {
-            "Pedro Sánchez": ["1234", "cdef"],
-            "María González": ["ghij", "klmn"]
+            "Pablo Gonzalez": ["6548"]
         }
     }
 }
+
 
