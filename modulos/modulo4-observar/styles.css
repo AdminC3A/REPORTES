@@ -26,6 +26,8 @@ main {
 h2, h3 {
   color: #4914db;
   margin-bottom: 15px;
+  /* Evita que un título quede al final de una página en el PDF */
+  break-after: avoid-page;
 }
 
 p {
@@ -33,10 +35,10 @@ p {
   margin: 8px 0;
 }
 
-/* Ajuste de imágenes */
+/* Imágenes optimizadas */
 .imagen-reporte {
   display: block;
-  max-width: 300px;   /* 🔑 control estricto del ancho */
+  max-width: 300px;  /* control estricto */
   width: 100%;
   height: auto;
   margin: 15px auto;
@@ -44,6 +46,8 @@ p {
   border: 1px solid #ccc;
   object-fit: contain;
   box-shadow: 0 0 4px rgba(0,0,0,0.2);
+  /* Evita que una imagen se parta a la mitad al cambiar de página en el PDF */
+  break-inside: avoid;
 }
 
 /* Botonera */
@@ -63,8 +67,8 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  min-width: 160px;   /* 🔑 evita que se estiren demasiado */
-  max-width: 200px;   /* 🔑 límite superior */
+  min-width: 160px;
+  max-width: 200px;
   text-align: center;
   transition: background-color 0.3s ease;
 }
@@ -73,7 +77,6 @@ button:hover {
   background-color: #3711a3;
 }
 
-/* Bloques de módulos */
 .modulo {
   background-color: #f9f9f9;
   border-left: 4px solid #4914db;
