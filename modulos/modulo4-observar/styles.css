@@ -1,3 +1,13 @@
+body {
+  border: 5px solid red !important;
+}
+
+/* El resto de tu código CSS va aquí debajo... */
+:root {
+  --primary-color: #0056b3; /* Azul profesional */
+  /* ... */
+}
+
 /* Colores base para un estilo más moderno y profesional */
 :root {
   --primary-color: #0056b3; /* Azul profesional */
