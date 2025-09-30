@@ -1,86 +1,149 @@
+/* Colores base para un estilo más moderno y profesional */
+:root {
+  --primary-color: #0056b3; /* Azul profesional */
+  --secondary-color: #007bff; /* Azul más claro para acentos */
+  --text-color: #343a40; /* Negro casi oscuro para texto */
+  --bg-color-light: #f8f9fa; /* Fondo claro */
+  --bg-color-medium: #e9ecef; /* Fondo intermedio para secciones */
+  --border-color: #dee2e6; /* Gris para bordes */
+  --shadow-light: rgba(0, 0, 0, 0.08); /* Sombra suave */
+}
+
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f2f2f2;
-  color: #333;
+  background-color: var(--bg-color-light);
+  color: var(--text-color);
+  line-height: 1.6;
 }
 
 header {
-  background-color: #4914db;
+  background-color: var(--primary-color);
   color: #fff;
-  padding: 20px;
+  padding: 25px 20px;
   text-align: center;
-  font-size: 1.8rem;
+  font-size: 2rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px var(--shadow-light);
 }
 
 main {
-  max-width: 800px;
+  max-width: 900px; /* Un poco más ancho para mejor presentación */
   margin: 30px auto;
-  padding: 20px;
+  padding: 25px;
   background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 4px 15px var(--shadow-light);
 }
 
 h2, h3 {
-  color: #4914db;
+  color: var(--primary-color);
+  margin-top: 25px;
   margin-bottom: 15px;
-  /* Evita que un título quede al final de una página en el PDF */
-  break-after: avoid-page;
+  border-bottom: 2px solid var(--bg-color-medium);
+  padding-bottom: 8px;
+  font-weight: 600;
+  break-after: avoid-page; /* Evita que el título se corte en PDF */
 }
 
 p {
   font-size: 1rem;
-  margin: 8px 0;
+  margin: 10px 0;
 }
 
-/* Imágenes optimizadas */
-.imagen-reporte {
-  display: block;
-  max-width: 300px;  /* control estricto */
-  width: 100%;
-  height: auto;
-  margin: 15px auto;
+/* Contenedor de las fotos: flexbox para organizar mejor */
+.fotos-galeria {
+  display: flex;
+  flex-wrap: wrap; /* Permite que las imágenes fluyan a la siguiente línea */
+  gap: 20px; /* Espacio entre las imágenes */
+  margin-top: 20px;
+  justify-content: center; /* Centra las imágenes si no llenan la fila */
+}
+
+/* Estilo para cada contenedor de imagen individual */
+.imagen-wrapper {
+  width: 250px; /* Ancho fijo para cada imagen */
+  height: 180px; /* Alto fijo para cada imagen */
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  border: 1px solid #ccc;
-  object-fit: contain;
-  box-shadow: 0 0 4px rgba(0,0,0,0.2);
-  /* Evita que una imagen se parta a la mitad al cambiar de página en el PDF */
-  break-inside: avoid;
+  overflow: hidden; /* Asegura que la imagen no se desborde del contenedor */
+  display: flex; /* Para centrar la imagen dentro del wrapper */
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-color-medium);
+  box-shadow: 0 2px 8px var(--shadow-light);
+  break-inside: avoid; /* Evita que el contenedor de imagen se corte en el PDF */
+  page-break-inside: avoid; /* Para compatibilidad de PDF */
 }
 
-/* Botonera */
+/* La imagen real dentro de su wrapper */
+.imagen-reporte {
+  max-width: 100%; /* Ajusta la imagen al ancho máximo del wrapper */
+  max-height: 100%; /* Ajusta la imagen al alto máximo del wrapper */
+  width: auto; /* Mantiene la proporción */
+  height: auto; /* Mantiene la proporción */
+  display: block; /* Elimina espacio extra debajo de la imagen */
+  object-fit: contain; /* Ajusta la imagen para que quepa, mostrando barras si es necesario */
+}
+
+
+/* Estilo de los Botones */
 .botones {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 15px;
-  margin-top: 30px;
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color);
 }
 
 button {
-  background-color: #4914db;
+  background-color: var(--primary-color);
   color: #fff;
-  padding: 12px 20px;
-  font-size: 1.1rem;
+  padding: 12px 25px;
+  font-size: 1.05rem;
   border: none;
-  border-radius: 5px;
+  border-radius: 6px;
   cursor: pointer;
-  min-width: 160px;
-  max-width: 200px;
+  min-width: 180px;
   text-align: center;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 5px var(--shadow-light);
+  font-weight: 500;
 }
 
 button:hover {
-  background-color: #3711a3;
+  background-color: var(--secondary-color);
+  transform: translateY(-2px); /* Efecto sutil al pasar el ratón */
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px var(--shadow-light);
+}
+
+/* Estilos específicos para botones si quieres diferenciarlos */
+#finalizar-reporte {
+  background-color: #dc3545; /* Rojo para finalizar/peligro */
+}
+#finalizar-reporte:hover {
+  background-color: #c82333;
+}
+
+#descargar-pdf {
+  background-color: #28a745; /* Verde para descargar */
+}
+#descargar-pdf:hover {
+  background-color: #218838;
 }
 
 .modulo {
-  background-color: #f9f9f9;
-  border-left: 4px solid #4914db;
-  padding: 15px;
-  margin-bottom: 20px;
-  border-radius: 4px;
+  background-color: var(--bg-color-medium);
+  border-left: 5px solid var(--primary-color);
+  padding: 15px 20px;
+  margin-bottom: 25px;
+  border-radius: 6px;
+  box-shadow: 0 1px 5px var(--shadow-light);
 }
