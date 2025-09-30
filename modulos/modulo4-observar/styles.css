@@ -35,13 +35,14 @@ p {
 
 .imagen-reporte {
   display: block;
-  max-width: 90%;
-  max-height: 400px;
-  width: auto;
+  width: 100%;
+  max-width: 400px;
   height: auto;
-  margin: 20px auto;
+  margin: 15px auto;
   border-radius: 8px;
-  box-shadow: 0 0 5px rgba(0,0,0,0.2);
+  border: 1px solid #ccc;
+  object-fit: contain;
+  box-shadow: 0 0 4px rgba(0,0,0,0.2);
 }
 
 .botones {
