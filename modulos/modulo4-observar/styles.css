@@ -88,7 +88,7 @@ p {
 }
 
 
-/* Estilo de los Botones */
+/* Estilo de los Botones (para pantallas grandes) */
 .botones {
   display: flex;
   flex-wrap: wrap;
@@ -107,6 +107,7 @@ button {
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  width: auto; /* Ancho automático por defecto */
   min-width: 180px;
   text-align: center;
   transition: background-color 0.3s ease, transform 0.2s ease;
@@ -146,4 +147,27 @@ button:active {
   margin-bottom: 25px;
   border-radius: 6px;
   box-shadow: 0 1px 5px var(--shadow-light);
+}
+
+/* ================================================================== */
+/* == NUEVA SECCIÓN PARA DISPOSITIVOS MÓVILES (PANTALLAS PEQUEÑAS) == */
+/* ================================================================== */
+@media (max-width: 600px) {
+  main {
+    margin: 15px; /* Reduce el margen en móviles */
+    padding: 15px;
+  }
+  
+  .botones {
+    flex-direction: column; /* Apila los botones verticalmente */
+    align-items: center;  /* Centra los botones en la columna */
+    gap: 12px; /* Ajusta el espacio vertical entre botones */
+  }
+
+  button {
+    width: 90%; /* Hace que los botones sean anchos y fáciles de presionar */
+    max-width: 400px; /* Limita el ancho máximo por si acaso */
+    padding: 15px; /* Aumenta el padding para un mejor área de toque */
+    font-size: 1.1rem; /* Letra un poco más grande en móvil */
+  }
 }
