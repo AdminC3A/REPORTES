@@ -2,8 +2,8 @@
     "supervisoresSeguridad": {
         "rol": "Supervisor de Seguridad",
         "supervisores": {
-            "Juan Pérez": ["1234", "5678"],
-            "Carlos Ramírez": ["abcd", "efgh"]
+            "Laura Cruz": ["Gary"],
+            "David Martinez": ["Admin25"]
         }
     },
     "supervisoresObra": {
@@ -21,3 +21,4 @@
         }
     }
 }
+
