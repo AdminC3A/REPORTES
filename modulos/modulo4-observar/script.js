@@ -17,7 +17,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     let html = "";
-    // Muestra la fecha del sistema al momento de ver el resumen
     html += `<p><strong>Fecha de visualización:</strong> ${new Date().toLocaleString()}</p>`;
 
     // --- Muestra los datos de los módulos ---
@@ -55,7 +54,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // --- Lógica para mostrar las imágenes ---
-    // Unificamos todas las imágenes en un solo array para simplificar
     let todasLasImagenes = [];
     if (reporte.modulo2?.imagenes) {
       todasLasImagenes = reporte.modulo2.imagenes;
@@ -63,9 +61,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (todasLasImagenes.length > 0) {
       html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
+      html += `<div class="fotos-galeria">`; // Contenedor flex para la galería
       todasLasImagenes.forEach((imgBase64, index) => {
-        html += `<img class="imagen-reporte" src="${imgBase64}" alt="Imagen ${index + 1}" />`;
+        // Cada imagen ahora va dentro de un .imagen-wrapper
+        html += `
+          <div class="imagen-wrapper">
+            <img class="imagen-reporte" src="${imgBase64}" alt="Imagen ${index + 1}" />
+          </div>`;
       });
+      html += `</div>`; // Cierra .fotos-galeria
     }
 
     reporteContainer.innerHTML = html;
@@ -83,13 +87,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
 
-        const MAX_WIDTH = 800;
-        const MAX_HEIGHT = 600;
+        const MAX_WIDTH = 800; // Ancho máximo deseado
+        const MAX_HEIGHT = 600; // Alto máximo deseado
 
         let width = img.width;
         let height = img.height;
 
-        // Calcula las nuevas dimensiones
+        // Calcula las nuevas dimensiones manteniendo la proporción
         if (width > height) {
           if (width > MAX_WIDTH) {
             height = Math.round((height * MAX_WIDTH) / width);
@@ -107,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ctx.drawImage(img, 0, 0, width, height);
 
         // Convierte el canvas a base64 con calidad optimizada
-        resolve(canvas.toDataURL("image/jpeg", 0.8));
+        resolve(canvas.toDataURL("image/jpeg", 0.8)); // Calidad 80% para jpeg
       };
       img.src = base64Src;
     });
@@ -129,20 +133,16 @@ document.addEventListener("DOMContentLoaded", () => {
       const reader = new FileReader();
       reader.onload = async (e) => {
         const base64Original = e.target.result;
-        // Espera a que la imagen se redimensione
         const base64Redimensionada = await redimensionarImagen(base64Original);
 
-        // Actualiza el reporte en localStorage
         const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
         reporte.modulo2 = reporte.modulo2 || {};
-        // Asegura que el array de imágenes exista
         if (!Array.isArray(reporte.modulo2.imagenes)) {
           reporte.modulo2.imagenes = [];
         }
         reporte.modulo2.imagenes.push(base64Redimensionada);
         localStorage.setItem("reporte", JSON.stringify(reporte));
 
-        // Vuelve a cargar y mostrar el reporte actualizado
         cargarYRenderizarReporte();
       };
       reader.readAsDataURL(file);
@@ -160,13 +160,24 @@ document.addEventListener("DOMContentLoaded", () => {
     const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
     const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
     
-    // Opciones para mejorar la calidad del PDF
+    // Opciones para html2pdf ajustadas para mejor calidad y compatibilidad
     const opt = {
       margin: 10,
       filename: nombreArchivo,
-      image: { type: 'jpeg', quality: 0.95 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      image: { type: 'jpeg', quality: 0.98 }, // Calidad más alta para la imagen en el PDF
+      html2canvas: { 
+        scale: 2, // Aumenta la resolución de la captura
+        useCORS: true, 
+        scrollY: 0 // Asegura que se renderiza desde el inicio del elemento
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        // Opcional: añadir un encabezado y pie de página simple en jsPDF
+        // Si necesitas algo más complejo, habría que integrar directamente con jsPDF
+        // para dibujar texto y líneas en cada página.
+      }
     };
 
     html2pdf().set(opt).from(element).save();
@@ -179,7 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const confirmacion = confirm("¿Estás seguro de que deseas finalizar y borrar este reporte?");
     if (confirmacion) {
         localStorage.removeItem("reporte");
-        // Cambia a la URL correcta del primer módulo si es necesario
+        // Asegúrate de que esta URL sea la correcta para el primer módulo
         window.location.href = "../modulo1-qr/"; 
     }
   }
@@ -188,39 +199,44 @@ document.addEventListener("DOMContentLoaded", () => {
    * Redirige al siguiente módulo del flujo.
    */
   function siguienteModulo() {
-    window.location.href = "../modulo5-corregir/";
+    // Asegúrate de que esta URL sea la correcta para el siguiente módulo
+    window.location.href = "../modulo5-corregir/"; 
   }
   
   /**
-   * **Corrección importante:**
-   * Al cargar la página, se debe redimensionar la imagen inicial si existe.
-   * Esta función se ejecuta una sola vez para estandarizar todas las imágenes.
+   * Procesa las imágenes iniciales (si vienen de un módulo anterior) para asegurar
+   * que estén redimensionadas y almacenadas en el formato unificado (array 'imagenes').
+   * Esto se ejecuta una sola vez al cargar la página.
    */
   async function estandarizarImagenesIniciales() {
     const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
-    if (reporte.modulo2 && reporte.modulo2.imagen) {
-      // Si existe la imagen "suelta" inicial, la redimensionamos
-      const imgRedimensionada = await redimensionarImagen(reporte.modulo2.imagen);
-      
-      // La agregamos al array unificado de imágenes
-      if (!Array.isArray(reporte.modulo2.imagenes)) {
-        reporte.modulo2.imagenes = [];
+
+    if (reporte.modulo2) {
+      // Si aún existe la imagen 'suelta' original de modulo2.imagen
+      if (reporte.modulo2.imagen) {
+        const imgRedimensionada = await redimensionarImagen(reporte.modulo2.imagen);
+        
+        // Inicializa el array si no existe
+        if (!Array.isArray(reporte.modulo2.imagenes)) {
+          reporte.modulo2.imagenes = [];
+        }
+        // Agrega la imagen redimensionada al principio del array
+        reporte.modulo2.imagenes.unshift(imgRedimensionada); 
+        
+        // Elimina la propiedad antigua para evitar duplicados y mantener el formato unificado
+        delete reporte.modulo2.imagen; 
+        
+        localStorage.setItem("reporte", JSON.stringify(reporte));
       }
-      reporte.modulo2.imagenes.unshift(imgRedimensionada); // La pone al principio
-      
-      // Borramos la propiedad antigua para no duplicarla
-      delete reporte.modulo2.imagen; 
-      
-      // Guardamos el reporte ya corregido en localStorage
-      localStorage.setItem("reporte", JSON.stringify(reporte));
     }
-    // Una vez estandarizadas, renderizamos el reporte final
+    // Después de estandarizar, o si no había nada que estandarizar, renderiza el reporte
     cargarYRenderizarReporte();
   }
 
 
   // --- Inicialización y Eventos ---
-  estandarizarImagenesIniciales(); // Llama a la función que corrige y luego renderiza
+  // Llama a la función que corrige el formato de las imágenes iniciales y luego renderiza
+  estandarizarImagenesIniciales(); 
   
   agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
   descargarBtn.addEventListener("click", descargarPDF);
