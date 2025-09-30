@@ -5,16 +5,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const siguienteBtn = document.getElementById("siguiente-modulo");
   const agregarFotoBtn = document.getElementById("agregar-foto");
 
-  // ==================================================================
-  // == NUEVA FUNCIÓN PARA MANEJAR ESTILOS DE BOTONES DINÁMICAMENTE ==
-  // ==================================================================
   function ajustarEstiloBotones() {
     const anchoPantalla = window.innerWidth;
     const botonesContainer = document.querySelector(".botones");
     const botones = document.querySelectorAll(".botones button");
 
     if (anchoPantalla <= 600) {
-      // ESTILOS PARA MÓVIL (PANTALLA PEQUEÑA)
       botonesContainer.style.flexDirection = "column";
       botonesContainer.style.alignItems = "center";
       botones.forEach(boton => {
@@ -23,20 +19,16 @@ document.addEventListener("DOMContentLoaded", () => {
         boton.style.padding = "15px";
       });
     } else {
-      // ESTILOS PARA ESCRITORIO (PANTALLA GRANDE) - Restablece los valores
       botonesContainer.style.flexDirection = "row";
       botonesContainer.style.alignItems = "initial";
       botones.forEach(boton => {
-        boton.style.width = "auto"; // Vuelve al ancho automático
+        boton.style.width = "auto";
         boton.style.maxWidth = "200px";
-        boton.style.padding = "12px 25px"; // Restablece el padding original
+        boton.style.padding = "12px 25px";
       });
     }
   }
 
-  /**
-   * Carga y muestra los datos del reporte desde localStorage.
-   */
   function cargarYRenderizarReporte() {
     const reporte = JSON.parse(localStorage.getItem("reporte"));
 
@@ -48,7 +40,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let html = "";
     html += `<p><strong>Fecha de visualización:</strong> ${new Date().toLocaleString()}</p>`;
 
-    // --- Muestra los datos de los módulos ---
     if (reporte.modulo1?.codigoQR) {
       html += `<h3>📌 Código QR</h3><p>${reporte.modulo1.codigoQR}</p>`;
     }
@@ -80,7 +71,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // --- Lógica para mostrar las imágenes ---
     let todasLasImagenes = [];
     if (reporte.modulo2?.imagenes) {
       todasLasImagenes = reporte.modulo2.imagenes;
@@ -100,11 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
     reporteContainer.innerHTML = html;
   }
 
-  /**
-   * Redimensiona una imagen a un tamaño máximo manteniendo la proporción.
-   * @param {string} base64Src - La imagen en formato base64.
-   * @returns {Promise<string>} Una promesa que se resuelve con la nueva imagen en base64.
-   */
   function redimensionarImagen(base64Src) {
     return new Promise((resolve) => {
       const img = new Image();
@@ -135,9 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  /**
-   * Abre el selector de archivos para agregar una nueva foto, la redimensiona y la guarda.
-   */
   async function agregarFotoAdicional() {
     const input = document.createElement("input");
     input.type = "file";
@@ -164,19 +146,46 @@ document.addEventListener("DOMContentLoaded", () => {
     input.click();
   }
 
+  // ==================================================================
+  // == FUNCIÓN DESCARGAR PDF MODIFICADA PARA INCLUIR ENCABEZADO ==
+  // ==================================================================
   function descargarPDF() {
-    const element = document.getElementById("reporte");
+    // 1. Elemento que contiene el reporte en la página
+    const reportElement = document.getElementById("reporte");
+
+    // 2. Creamos un contenedor temporal que será usado solo para el PDF
+    const pdfContainer = document.createElement("div");
+
+    // 3. Creamos el encabezado para el PDF
+    const pdfHeader = document.createElement("h1");
+    pdfHeader.textContent = "Reporte de Incidencias de Seguridad";
+    
+    // 4. (Opcional) Le damos estilo al encabezado del PDF
+    pdfHeader.style.textAlign = "center";
+    pdfHeader.style.color = "#0056b3";
+    pdfHeader.style.fontSize = "24px";
+    pdfHeader.style.marginBottom = "25px";
+    pdfHeader.style.borderBottom = "2px solid #dee2e6";
+    pdfHeader.style.paddingBottom = "10px";
+
+    // 5. Agregamos el nuevo encabezado y el contenido del reporte al contenedor temporal
+    pdfContainer.appendChild(pdfHeader);
+    pdfContainer.appendChild(reportElement.cloneNode(true)); // Usamos un clon para no alterar la página visible
+
+    // 6. Configuramos las opciones de html2pdf
     const fecha = new Date().toISOString().split("T")[0];
     const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
     const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
     const opt = {
-      margin: 10,
+      margin: [15, 10, 15, 10], // Arriba, Izquierda, Abajo, Derecha
       filename: nombreArchivo,
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(element).save();
+
+    // 7. Generamos el PDF a partir de nuestro contenedor temporal
+    html2pdf().set(opt).from(pdfContainer).save();
   }
 
   function limpiarReporte() {
@@ -212,7 +221,6 @@ document.addEventListener("DOMContentLoaded", () => {
   finalizarBtn.addEventListener("click", limpiarReporte);
   siguienteBtn.addEventListener("click", siguienteModulo);
   
-  // -- EJECUCIÓN DE LA NUEVA LÓGICA DE ESTILOS --
-  ajustarEstiloBotones(); // Se ejecuta una vez al cargar la página
-  window.addEventListener('resize', ajustarEstiloBotones); // Se ejecuta cada vez que cambia el tamaño de la ventana
+  ajustarEstiloBotones();
+  window.addEventListener('resize', ajustarEstiloBotones);
 });
