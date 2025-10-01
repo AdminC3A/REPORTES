@@ -73,9 +73,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
   
-  // ==================================================================
-  // == FUNCIÓN DESCARGAR PDF (CON DELAY PARA RENDERIZAR IMÁGENES) ==
-  // ==================================================================
   function descargarPDF() {
     const reportElement = document.getElementById("reporte-container");
     
@@ -96,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
     
     reportElement.prepend(pdfHeader);
     
-    // Le damos al navegador una pequeña pausa de 100 milisegundos para renderizar todo.
+    // Aumentamos el tiempo de espera para dar más tiempo a que las imágenes se rendericen
     setTimeout(() => {
         const fecha = new Date().toISOString().split("T")[0];
         const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
@@ -119,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
             reportElement.removeChild(pdfHeader);
             setEstadoCarga(false);
         });
-    }, 100); // 100ms de delay
+    }, 500); // ✅ CAMBIO: Aumentado de 100ms a 500ms
   }
 
   function setEstadoCarga(cargando) {
