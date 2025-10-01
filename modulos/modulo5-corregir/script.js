@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Información de Contacto ---
   const DESTINATARIO_PRINCIPAL = "ctasupervisionnom031@gmail.com";
   const DESTINATARIO_COPIA = "supervision@casatresguas.com";
-  const NUMERO_WHATSAPP = "526241161190";
+  const NUMERO_WHATSAPP = "525549616817";
 
   /**
    * Busca el nombre del portador de una llave.
