@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const PUBLIC_KEY = "AV0u6cTpjcpnjm3xKO";
 
   // --- Información de Contacto ---
-  const DESTINATARIO_PRINCIPAL = "ctasupervisionnom031@gmail.com";
+  const DESTINATARIO_PRINCIPAL = "ctaseguridadnom031@gmail.com";
   const DESTINATARIO_COPIA = "supervision@casatresguas.com";
   const NUMERO_WHATSAPP = "525549616817";
 
