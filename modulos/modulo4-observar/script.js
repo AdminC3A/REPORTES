@@ -60,9 +60,6 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // ==================================================================
-  // == FUNCIÓN DESCARGAR PDF (REESCRITA CON jspdf y jspdf-autotable) ==
-  // ==================================================================
   async function descargarPDF() {
     setEstadoCarga(true);
     try {
@@ -80,12 +77,10 @@ document.addEventListener("DOMContentLoaded", () => {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      // --- 1. TÍTULO ---
       doc.setFontSize(20);
       doc.setTextColor("#0056b3");
       doc.text("Reporte de Incidencias de Seguridad", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
-      // --- 2. TABLA DE DATOS ---
       const tableRows = [];
       tableRows.push(["Fecha", new Date().toLocaleDateString('es-MX')]);
       if (reporte.modulo1?.codigoQR) tableRows.push(["Código QR", reporte.modulo1.codigoQR]);
@@ -102,32 +97,30 @@ document.addEventListener("DOMContentLoaded", () => {
         head: [['Concepto', 'Información']],
         body: tableRows,
         theme: 'grid',
-        headStyles: { fillColor: [0, 86, 179] } // Color azul del encabezado
+        headStyles: { fillColor: [0, 86, 179] }
       });
 
-      // --- 3. IMÁGENES ---
       const todasLasImagenes = reporte.modulo2?.imagenes || [];
       if (todasLasImagenes.length > 0) {
-        let finalY = doc.lastAutoTable.finalY || 30; // Posición después de la tabla
+        let finalY = doc.lastAutoTable.finalY || 30;
         doc.setFontSize(14);
         doc.text("Evidencia Fotográfica", 14, finalY + 15);
         
         let y = finalY + 20;
         const margin = 14;
-        const imgWidth = 80; // Ancho fijo para las imágenes
+        const imgWidth = 80;
         const pageHeight = doc.internal.pageSize.getHeight();
 
         todasLasImagenes.forEach(imgData => {
-            if (y + 65 > pageHeight) { // Si la imagen no cabe, crea una nueva página
+            if (y + 65 > pageHeight) {
                 doc.addPage();
-                y = 20; // Reinicia la posición Y en la nueva página
+                y = 20;
             }
-            doc.addImage(imgData, 'JPEG', margin, y, imgWidth, 60); // x, y, ancho, alto
-            y += 65; // Mueve la posición para la siguiente imagen
+            doc.addImage(imgData, 'JPEG', margin, y, imgWidth, 60);
+            y += 65;
         });
       }
 
-      // --- 4. GUARDAR ---
       const fecha = new Date().toISOString().split("T")[0];
       const nombreArchivo = `ReporteSeguridad_${fecha}.pdf`;
       doc.save(nombreArchivo);
@@ -140,14 +133,90 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  function setEstadoCarga(cargando) { /* ... (función sin cambios) ... */ }
-  async function estandarizarImagenesIniciales() { /* ... (función sin cambios) ... */ }
-  function redimensionarImagen(base64Src) { /* ... (función sin cambios) ... */ }
-  async function agregarFotoAdicional() { /* ... (función sin cambios) ... */ }
-  function limpiarReporte() { /* ... (función sin cambios) ... */ }
-  function siguienteModulo() { /* ... (función sin cambios) ... */ }
+  function setEstadoCarga(cargando) {
+    const botones = [agregarFotoBtn, descargarBtn, siguienteBtn, finalizarBtn];
+    if (cargando) {
+      descargarBtn.textContent = "Generando PDF...";
+      botones.forEach(btn => btn.disabled = true);
+    } else {
+      descargarBtn.textContent = "📄 Descargar PDF";
+      botones.forEach(btn => btn.disabled = false);
+    }
+  }
 
-  cargarYRenderizarReporte();
+  async function estandarizarImagenesIniciales() {
+    const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+    if (reporte.modulo2 && reporte.modulo2.imagen) {
+      const imgRedimensionada = await redimensionarImagen(reporte.modulo2.imagen);
+      if (!Array.isArray(reporte.modulo2.imagenes)) {
+        reporte.modulo2.imagenes = [];
+      }
+      reporte.modulo2.imagenes.unshift(imgRedimensionada);
+      delete reporte.modulo2.imagen;
+      localStorage.setItem("reporte", JSON.stringify(reporte));
+    }
+    await cargarYRenderizarReporte();
+  }
+
+  function redimensionarImagen(base64Src) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 600;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.8));
+      };
+      img.src = base64Src;
+    });
+  }
+
+  async function agregarFotoAdicional() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "environment";
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Redimensionada = await redimensionarImagen(e.target.result);
+        const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+        reporte.modulo2 = reporte.modulo2 || {};
+        if (!Array.isArray(reporte.modulo2.imagenes)) { reporte.modulo2.imagenes = []; }
+        reporte.modulo2.imagenes.push(base64Redimensionada);
+        localStorage.setItem("reporte", JSON.stringify(reporte));
+        cargarYRenderizarReporte();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  function limpiarReporte() {
+    if (confirm("¿Estás seguro de que deseas finalizar y borrar este reporte?")) {
+      localStorage.removeItem("reporte");
+      window.location.href = "../modulo1-qr/";
+    }
+  }
+
+  function siguienteModulo() {
+    window.location.href = "../modulo5-corregir/";
+  }
+
+  estandarizarImagenesIniciales();
   agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
   descargarBtn.addEventListener("click", descargarPDF);
   finalizarBtn.addEventListener("click", limpiarReporte);
