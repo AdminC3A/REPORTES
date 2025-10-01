@@ -74,7 +74,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // ==================================================================
-  // == FUNCIÓN DESCARGAR PDF (ESTRATEGIA FINAL Y DIRECTA) ==
+  // == FUNCIÓN DESCARGAR PDF (CON DELAY PARA RENDERIZAR IMÁGENES) ==
   // ==================================================================
   function descargarPDF() {
     const reportElement = document.getElementById("reporte-container");
@@ -86,7 +86,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setEstadoCarga(true);
 
-    // 1. Crear el encabezado que vamos a insertar
     const pdfHeader = document.createElement("h1");
     pdfHeader.textContent = "Reporte de Incidencias de Seguridad";
     pdfHeader.style.color = "#0056b3";
@@ -95,32 +94,32 @@ document.addEventListener("DOMContentLoaded", () => {
     pdfHeader.style.paddingBottom = "10px";
     pdfHeader.style.marginBottom = "20px";
     
-    // 2. Insertar el encabezado al principio del contenido visible
     reportElement.prepend(pdfHeader);
     
-    const fecha = new Date().toISOString().split("T")[0];
-    const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
-    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
-    
-    const opt = { 
-        margin: 15, 
-        filename: nombreArchivo, 
-        image: { type: 'jpeg', quality: 0.98 }, 
-        html2canvas: { scale: 2, useCORS: true }, 
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-    };
+    // Le damos al navegador una pequeña pausa de 100 milisegundos para renderizar todo.
+    setTimeout(() => {
+        const fecha = new Date().toISOString().split("T")[0];
+        const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
+        const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
+        
+        const opt = { 
+            margin: 15, 
+            filename: nombreArchivo, 
+            image: { type: 'jpeg', quality: 0.98 }, 
+            html2canvas: { scale: 2, useCORS: true }, 
+            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+        };
 
-    // 3. Generar el PDF desde el elemento modificado y limpiar después
-    html2pdf().from(reportElement).set(opt).save().then(() => {
-        reportElement.removeChild(pdfHeader); // Quita el encabezado de la página
-        setEstadoCarga(false);
-    }).catch((err) => {
-        // En caso de error, también nos aseguramos de limpiar
-        console.error("Error al generar PDF:", err);
-        alert("Ocurrió un error al crear el PDF.");
-        reportElement.removeChild(pdfHeader);
-        setEstadoCarga(false);
-    });
+        html2pdf().from(reportElement).set(opt).save().then(() => {
+            reportElement.removeChild(pdfHeader);
+            setEstadoCarga(false);
+        }).catch((err) => {
+            console.error("Error al generar PDF:", err);
+            alert("Ocurrió un error al crear el PDF.");
+            reportElement.removeChild(pdfHeader);
+            setEstadoCarga(false);
+        });
+    }, 100); // 100ms de delay
   }
 
   function setEstadoCarga(cargando) {
