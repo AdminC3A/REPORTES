@@ -22,13 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return "Portador no identificado";
   }
 
-  /**
-   * NUEVA FUNCIÓN: Construye el HTML del reporte a partir de los datos.
-   * Esta función es ahora la única fuente de verdad para el contenido del reporte.
-   * @param {object} reporte - El objeto del reporte desde localStorage.
-   * @param {object} rolesData - El objeto JSON con todos los roles.
-   * @returns {string} - El string HTML del contenido del reporte.
-   */
   function generarHtmlDelReporte(reporte, rolesData) {
     if (!reporte || Object.keys(reporte).length === 0) {
       return "<p>No se encontró información del reporte.</p>";
@@ -75,7 +68,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const rolesData = await response.json();
       const reporte = JSON.parse(localStorage.getItem("reporte"));
 
-      // Ahora esta función solo llama a la nueva función constructora
       reporteContainer.innerHTML = generarHtmlDelReporte(reporte, rolesData);
 
     } catch (error) {
@@ -86,13 +78,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function descargarPDF() {
     try {
-        // Obtenemos los datos necesarios de nuevo para asegurar que estén actualizados
         const response = await fetch('/data/roles.json');
         if (!response.ok) throw new Error("No se pudo cargar el archivo de roles para el PDF.");
         const rolesData = await response.json();
         const reporte = JSON.parse(localStorage.getItem("reporte"));
         
-        // Creamos el contenido del reporte usando la nueva función
         const contenidoHtml = generarHtmlDelReporte(reporte, rolesData);
         
         const pdfContainer = document.createElement("div");
@@ -131,12 +121,77 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- El resto de las funciones no cambian ---
-  async function estandarizarImagenesIniciales() { /* ...código completo... */ }
-  function redimensionarImagen(base64Src) { /* ...código completo... */ }
-  async function agregarFotoAdicional() { /* ...código completo... */ }
-  function limpiarReporte() { /* ...código completo... */ }
-  function siguienteModulo() { /* ...código completo... */ }
+  async function estandarizarImagenesIniciales() {
+    const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+    if (reporte.modulo2 && reporte.modulo2.imagen) {
+      const imgRedimensionada = await redimensionarImagen(reporte.modulo2.imagen);
+      if (!Array.isArray(reporte.modulo2.imagenes)) {
+        reporte.modulo2.imagenes = [];
+      }
+      reporte.modulo2.imagenes.unshift(imgRedimensionada);
+      delete reporte.modulo2.imagen;
+      localStorage.setItem("reporte", JSON.stringify(reporte));
+    }
+    await cargarYRenderizarReporte();
+  }
+
+  function redimensionarImagen(base64Src) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const MAX_WIDTH = 800;
+        const MAX_HEIGHT = 600;
+        let width = img.width;
+        let height = img.height;
+        if (width > height) {
+          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
+        } else {
+          if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
+        }
+        canvas.width = width;
+        canvas.height = height;
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL("image/jpeg", 0.8));
+      };
+      img.src = base64Src;
+    });
+  }
+
+  async function agregarFotoAdicional() {
+    const input = document.createElement("input");
+    input.type = "file";
+    input.accept = "image/*";
+    input.capture = "environment";
+    input.onchange = (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const base64Redimensionada = await redimensionarImagen(e.target.result);
+        const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
+        reporte.modulo2 = reporte.modulo2 || {};
+        if (!Array.isArray(reporte.modulo2.imagenes)) { reporte.modulo2.imagenes = []; }
+        reporte.modulo2.imagenes.push(base64Redimensionada);
+        localStorage.setItem("reporte", JSON.stringify(reporte));
+        cargarYRenderizarReporte();
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  }
+
+  function limpiarReporte() {
+    if (confirm("¿Estás seguro de que deseas finalizar y borrar este reporte?")) {
+      localStorage.removeItem("reporte");
+      window.location.href = "../modulo1-qr/";
+    }
+  }
+
+  function siguienteModulo() {
+    window.location.href = "../modulo5-corregir/";
+  }
 
   estandarizarImagenesIniciales();
   agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
