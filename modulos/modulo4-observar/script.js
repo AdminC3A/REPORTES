@@ -6,28 +6,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const agregarFotoBtn = document.getElementById("agregar-foto");
 
   /**
-   * MEJORA: Búsqueda insensible a mayúsculas/minúsculas y espacios.
-   * @param {string} llave - La llave/ID a buscar.
-   * @param {object} rolesData - El objeto JSON con todos los roles.
-   * @returns {string} - El nombre del portador o un mensaje si no se encuentra.
+   * CORREGIDO: Ahora maneja correctamente el array de llaves.
    */
   function buscarPortadorPorLlave(llave, rolesData) {
-    const llaveLimpia = llave.trim().toLowerCase(); // Limpiamos la llave buscada
+    const llaveLimpia = llave.trim().toLowerCase();
     for (const categoria in rolesData) {
       const supervisores = rolesData[categoria].supervisores;
       for (const nombre in supervisores) {
-        // Comparamos ambas llaves en minúsculas y sin espacios
-        if (supervisores[nombre].trim().toLowerCase() === llaveLimpia) {
-          return nombre;
+        const llavesDelSupervisor = supervisores[nombre]; // Esto es un array, ej: ["Gary"]
+        
+        // Verificamos que sea un array y que no esté vacío
+        if (Array.isArray(llavesDelSupervisor) && llavesDelSupervisor.length > 0) {
+          const primeraLlave = llavesDelSupervisor[0]; // Obtenemos el texto de adentro, ej: "Gary"
+          if (primeraLlave.trim().toLowerCase() === llaveLimpia) {
+            return nombre; // ¡Coincide!
+          }
         }
       }
     }
     return "Portador no identificado";
   }
 
-  /**
-   * Carga y muestra los datos del reporte.
-   */
   async function cargarYRenderizarReporte() {
     try {
       const response = await fetch('../../data/roles.json');
@@ -42,7 +41,6 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
-      // El resto de esta función sigue igual, generando el HTML...
       let html = "";
       html += `<p><strong>Fecha de visualización:</strong> ${new Date().toLocaleString()}</p>`;
       if (reporte.modulo1?.codigoQR) {
@@ -100,40 +98,27 @@ document.addEventListener("DOMContentLoaded", () => {
       reporteContainer.innerHTML = "<p>Error al cargar la información del reporte. Verifique la consola.</p>";
     }
   }
-
-  /**
-   * MEJORA: Genera el PDF aplicando todos los estilos de la página.
-   */
+  
   function descargarPDF() {
     const reportElementOriginal = document.getElementById("reporte-container");
-    
-    // 1. Crear contenedor temporal para el PDF
     const pdfContainer = document.createElement("div");
-    pdfContainer.style.width = "900px"; // Ancho similar al 'main' para consistencia
-    
-    // 2. Crear y añadir el encabezado del PDF
+    pdfContainer.style.width = "900px";
     const pdfHeader = document.createElement("h1");
     pdfHeader.textContent = "Reporte de Incidencias de Seguridad";
-    pdfHeader.style.color = "#0056b3"; // Usando los colores de tu CSS
+    pdfHeader.style.color = "#0056b3";
     pdfHeader.style.textAlign = "center";
     pdfHeader.style.borderBottom = "2px solid #e9ecef";
     pdfHeader.style.paddingBottom = "10px";
     pdfHeader.style.marginBottom = "20px";
     pdfContainer.appendChild(pdfHeader);
-
-    // 3. Clonar y añadir el contenido del reporte
     pdfContainer.appendChild(reportElementOriginal.cloneNode(true));
-
-    // 4. Añadir el contenedor temporal al body de forma invisible
     pdfContainer.style.position = "absolute";
     pdfContainer.style.left = "-9999px";
     document.body.appendChild(pdfContainer);
 
-    // 5. Configurar opciones y generar el PDF
     const fecha = new Date().toISOString().split("T")[0];
     const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
     const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
-    
     const opt = {
       margin: 15,
       filename: nombreArchivo,
@@ -142,14 +127,11 @@ document.addEventListener("DOMContentLoaded", () => {
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
-    // 6. Generar PDF y luego eliminar el contenedor temporal
     html2pdf().from(pdfContainer).set(opt).save().then(() => {
         document.body.removeChild(pdfContainer);
     });
   }
 
-
-  // --- RESTO DE LAS FUNCIONES (SIN CAMBIOS) ---
   function redimensionarImagen(base64Src) {
     return new Promise((resolve) => {
       const img = new Image();
@@ -220,7 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
     await cargarYRenderizarReporte();
   }
 
-  // --- Inicialización y Eventos ---
   estandarizarImagenesIniciales();
   agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
   descargarBtn.addEventListener("click", descargarPDF);
