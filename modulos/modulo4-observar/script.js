@@ -74,115 +74,38 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // ==================================================================
-  // == FUNCIÓN DESCARGAR PDF (ESTRATEGIA FINAL CON IFRAME AISLADO) ==
+  // == FUNCIÓN DESCARGAR PDF (VERSIÓN SIMPLE Y DIRECTA) ==
   // ==================================================================
-  async function descargarPDF() {
-    setEstadoCarga(true);
+  function descargarPDF() {
+    const reportElement = document.getElementById("reporte-container");
     
-    try {
-      const response = await fetch('/data/roles.json');
-      if (!response.ok) throw new Error("No se pudo cargar roles.json para el PDF.");
-      const rolesData = await response.json();
-      const reporte = JSON.parse(localStorage.getItem("reporte"));
-
-      if (!reporte) {
-        alert("No hay reporte para generar el PDF.");
-        setEstadoCarga(false);
+    if (!reportElement || reportElement.innerHTML.includes("No se encontró información")) {
+        alert("No hay información de reporte para generar un PDF.");
         return;
-      }
-
-      // 1. Construir el HTML completo del reporte para el iframe
-      let reporteHtml = `
-        <style>
-          body { font-family: Arial, sans-serif; color: #333; }
-          h1 { color: #0056b3; text-align: center; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; }
-          h3 { color: #0056b3; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-          .fotos-galeria { display: flex; flex-wrap: wrap; gap: 10px; page-break-inside: avoid; }
-          .imagen-wrapper { width: 250px; height: 180px; border: 1px solid #ccc; display: flex; align-items: center; justify-content: center; overflow: hidden; page-break-inside: avoid; }
-          .imagen-reporte { max-width: 100%; max-height: 100%; }
-        </style>
-        <h1>Reporte de Incidencias de Seguridad</h1>
-      `;
-      reporteHtml += generarHtmlDelReporte(reporte, rolesData); // Usamos la función que ya teníamos
-
-      // 2. Crear un iframe invisible
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'absolute';
-      iframe.style.width = '0';
-      iframe.style.height = '0';
-      iframe.style.border = 'none';
-      document.body.appendChild(iframe);
-
-      // 3. Escribir el HTML en el iframe y esperar a que cargue
-      const iframeDoc = iframe.contentWindow.document;
-      iframeDoc.open();
-      iframeDoc.write(reporteHtml);
-      iframeDoc.close();
-
-      await new Promise(resolve => {
-        iframe.onload = () => resolve();
-      });
-
-      // 4. Configurar y generar el PDF desde el iframe
-      const fecha = new Date().toISOString().split("T")[0];
-      const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
-      const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
-      
-      const opt = { 
-          margin: 15, 
-          filename: nombreArchivo, 
-          image: { type: 'jpeg', quality: 0.98 }, 
-          html2canvas: { scale: 2, useCORS: true, logging: false }, 
-          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-      };
-
-      await html2pdf().from(iframe.contentWindow.document.body).set(opt).save();
-      
-      // 5. Limpiar: remover el iframe
-      document.body.removeChild(iframe);
-
-    } catch (error) {
-      console.error("Error al generar PDF:", error);
-      alert("Ocurrió un error al crear el PDF. Revisa la consola.");
-    } finally {
-      setEstadoCarga(false);
     }
-  }
 
-  function generarHtmlDelReporte(reporte, rolesData) {
-    if (!reporte || Object.keys(reporte).length === 0) {
-      return "<p>No se encontró información del reporte.</p>";
-    }
-    let html = "";
-    html += `<p><strong>Fecha de visualización:</strong> ${new Date().toLocaleString()}</p>`;
-    if (reporte.modulo1?.codigoQR) {
-      html += `<h3>📌 Código QR</h3><p>${reporte.modulo1.codigoQR}</p>`;
-    }
-    if (reporte.modulo2) {
-      html += `<h3>⚠️ Riesgos Detectados</h3>`;
-      html += `<p><strong>Riesgos:</strong> ${reporte.modulo2.riesgos?.join(", ") || "N/A"}</p>`;
-    }
-    if (reporte.modulo3) {
-      html += `<h3>🧑‍💼 Rol de quien Reporta</h3>`;
-      html += `<p><strong>Rol:</strong> ${reporte.modulo3.rolSeleccionado}</p>`;
-      if (reporte.modulo3.llave) {
-        html += `<p><strong>Llave:</strong> VALIDADA</p>`;
-        const nombrePortador = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
-        html += `<p><strong>Portador de la Llave:</strong> ${nombrePortador}</p>`;
-      } else {
-        html += `<p><strong>Llave:</strong> NO VALIDADO</p>`;
-      }
-    }
-    const todasLasImagenes = reporte.modulo2?.imagenes || [];
-    if (todasLasImagenes.length > 0) {
-      html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
-      html += `<div class="fotos-galeria">`;
-      todasLasImagenes.forEach((imgBase64, index) => {
-        html += `<div class="imagen-wrapper"><img class="imagen-reporte" src="${imgBase64}" alt="Imagen ${index + 1}" /></div>`;
-      });
-      html += `</div>`;
-    }
-    return html;
+    setEstadoCarga(true);
+
+    const fecha = new Date().toISOString().split("T")[0];
+    const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
+    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
+    
+    const opt = { 
+        margin: 15, 
+        filename: nombreArchivo, 
+        image: { type: 'jpeg', quality: 0.98 }, 
+        html2canvas: { scale: 2, useCORS: true }, 
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+    };
+
+    // Generamos el PDF directamente del elemento visible, sin encabezados ni trucos.
+    html2pdf().from(reportElement).set(opt).save().then(() => {
+        setEstadoCarga(false);
+    }).catch(err => {
+        console.error("Error al generar el PDF:", err);
+        alert("Ocurrió un error al crear el PDF.");
+        setEstadoCarga(false);
+    });
   }
 
   function setEstadoCarga(cargando) {
