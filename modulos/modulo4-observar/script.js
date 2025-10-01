@@ -73,37 +73,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  /**
-   * ✅ FUNCIÓN CORREGIDA PARA EL PDF
-   * Vuelve al método de clonar el contenido visible, que es más fiable.
-   */
+  // ==================================================================
+  // == FUNCIÓN DE DIAGNÓSTICO: Genera el PDF del modo más simple posible ==
+  // ==================================================================
   function descargarPDF() {
-    const reportElementOriginal = document.getElementById("reporte-container");
+    // Apuntamos directamente al contenedor que SÍ se ve en pantalla
+    const reportElement = document.getElementById("reporte-container");
     
-    // Verifica si hay contenido para evitar generar un PDF en blanco si la página está en blanco.
-    if (!reportElementOriginal || reportElementOriginal.innerHTML.includes("No se encontró información")) {
+    if (!reportElement || reportElement.innerHTML.includes("No se encontró información")) {
         alert("No hay información de reporte para generar un PDF.");
         return;
     }
-
-    const pdfContainer = document.createElement("div");
-    pdfContainer.style.width = "900px";
-    
-    const pdfHeader = document.createElement("h1");
-    pdfHeader.textContent = "Reporte de Incidencias de Seguridad";
-    pdfHeader.style.color = "#0056b3";
-    pdfHeader.style.textAlign = "center";
-    pdfHeader.style.borderBottom = "2px solid #e9ecef";
-    pdfHeader.style.paddingBottom = "10px";
-    pdfHeader.style.marginBottom = "20px";
-    
-    // Añadimos el encabezado y un CLON del contenido ya visible en la página
-    pdfContainer.appendChild(pdfHeader);
-    pdfContainer.appendChild(reportElementOriginal.cloneNode(true));
-
-    pdfContainer.style.position = "absolute";
-    pdfContainer.style.left = "-9999px";
-    document.body.appendChild(pdfContainer);
 
     const fecha = new Date().toISOString().split("T")[0];
     const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
@@ -117,9 +97,9 @@ document.addEventListener("DOMContentLoaded", () => {
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
     };
 
-    html2pdf().from(pdfContainer).set(opt).save().then(() => {
-        document.body.removeChild(pdfContainer);
-    });
+    // Le pedimos a la librería que genere el PDF directamente del elemento visible.
+    // Ya no creamos un contenedor temporal.
+    html2pdf().from(reportElement).set(opt).save();
   }
 
   async function estandarizarImagenesIniciales() {
