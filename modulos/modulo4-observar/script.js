@@ -6,16 +6,18 @@ document.addEventListener("DOMContentLoaded", () => {
   const agregarFotoBtn = document.getElementById("agregar-foto");
 
   /**
-   * Busca en los datos de roles el nombre del portador de una llave.
-   * @param {string} llave - La llave/ID a buscar (ej. "Gary", "2509").
-   * @param {object} rolesData - El objeto JSON con todos los roles y supervisores.
+   * MEJORA: Búsqueda insensible a mayúsculas/minúsculas y espacios.
+   * @param {string} llave - La llave/ID a buscar.
+   * @param {object} rolesData - El objeto JSON con todos los roles.
    * @returns {string} - El nombre del portador o un mensaje si no se encuentra.
    */
   function buscarPortadorPorLlave(llave, rolesData) {
+    const llaveLimpia = llave.trim().toLowerCase(); // Limpiamos la llave buscada
     for (const categoria in rolesData) {
       const supervisores = rolesData[categoria].supervisores;
       for (const nombre in supervisores) {
-        if (supervisores[nombre] === llave) {
+        // Comparamos ambas llaves en minúsculas y sin espacios
+        if (supervisores[nombre].trim().toLowerCase() === llaveLimpia) {
           return nombre;
         }
       }
@@ -28,13 +30,11 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   async function cargarYRenderizarReporte() {
     try {
-      // ✅ RUTA CORREGIDA
       const response = await fetch('../../data/roles.json');
       if (!response.ok) {
         throw new Error(`Error al cargar roles.json: ${response.statusText}`);
       }
       const rolesData = await response.json();
-
       const reporte = JSON.parse(localStorage.getItem("reporte"));
 
       if (!reporte || Object.keys(reporte).length === 0) {
@@ -42,13 +42,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      // El resto de esta función sigue igual, generando el HTML...
       let html = "";
       html += `<p><strong>Fecha de visualización:</strong> ${new Date().toLocaleString()}</p>`;
-
       if (reporte.modulo1?.codigoQR) {
         html += `<h3>📌 Código QR</h3><p>${reporte.modulo1.codigoQR}</p>`;
       }
-
       if (reporte.modulo2) {
         html += `<h3>⚠️ Riesgos Detectados</h3>`;
         html += `<p><strong>Riesgos:</strong> ${reporte.modulo2.riesgos?.join(", ") || "N/A"}</p>`;
@@ -60,7 +59,6 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<p><strong>Detalle Clasificación:</strong> ${reporte.modulo2.detalleClasificacion}</p>`;
         }
       }
-
       if (reporte.modulo3) {
         html += `<h3>🧑‍💼 Rol de quien Reporta</h3>`;
         html += `<p><strong>Rol:</strong> ${reporte.modulo3.rolSeleccionado}</p>`;
@@ -83,7 +81,6 @@ document.addEventListener("DOMContentLoaded", () => {
             html += `<p><strong>Observaciones:</strong> ${reporte.modulo3.observacionesAdicionales}</p>`;
         }
       }
-
       const todasLasImagenes = reporte.modulo2?.imagenes || [];
       if (todasLasImagenes.length > 0) {
         html += `<h3>🖼️ Evidencia Fotográfica</h3>`;
@@ -96,7 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         html += `</div>`;
       }
-
       reporteContainer.innerHTML = html;
 
     } catch (error) {
@@ -105,6 +101,55 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  /**
+   * MEJORA: Genera el PDF aplicando todos los estilos de la página.
+   */
+  function descargarPDF() {
+    const reportElementOriginal = document.getElementById("reporte-container");
+    
+    // 1. Crear contenedor temporal para el PDF
+    const pdfContainer = document.createElement("div");
+    pdfContainer.style.width = "900px"; // Ancho similar al 'main' para consistencia
+    
+    // 2. Crear y añadir el encabezado del PDF
+    const pdfHeader = document.createElement("h1");
+    pdfHeader.textContent = "Reporte de Incidencias de Seguridad";
+    pdfHeader.style.color = "#0056b3"; // Usando los colores de tu CSS
+    pdfHeader.style.textAlign = "center";
+    pdfHeader.style.borderBottom = "2px solid #e9ecef";
+    pdfHeader.style.paddingBottom = "10px";
+    pdfHeader.style.marginBottom = "20px";
+    pdfContainer.appendChild(pdfHeader);
+
+    // 3. Clonar y añadir el contenido del reporte
+    pdfContainer.appendChild(reportElementOriginal.cloneNode(true));
+
+    // 4. Añadir el contenedor temporal al body de forma invisible
+    pdfContainer.style.position = "absolute";
+    pdfContainer.style.left = "-9999px";
+    document.body.appendChild(pdfContainer);
+
+    // 5. Configurar opciones y generar el PDF
+    const fecha = new Date().toISOString().split("T")[0];
+    const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
+    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
+    
+    const opt = {
+      margin: 15,
+      filename: nombreArchivo,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+
+    // 6. Generar PDF y luego eliminar el contenedor temporal
+    html2pdf().from(pdfContainer).set(opt).save().then(() => {
+        document.body.removeChild(pdfContainer);
+    });
+  }
+
+
+  // --- RESTO DE LAS FUNCIONES (SIN CAMBIOS) ---
   function redimensionarImagen(base64Src) {
     return new Promise((resolve) => {
       const img = new Image();
@@ -116,15 +161,9 @@ document.addEventListener("DOMContentLoaded", () => {
         let width = img.width;
         let height = img.height;
         if (width > height) {
-          if (width > MAX_WIDTH) {
-            height = Math.round((height * MAX_WIDTH) / width);
-            width = MAX_WIDTH;
-          }
+          if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
         } else {
-          if (height > MAX_HEIGHT) {
-            width = Math.round((width * MAX_HEIGHT) / height);
-            height = MAX_HEIGHT;
-          }
+          if (height > MAX_HEIGHT) { width = Math.round((width * MAX_HEIGHT) / height); height = MAX_HEIGHT; }
         }
         canvas.width = width;
         canvas.height = height;
@@ -145,13 +184,10 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = async (e) => {
-        const base64Original = e.target.result;
-        const base64Redimensionada = await redimensionarImagen(base64Original);
+        const base64Redimensionada = await redimensionarImagen(e.target.result);
         const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
         reporte.modulo2 = reporte.modulo2 || {};
-        if (!Array.isArray(reporte.modulo2.imagenes)) {
-          reporte.modulo2.imagenes = [];
-        }
+        if (!Array.isArray(reporte.modulo2.imagenes)) { reporte.modulo2.imagenes = []; }
         reporte.modulo2.imagenes.push(base64Redimensionada);
         localStorage.setItem("reporte", JSON.stringify(reporte));
         cargarYRenderizarReporte();
@@ -160,36 +196,9 @@ document.addEventListener("DOMContentLoaded", () => {
     };
     input.click();
   }
-
-  function descargarPDF() {
-    const reportElement = document.getElementById("reporte");
-    const pdfContainer = document.createElement("div");
-    const pdfHeader = document.createElement("h1");
-    pdfHeader.textContent = "Reporte de Incidencias de Seguridad";
-    pdfHeader.style.textAlign = "center";
-    pdfHeader.style.color = "#0056b3";
-    pdfHeader.style.fontSize = "24px";
-    pdfHeader.style.marginBottom = "25px";
-    pdfHeader.style.borderBottom = "2px solid #dee2e6";
-    pdfHeader.style.paddingBottom = "10px";
-    pdfContainer.appendChild(pdfHeader);
-    pdfContainer.appendChild(reportElement.cloneNode(true));
-    const fecha = new Date().toISOString().split("T")[0];
-    const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
-    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
-    const opt = {
-      margin: [15, 10, 15, 10],
-      filename: nombreArchivo,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
-      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(pdfContainer).save();
-  }
-
+  
   function limpiarReporte() {
-    const confirmacion = confirm("¿Estás seguro de que deseas finalizar y borrar este reporte?");
-    if (confirmacion) {
+    if (confirm("¿Estás seguro de que deseas finalizar y borrar este reporte?")) {
         localStorage.removeItem("reporte");
         window.location.href = "../modulo1-qr/"; 
     }
@@ -203,9 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const reporte = JSON.parse(localStorage.getItem("reporte")) || {};
     if (reporte.modulo2 && reporte.modulo2.imagen) {
       const imgRedimensionada = await redimensionarImagen(reporte.modulo2.imagen);
-      if (!Array.isArray(reporte.modulo2.imagenes)) {
-        reporte.modulo2.imagenes = [];
-      }
+      if (!Array.isArray(reporte.modulo2.imagenes)) { reporte.modulo2.imagenes = []; }
       reporte.modulo2.imagenes.unshift(imgRedimensionada);
       delete reporte.modulo2.imagen; 
       localStorage.setItem("reporte", JSON.stringify(reporte));
@@ -213,8 +220,8 @@ document.addEventListener("DOMContentLoaded", () => {
     await cargarYRenderizarReporte();
   }
 
+  // --- Inicialización y Eventos ---
   estandarizarImagenesIniciales();
-  
   agregarFotoBtn.addEventListener("click", agregarFotoAdicional);
   descargarBtn.addEventListener("click", descargarPDF);
   finalizarBtn.addEventListener("click", limpiarReporte);
