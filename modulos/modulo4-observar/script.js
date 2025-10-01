@@ -72,12 +72,11 @@ document.addEventListener("DOMContentLoaded", () => {
       reporteContainer.innerHTML = "<p>Error al cargar la información del reporte. Verifique la consola.</p>";
     }
   }
-
+  
   // ==================================================================
-  // == FUNCIÓN DE DIAGNÓSTICO: Genera el PDF del modo más simple posible ==
+  // == FUNCIÓN DESCARGAR PDF (VERSIÓN FINAL Y ROBUSTA DE 2 PASOS) ==
   // ==================================================================
-  function descargarPDF() {
-    // Apuntamos directamente al contenedor que SÍ se ve en pantalla
+  async function descargarPDF() {
     const reportElement = document.getElementById("reporte-container");
     
     if (!reportElement || reportElement.innerHTML.includes("No se encontró información")) {
@@ -85,21 +84,61 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    const fecha = new Date().toISOString().split("T")[0];
-    const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
-    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
-    
-    const opt = { 
-        margin: 15, 
-        filename: nombreArchivo, 
-        image: { type: 'jpeg', quality: 0.98 }, 
-        html2canvas: { scale: 2, useCORS: true }, 
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
-    };
+    setEstadoCarga(true); // Bloqueamos los botones y mostramos "Generando..."
 
-    // Le pedimos a la librería que genere el PDF directamente del elemento visible.
-    // Ya no creamos un contenedor temporal.
-    html2pdf().from(reportElement).set(opt).save();
+    try {
+      // PASO 1: Usar html2canvas para tomar la "foto" del reporte, incluyendo imágenes.
+      const canvas = await html2canvas(reportElement, {
+        scale: 2, // Aumenta la resolución de la captura
+        useCORS: true,
+        logging: false
+      });
+      const contentImageDataUrl = canvas.toDataURL('image/jpeg', 0.95); // Imagen de alta calidad
+
+      // PASO 2: Usar jsPDF para construir el documento
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF('p', 'mm', 'a4'); // Orientación vertical, milímetros, tamaño A4
+
+      const pdfWidth = doc.internal.pageSize.getWidth();
+      const margin = 15;
+      
+      // Añadir el encabezado manualmente
+      doc.setFontSize(20);
+      doc.setTextColor("#0056b3");
+      doc.text("Reporte de Incidencias de Seguridad", pdfWidth / 2, margin, { align: 'center' });
+
+      // Calcular dimensiones de la imagen para que quepa en la página
+      const imgProps = doc.getImageProperties(contentImageDataUrl);
+      const imgWidth = pdfWidth - (margin * 2);
+      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+      const contentY = margin + 10; // Dejar un espacio después del título
+
+      // Añadir la "foto" del reporte al PDF
+      doc.addImage(contentImageDataUrl, 'JPEG', margin, contentY, imgWidth, imgHeight);
+
+      // Guardar el archivo
+      const fecha = new Date().toISOString().split("T")[0];
+      const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
+      const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
+      doc.save(nombreArchivo);
+
+    } catch (error) {
+      console.error("Error al generar el PDF final:", error);
+      alert("Ocurrió un error al crear el PDF. Revisa la consola.");
+    } finally {
+      setEstadoCarga(false); // Desbloqueamos los botones
+    }
+  }
+
+  function setEstadoCarga(cargando) {
+    const botones = [agregarFotoBtn, descargarBtn, siguienteBtn, finalizarBtn];
+    if (cargando) {
+      descargarBtn.textContent = "Generando PDF...";
+      botones.forEach(btn => btn.disabled = true);
+    } else {
+      descargarBtn.textContent = "📄 Descargar PDF";
+      botones.forEach(btn => btn.disabled = false);
+    }
   }
 
   async function estandarizarImagenesIniciales() {
