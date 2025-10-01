@@ -74,9 +74,9 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   // ==================================================================
-  // == FUNCIÓN DESCARGAR PDF (VERSIÓN FINAL Y ROBUSTA DE 2 PASOS) ==
+  // == FUNCIÓN DESCARGAR PDF (ESTRATEGIA FINAL Y DIRECTA) ==
   // ==================================================================
-  async function descargarPDF() {
+  function descargarPDF() {
     const reportElement = document.getElementById("reporte-container");
     
     if (!reportElement || reportElement.innerHTML.includes("No se encontró información")) {
@@ -84,50 +84,43 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
     }
 
-    setEstadoCarga(true); // Bloqueamos los botones y mostramos "Generando..."
+    setEstadoCarga(true);
 
-    try {
-      // PASO 1: Usar html2canvas para tomar la "foto" del reporte, incluyendo imágenes.
-      const canvas = await html2canvas(reportElement, {
-        scale: 2, // Aumenta la resolución de la captura
-        useCORS: true,
-        logging: false
-      });
-      const contentImageDataUrl = canvas.toDataURL('image/jpeg', 0.95); // Imagen de alta calidad
+    // 1. Crear el encabezado que vamos a insertar
+    const pdfHeader = document.createElement("h1");
+    pdfHeader.textContent = "Reporte de Incidencias de Seguridad";
+    pdfHeader.style.color = "#0056b3";
+    pdfHeader.style.textAlign = "center";
+    pdfHeader.style.borderBottom = "2px solid #e9ecef";
+    pdfHeader.style.paddingBottom = "10px";
+    pdfHeader.style.marginBottom = "20px";
+    
+    // 2. Insertar el encabezado al principio del contenido visible
+    reportElement.prepend(pdfHeader);
+    
+    const fecha = new Date().toISOString().split("T")[0];
+    const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
+    const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
+    
+    const opt = { 
+        margin: 15, 
+        filename: nombreArchivo, 
+        image: { type: 'jpeg', quality: 0.98 }, 
+        html2canvas: { scale: 2, useCORS: true }, 
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+    };
 
-      // PASO 2: Usar jsPDF para construir el documento
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF('p', 'mm', 'a4'); // Orientación vertical, milímetros, tamaño A4
-
-      const pdfWidth = doc.internal.pageSize.getWidth();
-      const margin = 15;
-      
-      // Añadir el encabezado manualmente
-      doc.setFontSize(20);
-      doc.setTextColor("#0056b3");
-      doc.text("Reporte de Incidencias de Seguridad", pdfWidth / 2, margin, { align: 'center' });
-
-      // Calcular dimensiones de la imagen para que quepa en la página
-      const imgProps = doc.getImageProperties(contentImageDataUrl);
-      const imgWidth = pdfWidth - (margin * 2);
-      const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
-      const contentY = margin + 10; // Dejar un espacio después del título
-
-      // Añadir la "foto" del reporte al PDF
-      doc.addImage(contentImageDataUrl, 'JPEG', margin, contentY, imgWidth, imgHeight);
-
-      // Guardar el archivo
-      const fecha = new Date().toISOString().split("T")[0];
-      const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
-      const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
-      doc.save(nombreArchivo);
-
-    } catch (error) {
-      console.error("Error al generar el PDF final:", error);
-      alert("Ocurrió un error al crear el PDF. Revisa la consola.");
-    } finally {
-      setEstadoCarga(false); // Desbloqueamos los botones
-    }
+    // 3. Generar el PDF desde el elemento modificado y limpiar después
+    html2pdf().from(reportElement).set(opt).save().then(() => {
+        reportElement.removeChild(pdfHeader); // Quita el encabezado de la página
+        setEstadoCarga(false);
+    }).catch((err) => {
+        // En caso de error, también nos aseguramos de limpiar
+        console.error("Error al generar PDF:", err);
+        alert("Ocurrió un error al crear el PDF.");
+        reportElement.removeChild(pdfHeader);
+        setEstadoCarga(false);
+    });
   }
 
   function setEstadoCarga(cargando) {
