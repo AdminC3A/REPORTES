@@ -72,16 +72,16 @@ document.addEventListener("DOMContentLoaded", () => {
       reporteContainer.innerHTML = "<p>Error al cargar la información del reporte. Verifique la consola.</p>";
     }
   }
-  
+
   // ==================================================================
-  // == FUNCIÓN DESCARGAR PDF (VERSIÓN SIMPLE Y DIRECTA) ==
+  // == FUNCIÓN DESCARGAR PDF (MEJORADA) ==
   // ==================================================================
   function descargarPDF() {
-    const reportElement = document.getElementById("reporte-container");
-    
-    if (!reportElement || reportElement.innerHTML.includes("No se encontró información")) {
-        alert("No hay información de reporte para generar un PDF.");
-        return;
+    const reportWrapper = document.getElementById("reporte"); // ahora se captura todo el contenedor
+
+    if (!reportWrapper || reportWrapper.innerHTML.includes("No se encontró información")) {
+      alert("No hay información de reporte para generar un PDF.");
+      return;
     }
 
     setEstadoCarga(true);
@@ -89,23 +89,25 @@ document.addEventListener("DOMContentLoaded", () => {
     const fecha = new Date().toISOString().split("T")[0];
     const hora = new Date().toLocaleTimeString("es-MX", { hour12: false }).replace(/:/g, "-");
     const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
-    
-    const opt = { 
-        margin: 15, 
-        filename: nombreArchivo, 
-        image: { type: 'jpeg', quality: 0.98 }, 
-        html2canvas: { scale: 2, useCORS: true }, 
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } 
+
+    const opt = {
+      margin: [0.5, 0.5, 0.5, 0.5], // márgenes en pulgadas (~13mm)
+      filename: nombreArchivo,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    // Generamos el PDF directamente del elemento visible, sin encabezados ni trucos.
-    html2pdf().from(reportElement).set(opt).save().then(() => {
+    // 🕐 Esperar un momento para renderizar antes de capturar
+    setTimeout(() => {
+      html2pdf().set(opt).from(reportWrapper).save().then(() => {
         setEstadoCarga(false);
-    }).catch(err => {
+      }).catch(err => {
         console.error("Error al generar el PDF:", err);
         alert("Ocurrió un error al crear el PDF.");
         setEstadoCarga(false);
-    });
+      });
+    }, 300);
   }
 
   function setEstadoCarga(cargando) {
