@@ -34,11 +34,21 @@ document.addEventListener("DOMContentLoaded", () => {
       let html = "";
       html += `<p><strong>Fecha de visualización:</strong> ${new Date().toLocaleString()}</p>`;
       if (reporte.modulo1?.codigoQR) html += `<h3>📌 Código QR</h3><p>${reporte.modulo1.codigoQR}</p>`;
+      
       if (reporte.modulo2) {
         html += `<h3>⚠️ Riesgos Detectados</h3><p><strong>Riesgos:</strong> ${reporte.modulo2.riesgos?.join(", ") || "N/A"}</p>`;
-        if (reporte.modulo2.clasificacionSeleccionada) html += `<p><strong>Clasificación:</strong> ${reporte.modulo2.clasificacionSeleccionada}</p>`;
-        if (reporte.modulo2.detalleClasificacion) html += `<p><strong>Detalle Clasificación:</strong> ${reporte.modulo2.detalleClasificacion}</p>`;
+        
+        if (reporte.modulo2.detalleOtros) {
+          html += `<p><strong>Detalle Otros Riesgos:</strong> ${reporte.modulo2.detalleOtros}</p>`;
+        }
+        if (reporte.modulo2.clasificacionSeleccionada) {
+          html += `<p><strong>Clasificación:</strong> ${reporte.modulo2.clasificacionSeleccionada}</p>`;
+        }
+        if (reporte.modulo2.detalleClasificacion) {
+          html += `<p><strong>Detalle Clasificación:</strong> ${reporte.modulo2.detalleClasificacion}</p>`;
+        }
       }
+      
       if (reporte.modulo3) {
         html += `<h3>🧑‍💼 Rol de quien Reporta</h3><p><strong>Rol:</strong> ${reporte.modulo3.rolSeleccionado}</p>`;
         if (reporte.modulo3.llave) {
@@ -85,7 +95,9 @@ document.addEventListener("DOMContentLoaded", () => {
       tableRows.push(["Fecha", new Date().toLocaleDateString('es-MX')]);
       if (reporte.modulo1?.codigoQR) tableRows.push(["Código QR", reporte.modulo1.codigoQR]);
       if (reporte.modulo2?.riesgos) tableRows.push(["Riesgos", reporte.modulo2.riesgos.join(", ")]);
+      if (reporte.modulo2?.detalleOtros) tableRows.push(["Detalle Otros Riesgos", reporte.modulo2.detalleOtros]);
       if (reporte.modulo2?.clasificacionSeleccionada) tableRows.push(["Clasificación", reporte.modulo2.clasificacionSeleccionada]);
+      if (reporte.modulo2?.detalleClasificacion) tableRows.push(["Detalle Clasificación", reporte.modulo2.detalleClasificacion]);
       if (reporte.modulo3?.rolSeleccionado) tableRows.push(["Rol Reporta", reporte.modulo3.rolSeleccionado]);
       if (reporte.modulo3?.llave) {
         const nombrePortador = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
@@ -105,7 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
         let finalY = doc.lastAutoTable.finalY || 30;
         doc.setFontSize(14);
         doc.text("Evidencia Fotográfica", 14, finalY + 15);
-        
         let y = finalY + 20;
         const margin = 14;
         const imgWidth = 80;
@@ -122,7 +133,8 @@ document.addEventListener("DOMContentLoaded", () => {
       }
 
       const fecha = new Date().toISOString().split("T")[0];
-      const nombreArchivo = `ReporteSeguridad_${fecha}.pdf`;
+      const hora = new Date().toLocaleTimeString('es-MX', { hour12: false }).replace(/:/g, '-');
+      const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
       doc.save(nombreArchivo);
 
     } catch (error) {
