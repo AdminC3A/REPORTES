@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resumenContainer = document.getElementById("reporte-resumen");
 
   // ⬇️ ⚠️ IMPORTANTE: PEGA AQUÍ LA URL DE TU APPS SCRIPT
-  const APPS_SCRIPT_URL = "URL_DE_TU_APPS_SCRIPT_AQUI";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbynSPgJHgf8oX7YEwhvH65vYfXc0wE1m7vCurwaYbkj4G2Y6tz-qdW0xe1_F4D4FMxg1g/exec";
 
   const SERVICE_ID = "service_m1kpjzd";
   const TEMPLATE_ID = "template_0vvcv8r";
