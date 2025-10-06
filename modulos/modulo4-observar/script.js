@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       doc.setFontSize(20);
       doc.setTextColor("#0056b3");
-      doc.text("Reporte de Incidencias de Seguridad", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+      doc.text("CTA-EAI Reportes de incidencias en seguridad e higiene", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
       const tableRows = [];
       tableRows.push(["Fecha", new Date().toLocaleDateString('es-MX')]);
