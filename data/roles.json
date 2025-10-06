@@ -3,14 +3,14 @@
         "rol": "Supervisor de Seguridad",
         "supervisores": {
             "Laura Cruz": ["Gary"],
-            "David Martinez": ["Admin25"]
+            "Ing. David Martinez": ["Admin25"]
         }
     },
     "supervisoresObra": {
         "rol": "Supervisor de Obra",
         "supervisores": {
-            "Arnulfo Sanchez": ["2509"],
-            "Norberto Zamora": ["4568"]
+            "Ing. Arnulfo Sanchez": ["8232"],
+            "Arq. Norberto Zamora": ["6698"]
         }
     },
     "guardiasTurno": {
@@ -20,5 +20,6 @@
         }
     }
 }
+
 
 
