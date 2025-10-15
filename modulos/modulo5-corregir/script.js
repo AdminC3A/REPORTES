@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resumenContainer = document.getElementById("reporte-resumen");
 
   // --- CONFIGURACIÓN ---
-  const APPS_SCRIPT_URL = "URL_DE_TU_APPS_SCRIPT_AQUI"; // 👈 PEGA TU URL DE APPS SCRIPT
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBspQT3_J4m3OFDeiQYCXcSrqt76ZSmTkTFuvOGyIC-7v0d80oGqzsAa5DPAAtzuOk/exec"; // 👈 PEGA TU URL DE APPS SCRIPT
   const SERVICE_ID = "service_m1kpjzd";
   const TEMPLATE_ID = "template_0vvcv8r";
   const PUBLIC_KEY = "AV0u6cTpjcpnjm3xKO";
