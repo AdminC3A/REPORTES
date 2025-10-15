@@ -1,11 +1,13 @@
 document.addEventListener("DOMContentLoaded", async () => {
+  // ✅ LÍNEA DEL BOTÓN 'enviar-ambos' ELIMINADA
   const enviarGoogleSheetBtn = document.getElementById("enviar-google-sheet");
   const enviarWhatsAppBtn = document.getElementById("enviar-whatsapp");
   const enviarCorreoBtn = document.getElementById("enviar-correo");
   const finalizarBtn = document.getElementById("finalizar");
   const resumenContainer = document.getElementById("reporte-resumen");
 
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyh0dZzDxEfbcW0teG9rZ8kTIF4gGxhUb1XvRwbpRRjY3pzC4RnVqCOLcf-gIxgz35gyA/exec"; // 👈 PEGA TU URL DE APPS SCRIPT
+  // --- CONFIGURACIÓN ---
+  const APPS_SCRIPT_URL = "URL_DE_TU_APPS_SCRIPT_AQUI"; // 👈 PEGA TU URL DE APPS SCRIPT
   const SERVICE_ID = "service_m1kpjzd";
   const TEMPLATE_ID = "template_0vvcv8r";
   const PUBLIC_KEY = "AV0u6cTpjcpnjm3xKO";
@@ -13,6 +15,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   const DESTINATARIO_COPIA = "supervision@casatresguas.com";
   const NUMERO_WHATSAPP = "5215549616817";
 
+  // --- FUNCIONES AUXILIARES ---
+
+  function setEstadoCarga(cargando, tipo) {
+    const botones = [enviarGoogleSheetBtn, enviarWhatsAppBtn, enviarCorreoBtn, finalizarBtn];
+    botones.forEach(btn => btn.disabled = cargando);
+    if (tipo === 'correo') {
+      enviarCorreoBtn.textContent = cargando ? "Enviando Correo..." : "Enviar por Correo";
+    } else if (tipo === 'sheet') {
+      enviarGoogleSheetBtn.textContent = cargando ? "Registrando..." : "📊 Registrar en Bitácora";
+    }
+  }
+  
   function buscarPortadorPorLlave(llave, rolesData) {
     const llaveLimpia = llave.trim().toLowerCase();
     for (const categoria in rolesData) {
@@ -26,7 +40,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     return null;
   }
-
+  
   function cargarResumenVisual() {
     const reporte = JSON.parse(localStorage.getItem("reporte"));
     if (!reporte) {
@@ -42,70 +56,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
     resumenContainer.innerHTML = html;
   }
-
-  function setEstadoCarga(cargando, tipo) {
-    const botones = [enviarGoogleSheetBtn, enviarWhatsAppBtn, enviarCorreoBtn, finalizarBtn];
-    botones.forEach(btn => btn.disabled = cargando);
-    if (tipo === 'correo') {
-      enviarCorreoBtn.textContent = cargando ? "Enviando Correo..." : "Enviar por Correo";
-    } else if (tipo === 'sheet') {
-      enviarGoogleSheetBtn.textContent = cargando ? "Registrando..." : "📊 Registrar en Bitácora";
-    }
-  }
-
-  async function enviarAGoogleSheet() {
-    setEstadoCarga(true, 'sheet');
-    try {
-      const reporte = JSON.parse(localStorage.getItem("reporte"));
-      if (!reporte) throw new Error("No hay reporte para enviar.");
-
-      const response = await fetch('/data/roles.json');
-      const rolesData = await response.json();
-
-      let reportadoPorTexto;
-      // ✅ LÓGICA ACTUALIZADA PARA LA COLUMNA "REPORTA"
-      if (reporte.modulo3?.rolSeleccionado === "Externo") {
-        const nombre = reporte.modulo3.nombreExterno || "Externo";
-        const telefono = reporte.modulo3.telefonoExterno || "Sin teléfono";
-        reportadoPorTexto = `${nombre} (${telefono})`;
-      } else {
-        // Lógica para roles internos
-        let nombreDelReportante = reporte.modulo3?.rolSeleccionado || 'No especificado';
-        if (reporte.modulo3?.llave) {
-          const nombreEncontrado = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
-          if (nombreEncontrado) nombreDelReportante = nombreEncontrado;
-        }
-        reportadoPorTexto = nombreDelReportante;
-      }
-
-      const datosParaSheet = {
-        codigoQR: reporte.modulo1?.codigoQR,
-        riesgos: reporte.modulo2?.riesgos?.join(', '),
-        detalleOtros: reporte.modulo2?.detalleOtros,
-        clasificacion: reporte.modulo2?.clasificacionSeleccionada,
-        detalleClasificacion: reporte.modulo2?.detalleClasificacion,
-        reportadoPor: reportadoPorTexto, // Se usa la nueva variable
-        infractor: reporte.modulo3?.infractor || "N/A",
-        compania: reporte.modulo3?.compania || "N/A",
-        numImagenes: reporte.modulo2?.imagenes?.length || 0
-      };
-
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosParaSheet)
-      });
-      
-      alert("Reporte registrado en la bitácora ✅");
-
-    } catch (error) {
-      console.error("Error al enviar a Google Sheet:", error);
-      alert("Error al registrar en la bitácora.");
-    } finally {
-      setEstadoCarga(false, 'sheet');
-    }
-  }
+  
+  // --- LÓGICA DE LOS BOTONES ---
 
   async function enviarCorreo() {
     setEstadoCarga(true, 'correo');
@@ -117,29 +69,22 @@ document.addEventListener("DOMContentLoaded", async () => {
       if (!response.ok) throw new Error("No se pudo cargar roles.json");
       const rolesData = await response.json();
 
+      // Generar PDF con jsPDF
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
       doc.setFontSize(20).setTextColor("#0056b3").text("Reporte de Incidencias", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
       const tableRows = [];
       tableRows.push(["Fecha", new Date().toLocaleDateString('es-MX')]);
-      
-      let nombreDelReportante;
-      if (reporte.modulo3?.rolSeleccionado === "Externo") {
-        const nombre = reporte.modulo3.nombreExterno || "Externo";
-        const telefono = reporte.modulo3.telefonoExterno || "Sin teléfono";
-        nombreDelReportante = `${nombre} (${telefono})`;
-      } else {
-        nombreDelReportante = reporte.modulo3?.rolSeleccionado || 'No especificado';
-        if (reporte.modulo3?.llave) {
-          const nombreEncontrado = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
-          if (nombreEncontrado) nombreDelReportante = nombreEncontrado;
-        }
+      let nombreDelReportante = reporte.modulo3?.rolSeleccionado || 'No especificado';
+      if (reporte.modulo3?.llave) {
+        const nombreEncontrado = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
+        if (nombreEncontrado) nombreDelReportante = nombreEncontrado;
       }
       tableRows.push(["Reportado Por", nombreDelReportante]);
-      
       doc.autoTable({ startY: 30, head: [['Concepto', 'Información']], body: tableRows, theme: 'grid', headStyles: { fillColor: [0, 86, 179] } });
       const pdfBase64 = doc.output('datauristring');
 
+      // Preparar y enviar correo
       const templateParams = {
         fecha: new Date().toLocaleDateString('es-MX'),
         reportado_por: nombreDelReportante,
@@ -161,13 +106,47 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  async function enviarAGoogleSheet() {
+    setEstadoCarga(true, 'sheet');
+    try {
+      const reporte = JSON.parse(localStorage.getItem("reporte"));
+      if (!reporte) throw new Error("No hay reporte para enviar.");
+      const response = await fetch('/data/roles.json');
+      const rolesData = await response.json();
+      let nombreDelReportante = reporte.modulo3?.rolSeleccionado || 'No especificado';
+      if (reporte.modulo3?.llave) {
+        const nombreEncontrado = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
+        if (nombreEncontrado) nombreDelReportante = nombreEncontrado;
+      }
+      const datosParaSheet = {
+        codigoQR: reporte.modulo1?.codigoQR,
+        riesgos: reporte.modulo2?.riesgos?.join(', '),
+        clasificacion: reporte.modulo2?.clasificacionSeleccionada,
+        reportadoPor: nombreDelReportante,
+        numImagenes: reporte.modulo2?.imagenes?.length || 0
+      };
+      await fetch(APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(datosParaSheet)
+      });
+      alert("Reporte registrado en la bitácora ✅");
+    } catch (error) {
+      console.error("Error al enviar a Google Sheet:", error);
+      alert("Error al registrar en la bitácora.");
+    } finally {
+      setEstadoCarga(false, 'sheet');
+    }
+  }
+
   function enviarWhatsApp() {
     const reporte = JSON.parse(localStorage.getItem("reporte"));
     let mensajeTexto = "Se ha generado un nuevo reporte de seguridad.";
     if (reporte) {
       const qr = reporte.modulo1?.codigoQR || "N/A";
       const riesgos = reporte.modulo2?.riesgos?.join(', ') || "Ninguno";
-      mensajeTexto = `*Reporte Generado*\n*QR:* ${qr}\n*Riesgos:* ${riesgos}`;
+      mensajeTexto = `*Reporte de Seguridad Generado*\n\n*Código QR:* ${qr}\n*Riesgos Detectados:* ${riesgos}\n\nEl PDF completo con imágenes fue enviado al correo de supervisión.`;
     }
     const mensaje = encodeURIComponent(mensajeTexto);
     const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
@@ -181,6 +160,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
   }
 
+  // --- INICIALIZACIÓN Y EVENTOS ---
   cargarResumenVisual();
   enviarGoogleSheetBtn.addEventListener("click", enviarAGoogleSheet);
   enviarCorreoBtn.addEventListener("click", enviarCorreo);
