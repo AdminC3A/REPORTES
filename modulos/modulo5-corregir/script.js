@@ -1,8 +1,8 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  // ✅ LÍNEA DEL BOTÓN 'enviar-ambos' ELIMINADA
-  const enviarGoogleSheetBtn = document.getElementById("enviar-google-sheet");
+ document.addEventListener("DOMContentLoaded", async () => {
+  // ✅ Referencias a los botones corregidas (ya no busca el botón eliminado)
   const enviarWhatsAppBtn = document.getElementById("enviar-whatsapp");
   const enviarCorreoBtn = document.getElementById("enviar-correo");
+  const registrarBitacoraBtn = document.getElementById("registrar-bitacora");
   const finalizarBtn = document.getElementById("finalizar");
   const resumenContainer = document.getElementById("reporte-resumen");
 
@@ -18,15 +18,21 @@ document.addEventListener("DOMContentLoaded", async () => {
   // --- FUNCIONES AUXILIARES ---
 
   function setEstadoCarga(cargando, tipo) {
-    const botones = [enviarGoogleSheetBtn, enviarWhatsAppBtn, enviarCorreoBtn, finalizarBtn];
+    const botones = [enviarWhatsAppBtn, enviarCorreoBtn, registrarBitacoraBtn, finalizarBtn];
     botones.forEach(btn => btn.disabled = cargando);
-    if (tipo === 'correo') {
-      enviarCorreoBtn.textContent = cargando ? "Enviando Correo..." : "Enviar por Correo";
-    } else if (tipo === 'sheet') {
-      enviarGoogleSheetBtn.textContent = cargando ? "Registrando..." : "📊 Registrar en Bitácora";
+
+    if (cargando) {
+      if (tipo === 'correo') {
+        enviarCorreoBtn.textContent = "Enviando...";
+      } else if (tipo === 'bitacora') {
+        registrarBitacoraBtn.textContent = "Registrando...";
+      }
+    } else {
+      enviarCorreoBtn.textContent = "📧 Enviar por Correo";
+      registrarBitacoraBtn.textContent = "📊 Registrar en Bitácora";
     }
   }
-  
+
   function buscarPortadorPorLlave(llave, rolesData) {
     const llaveLimpia = llave.trim().toLowerCase();
     for (const categoria in rolesData) {
@@ -40,7 +46,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
     return null;
   }
-  
+
   function cargarResumenVisual() {
     const reporte = JSON.parse(localStorage.getItem("reporte"));
     if (!reporte) {
@@ -56,7 +62,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     `;
     resumenContainer.innerHTML = html;
   }
-  
+
   // --- LÓGICA DE LOS BOTONES ---
 
   async function enviarCorreo() {
@@ -75,6 +81,8 @@ document.addEventListener("DOMContentLoaded", async () => {
       doc.setFontSize(20).setTextColor("#0056b3").text("Reporte de Incidencias", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
       const tableRows = [];
       tableRows.push(["Fecha", new Date().toLocaleDateString('es-MX')]);
+      if (reporte.modulo1?.codigoQR) tableRows.push(["Código QR", reporte.modulo1.codigoQR]);
+      if (reporte.modulo2?.riesgos) tableRows.push(["Riesgos", reporte.modulo2.riesgos.join(", ")]);
       let nombreDelReportante = reporte.modulo3?.rolSeleccionado || 'No especificado';
       if (reporte.modulo3?.llave) {
         const nombreEncontrado = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
@@ -107,7 +115,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   }
 
   async function enviarAGoogleSheet() {
-    setEstadoCarga(true, 'sheet');
+    setEstadoCarga(true, 'bitacora');
     try {
       const reporte = JSON.parse(localStorage.getItem("reporte"));
       if (!reporte) throw new Error("No hay reporte para enviar.");
@@ -136,7 +144,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       console.error("Error al enviar a Google Sheet:", error);
       alert("Error al registrar en la bitácora.");
     } finally {
-      setEstadoCarga(false, 'sheet');
+      setEstadoCarga(false, 'bitacora');
     }
   }
 
@@ -162,8 +170,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // --- INICIALIZACIÓN Y EVENTOS ---
   cargarResumenVisual();
-  enviarGoogleSheetBtn.addEventListener("click", enviarAGoogleSheet);
-  enviarCorreoBtn.addEventListener("click", enviarCorreo);
   enviarWhatsAppBtn.addEventListener("click", enviarWhatsApp);
+  enviarCorreoBtn.addEventListener("click", enviarCorreo);
+  registrarBitacoraBtn.addEventListener("click", enviarAGoogleSheet);
   finalizarBtn.addEventListener("click", finalizar);
 });
