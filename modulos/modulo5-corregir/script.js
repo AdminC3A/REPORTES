@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const resumenContainer = document.getElementById("reporte-resumen");
 
   // --- CONFIGURACIÓN ---
-  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwBspQT3_J4m3OFDeiQYCXcSrqt76ZSmTkTFuvOGyIC-7v0d80oGqzsAa5DPAAtzuOk/exec"; // 👈 PEGA TU URL DE APPS SCRIPT
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz8zZocWbp3Z2yX7T7-0Y1ZDeIJSDEquvj-FTY9X-al8JMr2tcKvbtSDcvs2zZiPECb7w/exec"; // 👈 PEGA TU URL DE APPS SCRIPT
   const SERVICE_ID = "service_m1kpjzd";
   const TEMPLATE_ID = "template_0vvcv8r";
   const PUBLIC_KEY = "AV0u6cTpjcpnjm3xKO";
