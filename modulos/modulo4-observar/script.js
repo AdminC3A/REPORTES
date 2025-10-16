@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const agregarFotoBtn = document.getElementById("agregar-foto");
   const siguienteBtn = document.getElementById("siguiente-modulo");
   const finalizarBtn = document.getElementById("finalizar-reporte");
+  const infractorInput = document.getElementById("infractor-input"); // ✅ Referencia al nuevo campo
 
   function buscarPortadorPorLlave(llave, rolesData) {
     const llaveLimpia = llave.trim().toLowerCase();
@@ -37,7 +38,6 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (reporte.modulo2) {
         html += `<h3>⚠️ Riesgos Detectados</h3><p><strong>Riesgos:</strong> ${reporte.modulo2.riesgos?.join(", ") || "N/A"}</p>`;
-        
         if (reporte.modulo2.detalleOtros) {
           html += `<p><strong>Detalle Otros Riesgos:</strong> ${reporte.modulo2.detalleOtros}</p>`;
         }
@@ -51,12 +51,26 @@ document.addEventListener("DOMContentLoaded", () => {
       
       if (reporte.modulo3) {
         html += `<h3>🧑‍💼 Rol de quien Reporta</h3><p><strong>Rol:</strong> ${reporte.modulo3.rolSeleccionado}</p>`;
-        if (reporte.modulo3.llave) {
-          html += `<p><strong>Llave:</strong> VALIDADA</p>`;
-          const nombrePortador = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
-          html += `<p><strong>Portador de la Llave:</strong> ${nombrePortador}</p>`;
+        
+        if (reporte.modulo3.rolSeleccionado === "Externo") {
+            html += `<p><strong>Nombre:</strong> ${reporte.modulo3.nombreExterno || "N/A"}</p>`;
+            html += `<p><strong>Teléfono:</strong> ${reporte.modulo3.telefonoExterno || "N/A"}</p>`;
+        } else {
+            if (reporte.modulo3.llave) {
+              html += `<p><strong>Llave:</strong> VALIDADA</p>`;
+              const nombrePortador = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
+              html += `<p><strong>Portador de la Llave:</strong> ${nombrePortador}</p>`;
+            }
+        }
+        
+        if (reporte.modulo3.descripcion) {
+            html += `<p><strong>Descripción:</strong> ${reporte.modulo3.descripcion}</p>`;
+        }
+        if (reporte.modulo3.observacionesAdicionales) {
+            html += `<p><strong>Observaciones:</strong> ${reporte.modulo3.observacionesAdicionales}</p>`;
         }
       }
+
       const todasLasImagenes = reporte.modulo2?.imagenes || [];
       if (todasLasImagenes.length > 0) {
         html += `<h3>🖼️ Evidencia Fotográfica</h3><div class="fotos-galeria">`;
@@ -84,10 +98,12 @@ document.addEventListener("DOMContentLoaded", () => {
         return;
       }
 
+      const infractor = infractorInput.value.trim();
+
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
 
-      doc.setFontSize(20);
+      doc.setFontSize(18);
       doc.setTextColor("#0056b3");
       doc.text("CTA-EAI Reportes de incidencias en seguridad e higiene", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
 
@@ -99,11 +115,19 @@ document.addEventListener("DOMContentLoaded", () => {
       if (reporte.modulo2?.clasificacionSeleccionada) tableRows.push(["Clasificación", reporte.modulo2.clasificacionSeleccionada]);
       if (reporte.modulo2?.detalleClasificacion) tableRows.push(["Detalle Clasificación", reporte.modulo2.detalleClasificacion]);
       if (reporte.modulo3?.rolSeleccionado) tableRows.push(["Rol Reporta", reporte.modulo3.rolSeleccionado]);
-      if (reporte.modulo3?.llave) {
+      if (reporte.modulo3?.rolSeleccionado === "Externo") {
+          tableRows.push(["Nombre Externo", reporte.modulo3.nombreExterno || "N/A"]);
+          tableRows.push(["Teléfono Externo", reporte.modulo3.telefonoExterno || "N/A"]);
+      } else if (reporte.modulo3?.llave) {
         const nombrePortador = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
         tableRows.push(["Portador de Llave", nombrePortador]);
       }
-
+      if (reporte.modulo3?.descripcion) tableRows.push(["Descripción", reporte.modulo3.descripcion]);
+      if (reporte.modulo3?.observacionesAdicionales) tableRows.push(["Observaciones", reporte.modulo3.observacionesAdicionales]);
+      if (infractor) {
+        tableRows.push(["Contratista Infractor", infractor]);
+      }
+      
       doc.autoTable({
         startY: 30,
         head: [['Concepto', 'Información']],
@@ -121,12 +145,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const margin = 14;
         const imgWidth = 80;
         const pageHeight = doc.internal.pageSize.getHeight();
-
         todasLasImagenes.forEach(imgData => {
-            if (y + 65 > pageHeight) {
-                doc.addPage();
-                y = 20;
-            }
+            if (y + 65 > pageHeight) { doc.addPage(); y = 20; }
             doc.addImage(imgData, 'JPEG', margin, y, imgWidth, 60);
             y += 65;
         });
