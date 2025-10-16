@@ -103,7 +103,6 @@ button:hover {
 #descargar-pdf { background-color: #28a745; }
 button:disabled { background-color: #6c757d; cursor: not-allowed; }
 
-/* ✅ ESTILOS PARA EL NUEVO CAMPO DE TEXTO */
 .campo-manual {
   margin: 30px 0 20px 0;
   padding: 20px;
