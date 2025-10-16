@@ -4,7 +4,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const agregarFotoBtn = document.getElementById("agregar-foto");
   const siguienteBtn = document.getElementById("siguiente-modulo");
   const finalizarBtn = document.getElementById("finalizar-reporte");
-  const infractorInput = document.getElementById("infractor-input"); // ✅ Referencia al nuevo campo
+  const infractorInput = document.getElementById("infractor-input");
+  const trabajadorInput = document.getElementById("trabajador-input"); // ✅ Referencia al nuevo campo
 
   function buscarPortadorPorLlave(llave, rolesData) {
     const llaveLimpia = llave.trim().toLowerCase();
@@ -35,42 +36,25 @@ document.addEventListener("DOMContentLoaded", () => {
       let html = "";
       html += `<p><strong>Fecha de visualización:</strong> ${new Date().toLocaleString()}</p>`;
       if (reporte.modulo1?.codigoQR) html += `<h3>📌 Código QR</h3><p>${reporte.modulo1.codigoQR}</p>`;
-      
       if (reporte.modulo2) {
         html += `<h3>⚠️ Riesgos Detectados</h3><p><strong>Riesgos:</strong> ${reporte.modulo2.riesgos?.join(", ") || "N/A"}</p>`;
-        if (reporte.modulo2.detalleOtros) {
-          html += `<p><strong>Detalle Otros Riesgos:</strong> ${reporte.modulo2.detalleOtros}</p>`;
-        }
-        if (reporte.modulo2.clasificacionSeleccionada) {
-          html += `<p><strong>Clasificación:</strong> ${reporte.modulo2.clasificacionSeleccionada}</p>`;
-        }
-        if (reporte.modulo2.detalleClasificacion) {
-          html += `<p><strong>Detalle Clasificación:</strong> ${reporte.modulo2.detalleClasificacion}</p>`;
-        }
+        if (reporte.modulo2.detalleOtros) html += `<p><strong>Detalle Otros Riesgos:</strong> ${reporte.modulo2.detalleOtros}</p>`;
+        if (reporte.modulo2.clasificacionSeleccionada) html += `<p><strong>Clasificación:</strong> ${reporte.modulo2.clasificacionSeleccionada}</p>`;
+        if (reporte.modulo2.detalleClasificacion) html += `<p><strong>Detalle Clasificación:</strong> ${reporte.modulo2.detalleClasificacion}</p>`;
       }
-      
       if (reporte.modulo3) {
         html += `<h3>🧑‍💼 Rol de quien Reporta</h3><p><strong>Rol:</strong> ${reporte.modulo3.rolSeleccionado}</p>`;
-        
         if (reporte.modulo3.rolSeleccionado === "Externo") {
             html += `<p><strong>Nombre:</strong> ${reporte.modulo3.nombreExterno || "N/A"}</p>`;
             html += `<p><strong>Teléfono:</strong> ${reporte.modulo3.telefonoExterno || "N/A"}</p>`;
-        } else {
-            if (reporte.modulo3.llave) {
-              html += `<p><strong>Llave:</strong> VALIDADA</p>`;
-              const nombrePortador = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
-              html += `<p><strong>Portador de la Llave:</strong> ${nombrePortador}</p>`;
-            }
+        } else if (reporte.modulo3.llave) {
+            html += `<p><strong>Llave:</strong> VALIDADA</p>`;
+            const nombrePortador = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
+            html += `<p><strong>Portador de la Llave:</strong> ${nombrePortador}</p>`;
         }
-        
-        if (reporte.modulo3.descripcion) {
-            html += `<p><strong>Descripción:</strong> ${reporte.modulo3.descripcion}</p>`;
-        }
-        if (reporte.modulo3.observacionesAdicionales) {
-            html += `<p><strong>Observaciones:</strong> ${reporte.modulo3.observacionesAdicionales}</p>`;
-        }
+        if (reporte.modulo3.descripcion) html += `<p><strong>Descripción:</strong> ${reporte.modulo3.descripcion}</p>`;
+        if (reporte.modulo3.observacionesAdicionales) html += `<p><strong>Observaciones:</strong> ${reporte.modulo3.observacionesAdicionales}</p>`;
       }
-
       const todasLasImagenes = reporte.modulo2?.imagenes || [];
       if (todasLasImagenes.length > 0) {
         html += `<h3>🖼️ Evidencia Fotográfica</h3><div class="fotos-galeria">`;
@@ -91,22 +75,17 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) throw new Error("No se pudo cargar roles.json para el PDF.");
       const rolesData = await response.json();
       const reporte = JSON.parse(localStorage.getItem("reporte"));
-      
       if (!reporte) {
         alert("No hay reporte para generar el PDF.");
         setEstadoCarga(false);
         return;
       }
-
       const infractor = infractorInput.value.trim();
+      const trabajador = trabajadorInput.value.trim(); // ✅ Leer el valor del nuevo campo
 
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-
-      doc.setFontSize(18);
-      doc.setTextColor("#0056b3");
-      doc.text("CTA-EAI Reportes de incidencias en seguridad e higiene", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
-
+      doc.setFontSize(18).setTextColor("#0056b3").text("CTA-EAI Reportes de incidencias en seguridad e higiene", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
       const tableRows = [];
       tableRows.push(["Fecha", new Date().toLocaleDateString('es-MX')]);
       if (reporte.modulo1?.codigoQR) tableRows.push(["Código QR", reporte.modulo1.codigoQR]);
@@ -127,36 +106,21 @@ document.addEventListener("DOMContentLoaded", () => {
       if (infractor) {
         tableRows.push(["Contratista Infractor", infractor]);
       }
-      
-      doc.autoTable({
-        startY: 30,
-        head: [['Concepto', 'Información']],
-        body: tableRows,
-        theme: 'grid',
-        headStyles: { fillColor: [0, 86, 179] }
-      });
-
+      if (trabajador) {
+        tableRows.push(["Nombre del Trabajador", trabajador]); // ✅ Añadir fila a la tabla del PDF
+      }
+      doc.autoTable({ startY: 30, head: [['Concepto', 'Información']], body: tableRows, theme: 'grid', headStyles: { fillColor: [0, 86, 179] } });
       const todasLasImagenes = reporte.modulo2?.imagenes || [];
       if (todasLasImagenes.length > 0) {
         let finalY = doc.lastAutoTable.finalY || 30;
-        doc.setFontSize(14);
-        doc.text("Evidencia Fotográfica", 14, finalY + 15);
+        doc.setFontSize(14).text("Evidencia Fotográfica", 14, finalY + 15);
         let y = finalY + 20;
-        const margin = 14;
-        const imgWidth = 80;
-        const pageHeight = doc.internal.pageSize.getHeight();
-        todasLasImagenes.forEach(imgData => {
-            if (y + 65 > pageHeight) { doc.addPage(); y = 20; }
-            doc.addImage(imgData, 'JPEG', margin, y, imgWidth, 60);
-            y += 65;
-        });
+        todasLasImagenes.forEach(imgData => { if (y + 65 > doc.internal.pageSize.getHeight()) { doc.addPage(); y = 20; } doc.addImage(imgData, 'JPEG', 14, y, 80, 60); y += 65; });
       }
-
       const fecha = new Date().toISOString().split("T")[0];
       const hora = new Date().toLocaleTimeString('es-MX', { hour12: false }).replace(/:/g, '-');
       const nombreArchivo = `ReporteSeguridad_${fecha}_${hora}.pdf`;
       doc.save(nombreArchivo);
-
     } catch (error) {
       console.error("Error al generar el PDF:", error);
       alert("Ocurrió un error al crear el PDF.");
