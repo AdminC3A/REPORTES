@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const resumenContainer = document.getElementById("reporte-resumen");
 
     // --- CONFIGURACIÓN (REEMPLAZAR ESTO) ---
-    const APPS_SCRIPT_URL = "URL_DE_TU_APPS_SCRIPT_AQUI"; 
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJmeDXcMCmjkT0NaArjaK3c_fXVMw_y7qDNYXDvcqvtIS63hmqIPEEHy9IGSatXdV1/exec"; 
     const NUMERO_WHATSAPP = "5215549616817";
 
     // Función de control visual para deshabilitar/habilitar botones
