@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   const inputArchivo = document.getElementById("archivo");
 
   // CONFIGURACIÓN
-  const APPS_SCRIPT_URL = "PON_AQUI_TU_URL_WEBAPP";
+  const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxJmeDXcMCmjkT0NaArjaK3c_fXVMw_y7qDNYXDvcqvtIS63hmqIPEEHy9IGSatXdV1/exec";
   const NUMERO_WHATSAPP = "5215549616817";
 
   // MOSTRAR RESUMEN
