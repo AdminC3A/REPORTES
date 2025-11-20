@@ -1,29 +1,32 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Módulo 5: Enviar Reporte</title>
-  <link rel="stylesheet" href="styles.css" />
-  
-  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Módulo 5: Enviar Reporte</title>
+    <link rel="stylesheet" href="styles.css" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 </head>
 <body>
-  <header><h1>Módulo 5: Enviar Reporte</h1></header>
-  <main>
-    <div id="reporte-resumen">
-      <h3>Cargando resumen del reporte...</h3>
-    </div>
+    <header><h1>Módulo 5: Enviar Reporte</h1></header>
+    <main>
+        <div id="reporte-resumen">
+            <h3>Cargando resumen del reporte...</h3>
+        </div>
 
-    <p>¿Cómo deseas proceder?</p>
+        <p>¿Cómo deseas proceder?</p>
+        
+        <button id="enviar-drive">📂 Subir Reporte a Drive</button>
 
-    <button id="enviar-whatsapp">📲 Enviar por WhatsApp</button>
-    <button id="enviar-correo">📧 Enviar por Correo</button>
-    <button id="registrar-bitacora">📊 Registrar en Bitácora</button>
-    <button id="finalizar">❌ Finalizar y volver al inicio</button>
-  </main>
-  <script src="script.js"></script>
+        <button id="enviar-whatsapp" style="display: none;">
+            💬 Enviar Notificación por WhatsApp
+        </button>
+        <button id="finalizar" style="display: none;">
+            ❌ Finalizar Trámite y volver al inicio
+        </button>
+    </main>
+    <script src="script.js"></script>
 </body>
 </html>
