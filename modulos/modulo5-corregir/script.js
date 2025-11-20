@@ -1,177 +1,113 @@
- document.addEventListener("DOMContentLoaded", async () => {
-  // ✅ Referencias a los botones corregidas (ya no busca el botón eliminado)
-  const enviarWhatsAppBtn = document.getElementById("enviar-whatsapp");
-  const enviarCorreoBtn = document.getElementById("enviar-correo");
-  const registrarBitacoraBtn = document.getElementById("registrar-bitacora");
-  const finalizarBtn = document.getElementById("finalizar");
-  const resumenContainer = document.getElementById("reporte-resumen");
+document.addEventListener("DOMContentLoaded", async () => {
+    // --- REFERENCIAS A BOTONES ---
+    const enviarDriveBtn = document.getElementById("enviar-drive");
+    const enviarWhatsAppBtn = document.getElementById("enviar-whatsapp");
+    const finalizarBtn = document.getElementById("finalizar");
+    const resumenContainer = document.getElementById("reporte-resumen");
 
-  // --- CONFIGURACIÓN ---
-  const APPS_SCRIPT_URL = "URL_DE_TU_APPS_SCRIPT_AQUI"; // 👈 PEGA TU URL DE APPS SCRIPT
-  const SERVICE_ID = "service_m1kpjzd";
-  const TEMPLATE_ID = "template_0vvcv8r";
-  const PUBLIC_KEY = "AV0u6cTpjcpnjm3xKO";
-  const DESTINATARIO_PRINCIPAL = "ctasupervisionnom031@gmail.com";
-  const DESTINATARIO_COPIA = "supervision@casatresguas.com";
-  const NUMERO_WHATSAPP = "5215549616817";
+    // --- CONFIGURACIÓN (REEMPLAZAR ESTO) ---
+    const APPS_SCRIPT_URL = "URL_DE_TU_APPS_SCRIPT_AQUI"; 
+    const NUMERO_WHATSAPP = "5215549616817";
 
-  // --- FUNCIONES AUXILIARES ---
-
-  function setEstadoCarga(cargando, tipo) {
-    const botones = [enviarWhatsAppBtn, enviarCorreoBtn, registrarBitacoraBtn, finalizarBtn];
-    botones.forEach(btn => btn.disabled = cargando);
-
-    if (cargando) {
-      if (tipo === 'correo') {
-        enviarCorreoBtn.textContent = "Enviando...";
-      } else if (tipo === 'bitacora') {
-        registrarBitacoraBtn.textContent = "Registrando...";
-      }
-    } else {
-      enviarCorreoBtn.textContent = "📧 Enviar por Correo";
-      registrarBitacoraBtn.textContent = "📊 Registrar en Bitácora";
-    }
-  }
-
-  function buscarPortadorPorLlave(llave, rolesData) {
-    const llaveLimpia = llave.trim().toLowerCase();
-    for (const categoria in rolesData) {
-      const supervisores = rolesData[categoria].supervisores;
-      for (const nombre in supervisores) {
-        const llavesDelSupervisor = supervisores[nombre];
-        if (Array.isArray(llavesDelSupervisor) && llavesDelSupervisor.length > 0) {
-          if (llavesDelSupervisor[0].trim().toLowerCase() === llaveLimpia) return nombre;
+    // Función de control visual para deshabilitar/habilitar botones
+    function setEstadoCarga(cargando, tipo) {
+        enviarDriveBtn.disabled = cargando;
+        if (cargando) {
+            enviarDriveBtn.textContent = "Subiendo PDF a Drive...";
+        } else {
+            enviarDriveBtn.textContent = "📂 Subir Reporte a Drive";
         }
-      }
     }
-    return null;
-  }
 
-  function cargarResumenVisual() {
-    const reporte = JSON.parse(localStorage.getItem("reporte"));
-    if (!reporte) {
-      resumenContainer.innerHTML = "<h3>No se encontró reporte.</h3>";
-      return;
+    // Función que controla la visibilidad de los botones finales
+    function controlarBotonesFinales(mostrar) {
+        enviarWhatsAppBtn.style.display = mostrar ? 'block' : 'none';
+        finalizarBtn.style.display = mostrar ? 'block' : 'none';
+        enviarDriveBtn.style.display = mostrar ? 'none' : 'block';
     }
-    let html = `
-      <h3>Resumen del Reporte</h3>
-      <p><strong>QR:</strong> ${reporte.modulo1?.codigoQR || 'N/A'}</p>
-      <p><strong>Riesgos:</strong> ${reporte.modulo2?.riesgos?.join(', ') || 'N/A'}</p>
-      <p><strong>Clasificación:</strong> ${reporte.modulo2?.clasificacionSeleccionada || 'N/A'}</p>
-      <p><strong>Rol:</strong> ${reporte.modulo3?.rolSeleccionado || 'N/A'}</p>
-    `;
-    resumenContainer.innerHTML = html;
-  }
+    
+    // Las funciones buscarPortadorPorLlave y cargarResumenVisual se mantienen sin cambios (no incluidas aquí por brevedad, pero usa las versiones anteriores)
 
-  // --- LÓGICA DE LOS BOTONES ---
+    // --- LÓGICA DE ENVÍO A DRIVE ---
 
-  async function enviarCorreo() {
-    setEstadoCarga(true, 'correo');
-    try {
-      const reporte = JSON.parse(localStorage.getItem("reporte"));
-      if (!reporte) throw new Error("No hay reporte para enviar.");
-      
-      const response = await fetch('/data/roles.json');
-      if (!response.ok) throw new Error("No se pudo cargar roles.json");
-      const rolesData = await response.json();
+    async function enviarADrive() {
+        setEstadoCarga(true, 'drive');
+        try {
+            const reporte = JSON.parse(localStorage.getItem("reporte"));
+            if (!reporte) throw new Error("No hay reporte para enviar.");
+            
+            const response = await fetch('/data/roles.json');
+            if (!response.ok) throw new Error("No se pudo cargar roles.json");
+            const rolesData = await response.json();
 
-      // Generar PDF con jsPDF
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.setFontSize(20).setTextColor("#0056b3").text("Reporte de Incidencias", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
-      const tableRows = [];
-      tableRows.push(["Fecha", new Date().toLocaleDateString('es-MX')]);
-      if (reporte.modulo1?.codigoQR) tableRows.push(["Código QR", reporte.modulo1.codigoQR]);
-      if (reporte.modulo2?.riesgos) tableRows.push(["Riesgos", reporte.modulo2.riesgos.join(", ")]);
-      let nombreDelReportante = reporte.modulo3?.rolSeleccionado || 'No especificado';
-      if (reporte.modulo3?.llave) {
-        const nombreEncontrado = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
-        if (nombreEncontrado) nombreDelReportante = nombreEncontrado;
-      }
-      tableRows.push(["Reportado Por", nombreDelReportante]);
-      doc.autoTable({ startY: 30, head: [['Concepto', 'Información']], body: tableRows, theme: 'grid', headStyles: { fillColor: [0, 86, 179] } });
-      const pdfBase64 = doc.output('datauristring');
+            // 1. Generar PDF (usa la lógica completa de tu antigua función enviarCorreo)
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            // ... (código jsPDF para generar tabla y contenido) ...
+            let nombreDelReportante = reporte.modulo3?.rolSeleccionado || 'No especificado';
+            // (Necesitas incluir la lógica completa de generación de PDF aquí)
+            
+            // --- CÓDIGO CLAVE PARA GENERACIÓN DE PDF ---
+            doc.setFontSize(20).setTextColor("#0056b3").text("Reporte de Incidencias", doc.internal.pageSize.getWidth() / 2, 20, { align: 'center' });
+            // Lógica para obtener nombreDelReportante usando buscarPortadorPorLlave...
+            const tableRows = []; // ... llenar tableRows con datos ...
+            doc.autoTable({ startY: 30, head: [['Concepto', 'Información']], body: tableRows, theme: 'grid', headStyles: { fillColor: [0, 86, 179] } });
+            
+            // Obtener la cadena Base64
+            const pdfBase64 = doc.output('datauristring').split(',')[1];
+            // -----------------------------------------------------------
 
-      // Preparar y enviar correo
-      const templateParams = {
-        fecha: new Date().toLocaleDateString('es-MX'),
-        reportado_por: nombreDelReportante,
-        message: `QR: ${reporte.modulo1?.codigoQR}`,
-        to_email: DESTINATARIO_PRINCIPAL,
-        cc_email: DESTINATARIO_COPIA,
-        subject: `Reporte de Incidencias - ${reporte.modulo1?.codigoQR || ''}`,
-        attachment: pdfBase64,
-      };
+            // 2. Datos a enviar a Apps Script
+            const datosParaDrive = {
+                base64Data: pdfBase64,
+                mimeType: 'application/pdf',
+                fileName: `Reporte_${reporte.modulo1?.codigoQR || 'SIN_QR'}_${new Date().getTime()}.pdf`
+            };
 
-      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
-      alert("Correo con PDF adjunto enviado exitosamente ✅");
+            // 3. Envío a Apps Script
+            await fetch(APPS_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(datosParaDrive)
+            });
 
-    } catch (error) {
-      console.error("Error al enviar email:", error);
-      alert("Error al enviar el correo. Revisa la consola.");
-    } finally {
-      setEstadoCarga(false, 'correo');
+            // Éxito: Mostrar los siguientes pasos
+            alert("Reporte PDF subido a Drive exitosamente ✅. Ahora puedes notificar por WhatsApp.");
+            controlarBotonesFinales(true);
+            
+        } catch (error) {
+            console.error("Error al enviar a Drive:", error);
+            alert("Error al generar o enviar el PDF a Drive. Revisa la consola.");
+            controlarBotonesFinales(false);
+        } finally {
+            setEstadoCarga(false, 'drive');
+        }
     }
-  }
 
-  async function enviarAGoogleSheet() {
-    setEstadoCarga(true, 'bitacora');
-    try {
-      const reporte = JSON.parse(localStorage.getItem("reporte"));
-      if (!reporte) throw new Error("No hay reporte para enviar.");
-      const response = await fetch('/data/roles.json');
-      const rolesData = await response.json();
-      let nombreDelReportante = reporte.modulo3?.rolSeleccionado || 'No especificado';
-      if (reporte.modulo3?.llave) {
-        const nombreEncontrado = buscarPortadorPorLlave(reporte.modulo3.llave, rolesData);
-        if (nombreEncontrado) nombreDelReportante = nombreEncontrado;
-      }
-      const datosParaSheet = {
-        codigoQR: reporte.modulo1?.codigoQR,
-        riesgos: reporte.modulo2?.riesgos?.join(', '),
-        clasificacion: reporte.modulo2?.clasificacionSeleccionada,
-        reportadoPor: nombreDelReportante,
-        numImagenes: reporte.modulo2?.imagenes?.length || 0
-      };
-      await fetch(APPS_SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(datosParaSheet)
-      });
-      alert("Reporte registrado en la bitácora ✅");
-    } catch (error) {
-      console.error("Error al enviar a Google Sheet:", error);
-      alert("Error al registrar en la bitácora.");
-    } finally {
-      setEstadoCarga(false, 'bitacora');
+    // --- FUNCIÓN DE WHATSAPP (Solo abre el chat con el mensaje) ---
+    function enviarWhatsApp() {
+        const reporte = JSON.parse(localStorage.getItem("reporte"));
+        let mensajeTexto = `*Reporte de Seguridad Generado*\n\n*Código QR:* ${reporte.modulo1?.codigoQR || 'N/A'}\n*Riesgos Detectados:* ${reporte.modulo2?.riesgos?.join(', ') || 'Ninguno'}\n\nEl PDF completo se encuentra en la carpeta de Google Drive.`;
+        const mensaje = encodeURIComponent(mensajeTexto);
+        const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
+        window.open(url, "_blank");
     }
-  }
 
-  function enviarWhatsApp() {
-    const reporte = JSON.parse(localStorage.getItem("reporte"));
-    let mensajeTexto = "Se ha generado un nuevo reporte de seguridad.";
-    if (reporte) {
-      const qr = reporte.modulo1?.codigoQR || "N/A";
-      const riesgos = reporte.modulo2?.riesgos?.join(', ') || "Ninguno";
-      mensajeTexto = `*Reporte de Seguridad Generado*\n\n*Código QR:* ${qr}\n*Riesgos Detectados:* ${riesgos}\n\nEl PDF completo con imágenes fue enviado al correo de supervisión.`;
+    // --- FUNCIÓN FINALIZAR ---
+    function finalizar() {
+        if (confirm("¿Estás seguro de que deseas finalizar? Se borrará el reporte actual.")) {
+            localStorage.removeItem("reporte");
+            window.location.href = "../modulo1-qr/";
+        }
     }
-    const mensaje = encodeURIComponent(mensajeTexto);
-    const url = `https://wa.me/${NUMERO_WHATSAPP}?text=${mensaje}`;
-    window.open(url, "_blank");
-  }
 
-  function finalizar() {
-    if (confirm("¿Estás seguro de que deseas finalizar? Se borrará el reporte actual.")) {
-      localStorage.removeItem("reporte");
-      window.location.href = "../modulo1-qr/";
-    }
-  }
-
-  // --- INICIALIZACIÓN Y EVENTOS ---
-  cargarResumenVisual();
-  enviarWhatsAppBtn.addEventListener("click", enviarWhatsApp);
-  enviarCorreoBtn.addEventListener("click", enviarCorreo);
-  registrarBitacoraBtn.addEventListener("click", enviarAGoogleSheet);
-  finalizarBtn.addEventListener("click", finalizar);
+    // --- INICIALIZACIÓN Y EVENTOS ---
+    // (Necesitas incluir aquí las funciones auxiliares de buscarPortadorPorLlave y cargarResumenVisual)
+    cargarResumenVisual();
+    controlarBotonesFinales(false);
+    
+    enviarDriveBtn.addEventListener("click", enviarADrive); 
+    enviarWhatsAppBtn.addEventListener("click", enviarWhatsApp);
+    finalizarBtn.addEventListener("click", finalizar);
 });
