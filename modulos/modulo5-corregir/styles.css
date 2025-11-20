@@ -1,66 +1,32 @@
 body {
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: #f4f4f4;
-    color: #333;
-}
-
-header {
-    background-color: #4914db;
-    color: white;
+    background: #f4f4f4;
     padding: 20px;
     text-align: center;
 }
 
-main {
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+h2 {
+    color: #003366;
 }
 
-main p { 
-    font-size: 1.2rem;
-    text-align: center;
-    margin-bottom: 20px;
-}
-
-/* ESTILO GENERAL DE BOTONES (SE APLICARÁ A 'ENVIAR-DRIVE' POR DEFECTO) */
 button {
     display: block;
-    width: 100%;
-    margin: 15px auto;
+    width: 80%;
+    margin: 10px auto;
     padding: 15px;
-    font-size: 1.2rem;
-    background-color: #4914db; /* Púrpura */
+    font-size: 18px;
+    background-color: #0056b3;
     color: white;
     border: none;
     border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
 }
 
 button:hover {
-    background-color: #3711a3;
+    background-color: #003f80;
 }
 
-/* 🟢 ESTILO ESPECÍFICO PARA WHATSAPP */
-#enviar-whatsapp {
-    background-color: #25d366; /* Verde de WhatsApp */
-}
+#btn-whatsapp { background-color: #25d366; }
+#btn-whatsapp:hover { background-color: #1aa84d; }
 
-#enviar-whatsapp:hover {
-    background-color: #128c7e;
-}
-
-/* 🛑 ESTILO ESPECÍFICO PARA FINALIZAR */
-#finalizar {
-    background-color: #dc3545; /* Rojo de peligro/finalizar */
-}
-
-#finalizar:hover {
-    background-color: #c82333;
-}
+#btn-salir { background-color: #555; }
+#btn-salir:hover { background-color: #333; }
