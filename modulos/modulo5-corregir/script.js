@@ -1,81 +1,101 @@
-// CONFIGURA AQUÍ TU URL DE APPS SCRIPT Y LA CARPETA DE DRIVE
-const APPS_SCRIPT_URL = "PON_AQUI_TU_URL_DEL_WEBAPP";
-const WHATSAPP_NUMERO = "5210000000000"; // ← Cambia el número
+document.addEventListener("DOMContentLoaded", async () => {
 
-let archivoSeleccionado = null;
+  const subirDriveBtn = document.getElementById("subir-drive");
+  const enviarWhatsAppBtn = document.getElementById("enviar-whatsapp");
+  const finalizarBtn = document.getElementById("finalizar");
+  const resumenContainer = document.getElementById("reporte-resumen");
+  const inputArchivo = document.getElementById("archivo");
 
-// BOTONES
-const btnDrive = document.getElementById("btn-drive");
-const btnWhatsapp = document.getElementById("btn-whatsapp");
-const btnSalir = document.getElementById("btn-salir");
-const inputArchivo = document.getElementById("archivo");
+  // CONFIGURACIÓN
+  const APPS_SCRIPT_URL = "PON_AQUI_TU_URL_WEBAPP";
+  const NUMERO_WHATSAPP = "5215549616817";
 
-
-// ------------------------------------------------------
-// 1. SUBIR A DRIVE
-// ------------------------------------------------------
-btnDrive.addEventListener("click", () => {
-    inputArchivo.click();
-});
-
-// al seleccionar archivo
-inputArchivo.addEventListener("change", async (e) => {
-    archivoSeleccionado = e.target.files[0];
-
-    if (!archivoSeleccionado) {
-        alert("No seleccionaste archivo.");
-        return;
+  // MOSTRAR RESUMEN
+  function cargarResumenVisual() {
+    const reporte = JSON.parse(localStorage.getItem("reporte"));
+    if (!reporte) {
+      resumenContainer.innerHTML = "<h3>No se encontró reporte.</h3>";
+      return;
     }
 
-    alert("Archivo seleccionado: " + archivoSeleccionado.name);
+    resumenContainer.innerHTML = `
+      <h3>Resumen del Reporte</h3>
+      <p><strong>QR:</strong> ${reporte.modulo1?.codigoQR || 'N/A'}</p>
+      <p><strong>Riesgos:</strong> ${reporte.modulo2?.riesgos?.join(', ') || 'N/A'}</p>
+      <p><strong>Clasificación:</strong> ${reporte.modulo2?.clasificacionSeleccionada || 'N/A'}</p>
+      <p><strong>Rol:</strong> ${reporte.modulo3?.rolSeleccionado || 'N/A'}</p>
+    `;
+  }
 
-    const reader = new FileReader();
-    reader.onload = async function () {
-        try {
-            const base64 = reader.result.split(",")[1];
+  cargarResumenVisual();
 
-            const payload = {
-                fileName: archivoSeleccionado.name,
-                mimeType: archivoSeleccionado.type,
-                base64Data: base64
-            };
 
-            await fetch(APPS_SCRIPT_URL, {
-                method: "POST",
-                mode: "no-cors",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(payload)
-            });
+  // ---------------------------------------------------------------------------
+  // 1. SUBIR A DRIVE
+  // ---------------------------------------------------------------------------
+  subirDriveBtn.addEventListener("click", () => inputArchivo.click());
 
-            alert("Archivo subido a Drive.");
+  inputArchivo.addEventListener("change", async (e) => {
+    const archivo = e.target.files[0];
+    if (!archivo) return;
 
-            // Ocultar botón de Drive
-            btnDrive.style.display = "none";
+    const lector = new FileReader();
 
-        } catch (err) {
-            console.error(err);
-            alert("Error al subir el archivo.");
-        }
+    lector.onload = async function () {
+      const base64 = lector.result.split(",")[1];
+
+      const payload = {
+        fileName: archivo.name || `Reporte_${Date.now()}.pdf`,
+        mimeType: archivo.type || "application/pdf",
+        base64Data: base64
+      };
+
+      try {
+        await fetch(APPS_SCRIPT_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+
+        alert("PDF subido correctamente a Drive.");
+
+        // OCULTAR EL BOTÓN DE SUBIR A DRIVE
+        subirDriveBtn.style.display = "none";
+
+      } catch (error) {
+        alert("Error al subir archivo a Drive.");
+      }
     };
 
-    reader.readAsDataURL(archivoSeleccionado);
-});
+    lector.readAsDataURL(archivo);
+  });
 
 
-// ------------------------------------------------------
-// 2. ENVIAR A WHATSAPP
-// ------------------------------------------------------
-btnWhatsapp.addEventListener("click", () => {
-    const mensaje = encodeURIComponent("Reporte disponible.");
-    const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${mensaje}`;
-    window.open(url, "_blank");
-});
+  // ---------------------------------------------------------------------------
+  // 2. ENVIAR WHATSAPP
+  // ---------------------------------------------------------------------------
+  enviarWhatsAppBtn.addEventListener("click", () => {
+    const reporte = JSON.parse(localStorage.getItem("reporte"));
+    const qr = reporte?.modulo1?.codigoQR || "N/A";
+    const riesgos = reporte?.modulo2?.riesgos?.join(", ") || "Ninguno";
+
+    const txt = encodeURIComponent(
+      `Reporte generado:\nQR: ${qr}\nRiesgos: ${riesgos}\nEl PDF está en Drive.`
+    );
+
+    window.open(`https://wa.me/${NUMERO_WHATSAPP}?text=${txt}`, "_blank");
+  });
 
 
-// ------------------------------------------------------
-// 3. SALIR / ESCANEAR OTRO CÓDIGO
-// ------------------------------------------------------
-btnSalir.addEventListener("click", () => {
-    // Puede ser reload o redirigir a tu lector QR
-    location.reload();
+  // ---------------------------------------------------------------------------
+  // 3. FINALIZAR (SE RESPETA TAL CUAL ESTABA)
+  // ---------------------------------------------------------------------------
+  finalizarBtn.addEventListener("click", () => {
+    if (confirm("¿Estás seguro de que deseas finalizar? Se borrará el reporte actual.")) {
+      localStorage.removeItem("reporte");
+      window.location.href = "../modulo1-qr/"; // NO SE TOCA
+    }
+  });
+
 });
