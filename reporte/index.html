@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte de seguridad</title>
+  <link rel="icon" href="../img/favicon.png">
+  <link rel="stylesheet" href="../css/comun.css">
+  <link rel="stylesheet" href="reporte.css">
+</head>
+<body>
+  <header class="encabezado cab-rep">
+    <div class="logos"><img src="../img/logo.png" alt="" class="logo-app"><img id="logo-obra" alt="" class="logo-obra" hidden></div>
+    <div class="cab-texto"><h1>🦺 Reporte de seguridad</h1><span id="quien" class="quien"></span></div>
+    <button id="salir" class="boton chico secundario" type="button">Salir</button>
+  </header>
+
+  <main class="contenido">
+    <p id="cargando" class="sub">Cargando…</p>
+
+    <!-- Pasos -->
+    <ol id="pasos" class="pasos" hidden>
+      <li data-p="1"><span>1</span>QR</li>
+      <li data-p="2"><span>2</span>Evidencia</li>
+      <li data-p="3"><span>3</span>Infractor</li>
+      <li data-p="4"><span>4</span>Guardar</li>
+    </ol>
+
+    <div id="caja-obra" class="tarjeta fila-obra" hidden>
+      <label class="etiqueta" for="obra">Obra</label>
+      <select id="obra" class="campo"></select>
+    </div>
+
+    <!-- 1 · QR del infractor -->
+    <section id="p1" class="paso" hidden>
+      <div class="tarjeta">
+        <h2>Escanea el QR del infractor</h2>
+        <div id="lector" class="lector"></div>
+        <p id="estado-lector" class="sub centro">Abriendo la cámara…</p>
+        <div id="res-qr" class="res-qr" hidden></div>
+        <button id="sin-qr" class="boton secundario ancho" type="button">✍ No trae QR · escribir a mano</button>
+      </div>
+    </section>
+
+    <!-- 2 · Evidencia: fotos, riesgos y clasificación -->
+    <section id="p2" class="paso" hidden>
+      <div class="tarjeta">
+        <h2>📸 Fotos de evidencia</h2>
+        <div id="fotos" class="fotos"></div>
+        <div class="botones">
+          <button id="foto-camara" class="boton" type="button">📸 Tomar foto</button>
+          <button id="foto-galeria" class="boton secundario" type="button">🖼 Cargar del celular</button>
+        </div>
+        <input id="in-camara" type="file" accept="image/*" capture="environment" hidden>
+        <input id="in-galeria" type="file" accept="image/*" multiple hidden>
+      </div>
+      <div class="tarjeta">
+        <h2>⚠ Riesgos <span class="sub">(uno o varios)</span></h2>
+        <div id="riesgos" class="chips"></div>
+        <input id="detalle-otros" class="campo" placeholder="¿Cuáles otros riesgos?" hidden maxlength="300">
+      </div>
+      <div class="tarjeta">
+        <h2>🏷 Clasificación</h2>
+        <div id="clasificaciones" class="opciones"></div>
+        <input id="detalle-clas" class="campo" placeholder="¿Cuál clasificación?" hidden maxlength="200">
+      </div>
+      <div class="navegar"><button class="boton secundario" data-ir="1" type="button">◀ Atrás</button><button class="boton" id="a3" type="button">Siguiente ▶</button></div>
+    </section>
+
+    <!-- 3 · Infractor -->
+    <section id="p3" class="paso" hidden>
+      <div class="tarjeta">
+        <h2>👷 Infractor</h2>
+        <label class="etiqueta" for="trabajador">Nombre del trabajador</label>
+        <input id="trabajador" class="campo" maxlength="120" placeholder="Nombre completo">
+        <label class="etiqueta" for="contratista">Contratista</label>
+        <select id="contratista" class="campo"></select>
+        <input id="contratista-otra" class="campo" placeholder="Nombre de la contratista" hidden maxlength="120">
+        <label class="etiqueta" for="observacion">Observación (qué pasó, qué se le dijo)</label>
+        <textarea id="observacion" class="campo" rows="4" maxlength="1500" placeholder="Opcional"></textarea>
+      </div>
+      <div class="navegar"><button class="boton secundario" data-ir="2" type="button">◀ Atrás</button><button class="boton" id="a4" type="button">Revisar ▶</button></div>
+    </section>
+
+    <!-- 4 · Resumen y guardar -->
+    <section id="p4" class="paso" hidden>
+      <div class="tarjeta" id="resumen"></div>
+      <div id="msg-guardar"></div>
+      <div class="navegar"><button class="boton secundario" data-ir="3" type="button">◀ Atrás</button><button class="boton grande" id="guardar" type="button">💾 Guardar reporte</button></div>
+    </section>
+
+    <!-- ✅ Listo -->
+    <section id="p5" class="paso" hidden>
+      <div class="tarjeta listo">
+        <div class="palomita">✅</div>
+        <h2>Reporte guardado</h2>
+        <p id="listo-texto" class="sub"></p>
+        <div class="botones col">
+          <a id="ver-pdf" class="boton secundario" target="_blank" rel="noopener">📄 Ver el PDF</a>
+          <button id="compartir" class="boton secundario" type="button">📲 Mandar por WhatsApp</button>
+          <button id="nuevo" class="boton grande" type="button">➕ Nuevo reporte</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ¿Se negó a dar su credencial? -->
+  <div id="modal-nego" class="modal" hidden>
+    <div class="modal-caja">
+      <h2>Escaneaste TU propio QR</h2>
+      <p>¿El trabajador <b>se negó a darte su credencial</b>?</p>
+      <div class="botones col">
+        <button id="nego-si" class="boton" type="button">Sí, se negó</button>
+        <button id="nego-no" class="boton secundario" type="button">No, sólo no la trae</button>
+      </div>
+      <p class="sub">En los dos casos escribirás su nombre a mano.</p>
+    </div>
+  </div>
+
+  <footer class="pie"></footer>
+
+  <script src="../config.js"></script>
+  <script src="../js/comun.js"></script>
+  <script src="../js/lector.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <script src="reporte.js"></script>
+</body>
+</html>
