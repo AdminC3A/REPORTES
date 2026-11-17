@@ -1,0 +1,160 @@
+/* ============================================================================
+   Estilos comunes a toda la app
+   ========================================================================== */
+:root {
+  --fondo: #f4f4f6;
+  --tarjeta: #ffffff;
+  --texto: #111827;
+  --texto-suave: #4b5563;
+  --borde: #cfd4dc;
+  --principal: #16325c;
+  --principal-hover: #0d2242;
+  --principal-claro: #e6edf7;
+  --foco: #f5b301;
+  --sombra: 0 1px 3px rgba(15, 23, 42, .08), 0 4px 14px rgba(15, 23, 42, .06);
+  --ok: #1e7b3a;
+  --ok-fondo: #e3f4e8;
+  --error: #b42318;
+  --error-fondo: #fdecea;
+  --alerta: #9a6700;
+  --alerta-fondo: #fff4d6;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  line-height: 1.4;
+  background: var(--fondo);
+  color: var(--texto);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.encabezado {
+  background: var(--principal);
+  color: #fff;
+  padding: 12px 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.encabezado h1 { font-size: 18px; margin: 0; }
+.encabezado .derecha { display: flex; align-items: center; gap: 10px; font-size: 13px; flex-wrap: wrap; justify-content: flex-end; }
+/* Navegación de cada módulo: ← Atrás · ⌂ Inicio · ☰ Ir a… */
+.nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.nav-ir { position: relative; }
+.nav-ir summary { list-style: none; cursor: pointer; }
+.nav-ir summary::-webkit-details-marker { display: none; }
+.nav-lista { position: absolute; right: 0; top: calc(100% + 6px); z-index: 50; min-width: 240px; max-height: 70vh; overflow: auto;
+  background: #fff; border-radius: 12px; box-shadow: 0 10px 30px rgba(15, 23, 42, .25); padding: 6px; }
+.nav-lista a { display: block; padding: 10px 12px; border-radius: 8px; color: var(--texto); text-decoration: none; font-size: 15px; }
+.nav-lista a:hover { background: var(--principal-claro); color: var(--principal); }
+.version { opacity: .6; font-size: 11px; margin-left: 6px; }
+
+.contenido { flex: 1; width: 100%; max-width: 720px; margin: 0 auto; padding: 16px; }
+
+.tarjeta {
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: var(--sombra);
+}
+
+.boton {
+  display: inline-block;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: .2px;
+  border: 2px solid var(--principal);
+  border-radius: 10px;
+  background: var(--principal);
+  color: #fff;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, .25);
+  transition: background .15s, transform .05s;
+}
+.boton:hover { background: var(--principal-hover); border-color: var(--principal-hover); }
+.boton:active { transform: translateY(1px); box-shadow: none; }
+.boton:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+.boton:disabled { background: #9aa3af; border-color: #9aa3af; color: #fff; cursor: default; box-shadow: none; }
+.boton.secundario { background: #fff; color: var(--principal); border: 2px solid var(--principal); box-shadow: none; }
+.boton.secundario:hover { background: var(--principal-claro); }
+.boton.secundario:disabled { background: #f3f4f6; color: #9aa3af; border-color: #cfd4dc; }
+.encabezado .boton.secundario { border-color: #fff; }
+.boton.chico { padding: 6px 12px; font-size: 13px; border-radius: 8px; }
+.boton.grande { font-size: 22px; padding: 18px 32px; }
+
+.campo { display: block; width: 100%; padding: 12px; font-size: 17px; border: 1px solid var(--borde); border-radius: 8px; margin-bottom: 12px; }
+.campo:focus { outline: 3px solid var(--principal-claro); border-color: var(--principal); }
+
+.mensaje { margin: 10px 0 0; font-size: 14px; min-height: 1.2em; }
+.mensaje.error { color: var(--error); }
+
+.pie { text-align: center; color: var(--texto-suave); font-size: 13px; font-style: italic; padding: 14px; }
+
+.logo { display: block; max-width: 140px; height: auto; margin: 0 auto 16px; }
+.sub { color: var(--texto-suave); font-size: 14px; }
+[hidden] { display: none !important; }
+
+/* --- Pantalla de entrada y menú de inicio (index.html) --- */
+.login-fondo { flex: 1; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.login-caja { width: 100%; max-width: 340px; text-align: center; }
+.login-caja h2 { margin: 0 0 4px; font-size: 21px; }
+
+/* Menú de inicio: grupos con color, botones con ícono y una línea de qué hace */
+.menu-hola { font-size: 22px; font-weight: 700; color: var(--principal); margin: 4px 0 14px; }
+.menu-modulos { display: flex; flex-direction: column; gap: 22px; }
+.grupo-t { display: flex; align-items: baseline; gap: 8px; margin: 0 0 10px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--g); }
+.grupo-t::before { content: ""; width: 4px; height: 14px; border-radius: 2px; background: var(--g); align-self: center; }
+.grupo-t small { font-size: 12px; letter-spacing: 0; text-transform: none; color: var(--texto-suave); font-weight: 400; }
+.grupo-b { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.mod {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; border-radius: 14px; text-decoration: none;
+  background: var(--tarjeta); border: 1px solid #e5e7eb; color: var(--texto); box-shadow: 0 1px 2px rgba(15, 23, 42, .06);
+  transition: transform .12s, box-shadow .12s, border-color .12s;
+}
+.mod:hover { transform: translateY(-2px); border-color: var(--g); box-shadow: 0 8px 22px rgba(15, 23, 42, .12); }
+.mod:focus-visible { outline: 3px solid var(--foco); outline-offset: 2px; }
+.mod-ico { flex: none; width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center;
+  background: color-mix(in srgb, var(--g) 12%, #fff); color: var(--g); }
+.mod-ico svg { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.mod-txt { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.mod-txt b { font-size: 16px; line-height: 1.25; color: var(--texto); }
+.mod-txt > span { font-size: 13px; color: var(--texto-suave); line-height: 1.3; }
+.mod .insignia { margin: 6px 0 0; }
+@media (max-width: 600px) {
+  .menu-hola { font-size: 19px; margin-bottom: 10px; }
+  .menu-modulos { gap: 16px; }
+  .grupo-b { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .mod { flex-direction: column; align-items: flex-start; gap: 10px; padding: 14px 12px; }
+  .mod-txt b { font-size: 15px; }
+  .mod-txt > span { font-size: 12px; }
+}
+.insignia { display: block; width: fit-content; margin: 8px auto 0; padding: 3px 10px; border-radius: 12px; background: var(--alerta-fondo); color: var(--alerta); border: 1px solid #e8c766; font-size: 13px; }
+.caja-gris { background: var(--fondo); border-radius: 10px; padding: 12px; margin: 6px 0 4px; text-align: left; }
+.caja-cambiar { max-width: 380px; margin-bottom: 16px; }
+.titulo-chico { font-size: 17px; margin: 0 0 12px; color: var(--principal); }
+.mensaje.ok { color: var(--ok); }
+.enlace {background: none; border: none; color: var(--principal); text-decoration: underline; cursor: pointer; font-size: 14px; margin: 14px 0 8px; padding: 4px; }
+
+/* --- Piezas comunes de formularios y listas --- */
+.etiqueta { display: block; font-size: 14px; color: var(--texto-suave); margin: 0 0 4px; }
+.fila-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 12px; }
+.seccion { margin-top: 16px; }
+.seccion h2 { font-size: 17px; margin: 0 0 12px; color: var(--principal); }
+.aviso { border-radius: 8px; padding: 10px 12px; font-size: 14px; margin: 10px 0; }
+.aviso.alerta { background: var(--alerta-fondo); color: var(--alerta); }
+.aviso.ok { background: var(--ok-fondo); color: var(--ok); }
+.aviso.error { background: var(--error-fondo); color: var(--error); }
+.botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.etiqueta-estatus { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
