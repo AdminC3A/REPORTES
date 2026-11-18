@@ -293,25 +293,82 @@
 
   function prepararPonche() {
     const sugiere = (I.ponchePorClas || []).indexOf(R.clas) !== -1;
-    $('pon-si').classList.toggle('si', sugiere);
-    $('pon-no').classList.toggle('si', !sugiere);
-    $('pon-sugerencia').textContent = 'Por ser «' + R.clas + '», la app sugiere: ' + (sugiere ? 'SÍ amerita ponche.' : 'NO amerita ponche.') + ' Tú decides.';
-    $('pon-form').hidden = true;
+    ['pon-si', 'pon-llamada', 'pon-no'].forEach(function (id) { $(id).classList.remove('si'); });
+    $(sugiere ? 'pon-si' : 'pon-llamada').classList.add('si');
+    $('pon-sugerencia').textContent = 'Por ser «' + R.clas + '», la app sugiere: ' + (sugiere ? 'PONCHE.' : 'llamada de atención (sin ponche).') + ' Tú decides, viendo su historial.';
+    $('pon-form').hidden = true; $('llamada-form').hidden = true;
     $('listo-ponche').innerHTML = ''; $('ver-a2').hidden = true;
+    $('llamada-texto').value = R.observacion || '';
+    cargarHistorial();
   }
+  /* 📂 Historial ANTES de decidir: reportes, ponches y llamadas de atención anteriores */
+  async function cargarHistorial() {
+    $('hist-nombre').textContent = R.trabajador;
+    $('historial').innerHTML = '<p class="sub">Buscando reportes, ponches y llamadas de atención anteriores…</p>';
+    P = null;
+    try {
+      const r = await App.api('datosPoncheReporte', { obra: I.obra, codigo: R.codigo, nombre: R.trabajador, reporte: resultado ? resultado.id : '' });
+      if (!r.ok) throw new Error(r.error);
+      P = r;
+      pintarHistorial();
+    } catch (e) { $('historial').innerHTML = '<div class="aviso error">⚠ No se pudo traer su historial: ' + esc(e.message) + '</div>'; }
+  }
+  function pintarHistorial() {
+    const ponches = P.previos.filter(function (x) { return !/por autorizar/i.test(x.estatus); });
+    const pend = P.previos.length - ponches.length;
+    const items = [];
+    P.previos.forEach(function (x) { items.push({ f: x.fecha, t: '🔨 ' + (ORDINAL[x.numero] || x.numero) + ' ponche' + (/por autorizar/i.test(x.estatus) ? ' (por autorizar)' : ''), d: x.infraccion }); });
+    P.llamadas.forEach(function (x) { items.push({ f: x.fecha, t: '🗣 Llamada de atención', d: x.texto + (x.quien ? ' · ' + x.quien : '') }); });
+    const decididos = items.map(function (i) { return i.f; });   /* el reporte de un ponche o llamada ya se ve en ese renglón */
+    P.reportes.forEach(function (x) {
+      const ya = decididos.indexOf(x.fecha) !== -1;
+      if (!ya) items.push({ f: x.fecha, t: '📄 Reporte', d: x.clasificacion + (x.riesgos ? ' · ' + x.riesgos : '') });
+    });
+    items.sort(function (a, b) { return a.f < b.f ? 1 : -1; });
+    $('historial').innerHTML = '<div class="hist-cuentas">' +
+      '<div class="' + (ponches.length >= 2 ? 'rojo' : ponches.length ? 'amarillo' : '') + '"><b>' + ponches.length + '</b>ponche' + (ponches.length === 1 ? '' : 's') + (pend ? ' (+' + pend + ' por autorizar)' : '') + '</div>' +
+      '<div class="' + (P.llamadas.length ? 'amarillo' : '') + '"><b>' + P.llamadas.length + '</b>llamada' + (P.llamadas.length === 1 ? '' : 's') + ' de atención</div>' +
+      '<div><b>' + P.reportes.length + '</b>reporte' + (P.reportes.length === 1 ? '' : 's') + ' antes</div></div>' +
+      (items.length ? '<ul class="hist-lista">' + items.slice(0, 8).map(function (i) { return '<li><span class="tipo">' + esc(i.t) + '</span> · ' + esc(fechaCorta(i.f)) + '<br><span class="sub">' + esc(i.d) + '</span></li>'; }).join('') + '</ul>'
+        : '<div class="aviso ok">Sin antecedentes: es su primer reporte en esta obra.</div>');
+  }
+  $('pon-llamada').addEventListener('click', function () {
+    ['pon-si', 'pon-no'].forEach(function (id) { $(id).classList.remove('si'); }); $('pon-llamada').classList.add('si');
+    $('pon-form').hidden = true; $('llamada-form').hidden = false;
+    $('llamada-texto').focus();
+  });
+  $('llamada-guardar').addEventListener('click', async function () {
+    const b = this;
+    const texto = $('llamada-texto').value.trim();
+    if (!texto) return alert('Escribe qué se le dijo.');
+    b.disabled = true; b.textContent = 'Guardando…';
+    try {
+      const r = await App.api('llamadaDesdeReporte', { obra: I.obra, reporte: resultado.id, codigo: R.codigo, nombre: R.trabajador, empresa: R.contratista, texto: texto });
+      if (!r.ok) throw new Error(r.error);
+      $('listo-ponche').innerHTML = '<div class="aviso alerta">🗣 Llamada de atención a <b>' + esc(R.trabajador) + '</b> (' + esc(r.folio) + '). Queda en su historial; no cuenta como ponche.</div>';
+      $('msg-llamada').innerHTML = '';
+      prepararSeguimiento();
+      irPaso(6);
+    } catch (e) { $('msg-llamada').innerHTML = '<div class="aviso error">⚠ ' + esc(e.message) + '</div>'; }
+    finally { b.disabled = false; b.textContent = '🗣 Guardar llamada de atención'; }
+  });
   $('pon-no').addEventListener('click', function () {
-    $('listo-ponche').innerHTML = '<div class="aviso alerta">Sin ponche: queda sólo el reporte.</div>';
+    ['pon-si', 'pon-llamada'].forEach(function (id) { $(id).classList.remove('si'); });
+    $('listo-ponche').innerHTML = '<div class="aviso alerta">Sin ponche ni llamada de atención: queda sólo el reporte.</div>';
     prepararSeguimiento();
     irPaso(6);
   });
   $('pon-si').addEventListener('click', async function () {
-    $('pon-si').classList.add('si'); $('pon-no').classList.remove('si');
+    $('pon-si').classList.add('si'); $('pon-no').classList.remove('si'); $('pon-llamada').classList.remove('si');
+    $('llamada-form').hidden = true;
     $('pon-form').hidden = false;
     $('pon-permiso').innerHTML = '<p class="sub">Cargando la guía…</p>';
     try {
-      const r = await App.api('datosPoncheReporte', { obra: I.obra, codigo: R.codigo, nombre: R.trabajador });
-      if (!r.ok) throw new Error(r.error);
-      P = r;
+      if (!P) {
+        const r = await App.api('datosPoncheReporte', { obra: I.obra, codigo: R.codigo, nombre: R.trabajador, reporte: resultado ? resultado.id : '' });
+        if (!r.ok) throw new Error(r.error);
+        P = r;
+      }
       pintarPonche();
     } catch (e) { $('pon-permiso').innerHTML = '<div class="aviso error">⚠ ' + esc(e.message) + '</div>'; }
   });
@@ -320,10 +377,6 @@
     $('pon-permiso').innerHTML = pm.directo
       ? '<div class="aviso ok">✅ ' + (pm.siempre ? 'Puedes ponchar directo.' : 'Tienes permiso del coordinador hasta el ' + esc(fechaCorta(pm.hasta)) + '.') + ' El ponche queda firme al guardar.</div>'
       : '<div class="aviso alerta">⏳ No tienes permiso para ponchar sin autorización: el ponche le llega al coordinador para que lo autorice. Mientras, no cuenta en la puerta.</div>';
-    const prev = P.previos.filter(function (x) { return !/por autorizar/i.test(x.estatus); });
-    $('pon-historial').innerHTML = '<div class="aviso ' + (prev.length >= 2 ? 'error' : prev.length ? 'alerta' : 'ok') + ' historial"><b>' + esc(R.trabajador) + '</b>: ' +
-      prev.length + (prev.length === 1 ? ' ponche' : ' ponches') + ' antes en esta obra.' +
-      (P.previos.length ? '<br>' + P.previos.map(function (x) { return esc((ORDINAL[x.numero] || x.numero) + ' · ' + fechaCorta(x.fecha) + ' · ' + x.infraccion + (/por autorizar/i.test(x.estatus) ? ' (por autorizar)' : '')); }).join('<br>') : '') + '</div>';
     const grupos = ['Leve', 'Grave', 'Muy grave'];
     $('pon-falta').innerHTML = '<option value="">Elige la falta…</option>' + grupos.map(function (g) {
       const items = P.infracciones.filter(function (x) { return x.nivel.toLowerCase() === g.toLowerCase(); });

@@ -4,7 +4,7 @@
 //  La sesión se guarda en este teléfono hasta tocar «Salir».
 // ============================================================================
 (function () {
-  const VERSION = '2026.11.17-3';
+  const VERSION = '2026.11.17-4';
   const LLAVE = 'rep_token', LLAVE_SESION = 'rep_sesion';
 
   function leer(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
