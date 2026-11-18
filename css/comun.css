@@ -158,3 +158,4 @@ body {
 .aviso.error { background: var(--error-fondo); color: var(--error); }
 .botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .etiqueta-estatus { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+textarea.campo { font-family: inherit; resize: vertical; }

@@ -53,7 +53,7 @@
 
   // ------------------------------------------------------------------ pasos
   function irPaso(n) {
-    for (let i = 1; i <= 5; i++) $('p' + i).hidden = i !== n;
+    for (let i = 1; i <= 6; i++) $('p' + i).hidden = i !== n;
     document.querySelectorAll('.pasos li').forEach(function (li) {
       const p = Number(li.getAttribute('data-p'));
       li.className = p < n ? 'hecho' : (p === n ? 'activo' : '');
@@ -233,6 +233,7 @@
       resultado = r;
       $('listo-texto').textContent = 'Quedó en la bitácora de seguridad de ' + I.obra + ' (pestaña ' + r.id.replace('!', ', renglón ') + ') y el PDF en la carpeta de la app en Drive.';
       $('ver-pdf').href = r.pdf;
+      prepararPonche();
       irPaso(5);
     } catch (e) {
       $('msg-guardar').innerHTML = '<div class="aviso error">⚠ No se guardó: ' + esc(e.message) + '. Tus datos siguen aquí; vuelve a tocar «Guardar».</div>';
@@ -244,12 +245,169 @@
     window.open('https://wa.me/?text=' + encodeURIComponent(t), '_blank');
   });
   $('nuevo').addEventListener('click', function () {
-    R = nuevo(); resultado = null;
+    R = nuevo(); resultado = null; P = null;
+    ['pon-lugar', 'pon-actividad', 'pon-descripcion', 'pon-norma', 'pon-medidas', 'pon-recom'].forEach(function (id) { $(id).value = ''; delete $(id).dataset.editado; });
     $('observacion').value = ''; $('detalle-otros').value = ''; $('detalle-clas').value = '';
     pintarFotos(); pintarRiesgos(); pintarClasificaciones();
     irPaso(1);
   });
   pintarFotos();
+
+  // ------------------------------------------------------------ 5 · ¿Amerita ponche?
+  /* La clasificación sugiere la respuesta (⚙ Configuración › Seguridad); el supervisor decide.
+   * Con permiso del coordinador (o si es ADMIN / coordinador) el ponche queda firme;
+   * sin permiso queda «por autorizar» en la bandeja del coordinador. */
+  const ORDINAL = { 1: '1er', 2: '2º', 3: '3er' };
+  let P = null;   /* datos del ponche: guía, medidas, ponches anteriores, permiso */
+  function prepararPonche() {
+    const sugiere = (I.ponchePorClas || []).indexOf(R.clas) !== -1;
+    $('pon-si').classList.toggle('si', sugiere);
+    $('pon-no').classList.toggle('si', !sugiere);
+    $('pon-sugerencia').textContent = 'Por ser «' + R.clas + '», la app sugiere: ' + (sugiere ? 'SÍ amerita ponche.' : 'NO amerita ponche.') + ' Tú decides.';
+    $('pon-form').hidden = true;
+    $('listo-ponche').innerHTML = ''; $('ver-a2').hidden = true;
+  }
+  $('pon-no').addEventListener('click', function () {
+    $('listo-ponche').innerHTML = '<div class="aviso alerta">Sin ponche: queda sólo el reporte.</div>';
+    irPaso(6);
+  });
+  $('pon-si').addEventListener('click', async function () {
+    $('pon-si').classList.add('si'); $('pon-no').classList.remove('si');
+    $('pon-form').hidden = false;
+    $('pon-permiso').innerHTML = '<p class="sub">Cargando la guía…</p>';
+    try {
+      const r = await App.api('datosPoncheReporte', { obra: I.obra, codigo: R.codigo, nombre: R.trabajador });
+      if (!r.ok) throw new Error(r.error);
+      P = r;
+      pintarPonche();
+    } catch (e) { $('pon-permiso').innerHTML = '<div class="aviso error">⚠ ' + esc(e.message) + '</div>'; }
+  });
+  function pintarPonche() {
+    const pm = P.permiso;
+    $('pon-permiso').innerHTML = pm.directo
+      ? '<div class="aviso ok">✅ ' + (pm.siempre ? 'Puedes ponchar directo.' : 'Tienes permiso del coordinador hasta el ' + esc(fechaCorta(pm.hasta)) + '.') + ' El ponche queda firme al guardar.</div>'
+      : '<div class="aviso alerta">⏳ No tienes permiso para ponchar sin autorización: el ponche le llega al coordinador para que lo autorice. Mientras, no cuenta en la puerta.</div>';
+    const prev = P.previos.filter(function (x) { return !/por autorizar/i.test(x.estatus); });
+    $('pon-historial').innerHTML = '<div class="aviso ' + (prev.length >= 2 ? 'error' : prev.length ? 'alerta' : 'ok') + ' historial"><b>' + esc(R.trabajador) + '</b>: ' +
+      prev.length + (prev.length === 1 ? ' ponche' : ' ponches') + ' antes en esta obra.' +
+      (P.previos.length ? '<br>' + P.previos.map(function (x) { return esc((ORDINAL[x.numero] || x.numero) + ' · ' + fechaCorta(x.fecha) + ' · ' + x.infraccion + (/por autorizar/i.test(x.estatus) ? ' (por autorizar)' : '')); }).join('<br>') : '') + '</div>';
+    const grupos = ['Leve', 'Grave', 'Muy grave'];
+    $('pon-falta').innerHTML = '<option value="">Elige la falta…</option>' + grupos.map(function (g) {
+      const items = P.infracciones.filter(function (x) { return x.nivel.toLowerCase() === g.toLowerCase(); });
+      return items.length ? '<optgroup label="' + g + '">' + items.map(function (x) { return '<option value="' + esc(x.texto) + '" data-nivel="' + g + '">' + esc(x.texto) + '</option>'; }).join('') + '</optgroup>' : '';
+    }).join('');
+    P.numero = 0;
+    pintarNumero();
+    if (!$('pon-descripcion').value) $('pon-descripcion').value = [R.riesgos.join(', ') + (R.otros ? ' (' + R.otros + ')' : ''), R.observacion].filter(Boolean).join('. ');
+  }
+  function nivel() { const o = $('pon-falta').selectedOptions[0]; return o ? o.getAttribute('data-nivel') || '' : ''; }
+  function pintarNumero() {
+    $('pon-numero').innerHTML = [1, 2, 3].map(function (n) {
+      return '<button type="button" class="opcion nivel-' + n + (P.numero === n ? ' si' : '') + '" data-num="' + n + '">' + ORDINAL[n] + '<small>' + esc((P.medidas[n] || '').replace(/\s*\(.*\)$/, '')) + '</small></button>';
+    }).join('');
+    $('pon-numero').querySelectorAll('[data-num]').forEach(function (b) {
+      b.addEventListener('click', function () { P.numero = Number(b.getAttribute('data-num')); P.tocoNumero = true; pintarNumero(); ponerMedida(); });
+    });
+  }
+  function ponerMedida() { if (!$('pon-medidas').dataset.editado) $('pon-medidas').value = P.medidas[P.numero] || ''; }
+  $('pon-medidas').addEventListener('input', function () { this.dataset.editado = '1'; });
+  $('pon-falta').addEventListener('change', function () {
+    const nv = nivel();
+    if (!nv) { $('pon-recomienda').textContent = ''; return; }
+    const porFalta = { 'leve': 1, 'grave': 2, 'muy grave': 3 }[nv.toLowerCase()] || 1;
+    const prev = P.previos.filter(function (x) { return !/por autorizar/i.test(x.estatus); }).length;
+    const sug = Math.min(3, Math.max(porFalta, prev + 1));
+    $('pon-recomienda').innerHTML = 'Se recomienda: <b>' + ORDINAL[sug] + ' ponche</b> (falta ' + esc(nv.toLowerCase()) + (sug > porFalta ? ' y por reincidencia' : '') + ').';
+    if (!P.tocoNumero) { P.numero = sug; pintarNumero(); ponerMedida(); }
+  });
+  $('pon-guardar').addEventListener('click', async function () {
+    const b = this;
+    if (!$('pon-falta').value) return alert('Elige la falta de la guía.');
+    if (!P.numero) return alert('Elige el número de ponche.');
+    const datos = {
+      obra: I.obra, reporte: resultado.id, codigo: R.codigo, nombre: R.trabajador, empresa: R.contratista,
+      infraccion: $('pon-falta').value, clasificacion: nivel(), numero: P.numero,
+      lugar: $('pon-lugar').value.trim(), tipoActividad: $('pon-actividad').value.trim(), descripcion: $('pon-descripcion').value.trim(),
+      norma: $('pon-norma').value.trim(), medidas: $('pon-medidas').value.trim(), recomendaciones: $('pon-recom').value.trim()
+    };
+    b.disabled = true; b.textContent = 'Guardando…';
+    $('msg-ponche').innerHTML = '<div class="aviso alerta">⏳ Armando el Formato A2 y guardando…</div>';
+    try {
+      datos.pdf = armarA2(datos);
+      const r = await App.api('poncheDesdeReporte', datos);
+      if (!r.ok) throw new Error(r.error);
+      $('listo-ponche').innerHTML = r.estatus === 'Vigente'
+        ? '<div class="aviso ok">🔨 ' + ORDINAL[P.numero] + ' ponche a <b>' + esc(R.trabajador) + '</b> (' + esc(r.folio) + '). Ya cuenta en la puerta y se avisó al coordinador.</div>'
+        : '<div class="aviso alerta">⏳ ' + ORDINAL[P.numero] + ' ponche a <b>' + esc(R.trabajador) + '</b> (' + esc(r.folio) + ') <b>por autorizar</b>: le llegó al coordinador.</div>';
+      $('ver-a2').hidden = !r.a2; if (r.a2) $('ver-a2').href = r.a2;
+      $('msg-ponche').innerHTML = '';
+      irPaso(6);
+    } catch (e) {
+      $('msg-ponche').innerHTML = '<div class="aviso error">⚠ No se guardó el ponche: ' + esc(e.message) + '. Vuelve a intentar.</div>';
+    } finally { b.disabled = false; b.textContent = '🔨 Guardar ponche'; }
+  });
+  function fechaCorta(iso) { const m = String(iso || '').match(/^(\d{4})-(\d{2})-(\d{2})/); return m ? m[3] + '/' + m[2] + '/' + m[1] : String(iso || ''); }
+
+  /* Formato A2 (Anexo A2) en PDF, para firmas: supervisor, trabajador y contratista */
+  function armarA2(x) {
+    const jsPDF = window.jspdf && window.jspdf.jsPDF;
+    if (!jsPDF) throw new Error('No cargó el armador de PDF (revisa tu internet)');
+    const doc = new jsPDF({ unit: 'mm', format: 'letter' });
+    const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
+    const logo = I.logoObra || logoApp;
+    if (logo) { try { const p = doc.getImageProperties(logo); doc.addImage(logo, 14, 10, Math.min(40, 16 * p.width / p.height), 16); } catch (e) {} }
+    doc.setTextColor('#16325c').setFontSize(14).text('Formato de reporte de incidentes y ponchado', W - 14, 15, { align: 'right' });
+    doc.setFontSize(9).setTextColor('#4b5563').text('Anexo A2 · Obra ' + I.obra + ' · Reporte ' + resultado.id, W - 14, 21, { align: 'right' });
+    const linea = function (t) { return t || '_______________________________________________'; };
+    const marca = function (si, t) { return (si ? '[X] ' : '[  ] ') + t; };
+    const nv = String(x.clasificacion || '').toLowerCase();
+    const tabla = function (titulo, filas, y) {
+      doc.autoTable({ startY: y, head: [[titulo, '']], body: filas, theme: 'grid', headStyles: { fillColor: [22, 50, 92] },
+        columnStyles: { 0: { cellWidth: 62, fontStyle: 'bold' } }, styles: { fontSize: 9, cellPadding: 2 } });
+      return doc.lastAutoTable.finalY + 4;
+    };
+    let y = 30;
+    y = tabla('Datos generales', [
+      ['Fecha y hora del incidente', new Date().toLocaleString('es-MX')],
+      ['Lugar / frente de trabajo', linea(x.lugar)],
+      ['Nombre del trabajador', x.nombre],
+      ['Número de gafete o credencial', x.codigo || linea('')],
+      ['Empresa o contratista', x.empresa]
+    ], y);
+    y = tabla('Descripción de la incidencia', [
+      ['Tipo de actividad', linea(x.tipoActividad)],
+      ['Descripción de los hechos', x.descripcion || linea('')],
+      ['Clasificación del reporte', R.clas + ' · Riesgos: ' + R.riesgos.join(', ')],
+      ['Falta según la guía (Anexo A4)', x.infraccion],
+      ['Norma o procedimiento infringido', linea(x.norma)],
+      ['Clasificación de la falta', [marca(nv === 'leve', 'Leve'), marca(nv === 'grave', 'Grave'), marca(nv === 'muy grave', 'Muy grave')].join('    ')],
+      ['Número de perforación aplicada', [1, 2, 3].map(function (n) { return marca(x.numero === n, ORDINAL[n]); }).join('    ') + '   ' + (P.medidas[x.numero] || '')]
+    ], y);
+    y = tabla('Medidas inmediatas y correctivas', [
+      ['Acciones tomadas en el momento', x.medidas || linea('')],
+      ['Recomendaciones o medidas preventivas', x.recomendaciones || linea('')]
+    ], y);
+    if (R.fotos[0]) {
+      const f = R.fotos[0], h = Math.min(34, 70 * f.h / f.w), w = h * f.w / f.h;
+      if (y + h + 62 > H) { doc.addPage(); y = 16; }
+      doc.setFontSize(10).setTextColor('#16325c').text('Evidencia fotográfica', 14, y + 3);
+      doc.addImage(f.url, 'JPEG', 14, y + 5, w, h); y += h + 10;
+    }
+    if (y > H - 52) { doc.addPage(); y = 16; }
+    doc.setFontSize(10).setTextColor('#16325c').text('Descargo del trabajador', 14, y + 3);
+    doc.setDrawColor('#9aa3af');
+    for (let i = 0; i < 2; i++) doc.line(14, y + 11 + i * 7, W - 14, y + 11 + i * 7);
+    y += 34;
+    const col = (W - 28) / 3;
+    [['Supervisor(a) de Seguridad', I.usuario], ['Trabajador afectado', x.nombre], ['Representante del contratista', x.empresa]].forEach(function (f, i) {
+      const cx = 14 + i * col;
+      doc.line(cx + 4, y, cx + col - 4, y);
+      doc.setFontSize(8).setTextColor('#111827').text(f[0], cx + col / 2, y + 4, { align: 'center' });
+      doc.setTextColor('#4b5563').text(String(f[1] || ''), cx + col / 2, y + 8, { align: 'center', maxWidth: col - 6 });
+    });
+    doc.setFontSize(8).setTextColor('#9aa3af').text('Este documento debe archivarse y remitirse al contratista y a la Comisión de Seguridad para su seguimiento.', 14, H - 8);
+    return 'data:application/pdf;base64,' + doc.output('datauristring').split(',')[1];
+  }
 
   // ------------------------------------------------------------ PDF
   function armarPDF() {

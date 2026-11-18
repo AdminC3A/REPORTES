@@ -67,7 +67,14 @@
 .modal-caja { background: #fff; border-radius: 16px; padding: 18px; max-width: 380px; width: 100%; text-align: center; box-shadow: var(--sombra); }
 .modal-caja h2 { color: var(--error); margin-top: 0; }
 
+/* Ponche */
+.opciones.tres { grid-template-columns: repeat(3, 1fr); }
+.opcion.nivel-1.si { border-color: #b45309; background: #fff4d6; color: #92400e; }
+.opcion.nivel-2.si { border-color: #c2410c; background: #ffedd5; color: #9a3412; }
+.opcion.nivel-3.si { border-color: #b42318; background: #fdecea; color: #b42318; }
+.historial { margin: 0 0 10px; }
+
 @media (max-width: 420px) {
-  .opciones { grid-template-columns: 1fr; }
+  .opciones:not(.tres) { grid-template-columns: 1fr; }
   .cab-rep h1 { font-size: 15px; }
 }
