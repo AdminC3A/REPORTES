@@ -95,17 +95,27 @@
     <section id="p5" class="paso" hidden>
       <div class="tarjeta">
         <div class="aviso ok">✅ Reporte guardado en la bitácora.</div>
+        <h2>📂 Historial de <span id="hist-nombre"></span></h2>
+        <div id="historial"><p class="sub">Buscando reportes, ponches y llamadas de atención anteriores…</p></div>
         <h2>🔨 ¿Amerita PONCHE?</h2>
-        <div class="opciones">
-          <button type="button" class="opcion" id="pon-si">Sí<small>se llena su Formato A2</small></button>
-          <button type="button" class="opcion" id="pon-no">No<small>queda sólo el reporte</small></button>
+        <div class="opciones tres">
+          <button type="button" class="opcion" id="pon-si">🔨 Ponche<small>se llena su Formato A2</small></button>
+          <button type="button" class="opcion" id="pon-llamada">🗣 Llamada de atención<small>retroalimentación, sin ponche</small></button>
+          <button type="button" class="opcion" id="pon-no">✖ Sólo el reporte<small>sin ponche ni llamada</small></button>
         </div>
         <p id="pon-sugerencia" class="sub"></p>
+      </div>
+      <!-- 🗣 Llamada de atención -->
+      <div id="llamada-form" class="tarjeta" hidden>
+        <h2>🗣 Llamada de atención / retroalimentación</h2>
+        <label class="etiqueta" for="llamada-texto">¿Qué se le dijo? (queda en su historial)</label>
+        <textarea id="llamada-texto" class="campo" rows="4" maxlength="1000"></textarea>
+        <div id="msg-llamada"></div>
+        <button id="llamada-guardar" class="boton grande ancho" type="button">🗣 Guardar llamada de atención</button>
       </div>
       <div id="pon-form" hidden>
         <div class="tarjeta">
           <div id="pon-permiso"></div>
-          <div id="pon-historial"></div>
           <label class="etiqueta" for="pon-falta">Falta según la guía (Anexo A4)</label>
           <select id="pon-falta" class="campo"></select>
           <label class="etiqueta">Número de ponche (perforación)</label>
