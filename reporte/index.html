@@ -11,7 +11,8 @@
 <body>
   <header class="encabezado cab-rep">
     <div class="logos"><img src="../img/logo.png" alt="" class="logo-app"><img id="logo-obra" alt="" class="logo-obra" hidden></div>
-    <div class="cab-texto"><h1>🦺 Reporte de seguridad</h1><span id="quien" class="quien"></span></div>
+    <div class="cab-texto"><h1>🦺 Reporte</h1><span id="quien" class="quien"></span></div>
+    <a class="boton chico secundario" href="../seguimientos/index.html" title="Seguimientos">📋</a>
     <button id="salir" class="boton chico secundario" type="button">Salir</button>
   </header>
 
@@ -138,10 +139,35 @@
         <h2>Reporte guardado</h2>
         <p id="listo-texto" class="sub"></p>
         <div id="listo-ponche"></div>
+      </div>
+      <!-- 📋 ¿Necesita seguimiento? -->
+      <div class="tarjeta" id="seg-caja">
+        <h2>📋 ¿Necesita SEGUIMIENTO hasta su corrección?</h2>
+        <p class="sub">Se le manda al responsable de la contratista una liga con la copia del reporte para que envíe la foto cuando lo corrija.</p>
+        <div class="opciones">
+          <button type="button" class="opcion" id="seg-si">Sí<small>mandar al responsable</small></button>
+          <button type="button" class="opcion" id="seg-no">No<small>no hace falta</small></button>
+        </div>
+        <div id="seg-form" hidden>
+          <label class="etiqueta" for="seg-asunto">¿Qué tiene que corregir?</label>
+          <textarea id="seg-asunto" class="campo" rows="3" maxlength="600"></textarea>
+          <label class="etiqueta" for="seg-resp">Responsable de la contratista</label>
+          <input id="seg-resp" class="campo" maxlength="120" placeholder="Nombre">
+          <label class="etiqueta" for="seg-correo">Correo</label>
+          <input id="seg-correo" class="campo" type="email" placeholder="correo@contratista.com">
+          <label class="etiqueta" for="seg-wa">WhatsApp (10 dígitos)</label>
+          <input id="seg-wa" class="campo" type="tel" inputmode="tel" placeholder="624 123 4567">
+          <p class="sub" id="seg-nota"></p>
+          <button id="seg-enviar" class="boton ancho" type="button">📨 Enviar seguimiento</button>
+        </div>
+        <div id="seg-res"></div>
+      </div>
+      <div class="tarjeta listo">
         <div class="botones col">
           <a id="ver-pdf" class="boton secundario" target="_blank" rel="noopener">📄 Ver el PDF del reporte</a>
           <a id="ver-a2" class="boton secundario" target="_blank" rel="noopener" hidden>📄 Ver el Formato A2</a>
-          <button id="compartir" class="boton secundario" type="button">📲 Mandar por WhatsApp</button>
+          <button id="compartir" class="boton secundario" type="button">📲 Mandar el reporte por WhatsApp</button>
+          <a class="boton secundario" href="../seguimientos/index.html">📋 Ver mis seguimientos</a>
           <button id="nuevo" class="boton grande" type="button">➕ Nuevo reporte</button>
         </div>
       </div>

@@ -1,0 +1,13 @@
+/* Página pública: el responsable de la contratista manda la foto de la corrección */
+.cab-at { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+.cab-at .logos { display: flex; gap: 6px; background: #fff; border-radius: 10px; padding: 4px 6px; }
+.cab-at .logos img { height: 30px; max-width: 64px; object-fit: contain; }
+.cab-at h1 { font-size: 17px; margin: 0; }
+.aviso-grande { border: 3px solid var(--alerta); }
+.aviso-grande h2 { color: var(--alerta); margin-top: 0; }
+.asunto { font-size: 18px; font-weight: bold; white-space: pre-line; background: var(--alerta-fondo); border-radius: 10px; padding: 10px 12px; }
+.ancho { width: 100%; text-align: center; text-decoration: none; display: block; margin-top: 10px; }
+.vista { width: 100%; max-height: 50vh; object-fit: contain; border-radius: 12px; background: #000; margin-bottom: 10px; }
+.botones .boton { flex: 1 1 45%; }
+.gracias { text-align: center; }
+.palomita { font-size: 56px; }

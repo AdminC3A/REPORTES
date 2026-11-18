@@ -259,6 +259,38 @@
    * sin permiso queda «por autorizar» en la bandeja del coordinador. */
   const ORDINAL = { 1: '1er', 2: '2º', 3: '3er' };
   let P = null;   /* datos del ponche: guía, medidas, ponches anteriores, permiso */
+  function prepararSeguimiento() {
+    $('seg-si').classList.remove('si'); $('seg-no').classList.remove('si');
+    $('seg-form').hidden = true; $('seg-res').innerHTML = ''; $('seg-caja').hidden = false;
+    const c = (I.contactos || {})[R.contratista] || {};
+    $('seg-asunto').value = R.clas + ': ' + R.riesgos.join(', ') + (R.otros ? ' (' + R.otros + ')' : '') + (R.observacion ? '. ' + R.observacion : '');
+    $('seg-resp').value = c.responsable || ''; $('seg-correo').value = c.correo || ''; $('seg-wa').value = c.whatsapp ? c.whatsapp.replace(/^52/, '') : '';
+    $('seg-nota').textContent = c.correo || c.whatsapp ? 'Datos de ⚙ Empresas. Los puedes cambiar sólo para este envío.' : '⚠ ' + R.contratista + ' no tiene correo ni WhatsApp en ⚙ Empresas: escríbelos aquí o copia la liga para mandarla a mano.';
+  }
+  $('seg-no').addEventListener('click', function () { $('seg-no').classList.add('si'); $('seg-si').classList.remove('si'); $('seg-form').hidden = true; $('seg-res').innerHTML = '<div class="aviso alerta">Sin seguimiento.</div>'; });
+  $('seg-si').addEventListener('click', function () { $('seg-si').classList.add('si'); $('seg-no').classList.remove('si'); $('seg-form').hidden = false; $('seg-res').innerHTML = ''; });
+  $('seg-enviar').addEventListener('click', async function () {
+    const b = this;
+    if (!$('seg-asunto').value.trim()) return alert('Escribe qué tiene que corregir.');
+    b.disabled = true; b.textContent = 'Enviando…';
+    try {
+      const r = await App.api('crearSeguimiento', { obra: I.obra, reporte: resultado.id, asunto: $('seg-asunto').value.trim(),
+        responsable: $('seg-resp').value.trim(), correo: $('seg-correo').value.trim(), whatsapp: $('seg-wa').value.trim() });
+      if (!r.ok) throw new Error(r.error);
+      $('seg-form').hidden = true;
+      $('seg-res').innerHTML = '<div class="aviso ok">✅ Seguimiento enviado' + (r.correo ? ': le llegó un correo a ' + esc(r.correo) : '') + '.</div>' +
+        '<div class="botones col">' + (r.whatsapp ? '<a class="boton" target="_blank" rel="noopener" href="https://wa.me/' + esc(r.whatsapp) + '?text=' + encodeURIComponent(r.mensaje) + '">📲 Mandar por WhatsApp</a>' : '') +
+        '<button class="boton secundario" type="button" id="seg-copiar">📋 Copiar la liga</button></div>';
+      $('seg-copiar').addEventListener('click', function () {
+        const t = r.mensaje;
+        (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () { $('seg-copiar').textContent = '✅ Copiado'; })
+          .catch(function () { prompt('Copia el mensaje:', r.liga); });
+      });
+      if (!r.correo && !r.whatsapp) $('seg-res').insertAdjacentHTML('afterbegin', '<div class="aviso alerta">⚠ No hay correo ni WhatsApp: copia la liga y mándala a mano.</div>');
+    } catch (e) { $('seg-res').innerHTML = '<div class="aviso error">⚠ ' + esc(e.message) + '</div>'; }
+    finally { b.disabled = false; b.textContent = '📨 Enviar seguimiento'; }
+  });
+
   function prepararPonche() {
     const sugiere = (I.ponchePorClas || []).indexOf(R.clas) !== -1;
     $('pon-si').classList.toggle('si', sugiere);
@@ -269,6 +301,7 @@
   }
   $('pon-no').addEventListener('click', function () {
     $('listo-ponche').innerHTML = '<div class="aviso alerta">Sin ponche: queda sólo el reporte.</div>';
+    prepararSeguimiento();
     irPaso(6);
   });
   $('pon-si').addEventListener('click', async function () {
@@ -341,6 +374,7 @@
         : '<div class="aviso alerta">⏳ ' + ORDINAL[P.numero] + ' ponche a <b>' + esc(R.trabajador) + '</b> (' + esc(r.folio) + ') <b>por autorizar</b>: le llegó al coordinador.</div>';
       $('ver-a2').hidden = !r.a2; if (r.a2) $('ver-a2').href = r.a2;
       $('msg-ponche').innerHTML = '';
+      prepararSeguimiento();
       irPaso(6);
     } catch (e) {
       $('msg-ponche').innerHTML = '<div class="aviso error">⚠ No se guardó el ponche: ' + esc(e.message) + '. Vuelve a intentar.</div>';

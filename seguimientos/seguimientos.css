@@ -1,0 +1,23 @@
+/* Módulo: 📋 Seguimientos (quien reportó revisa la foto de la corrección) */
+.cab-seg { display: flex; align-items: center; gap: 10px; padding: 10px 14px; }
+.cab-seg .logo-app { height: 30px; background: #fff; border-radius: 8px; padding: 3px 5px; }
+.cab-seg h1 { flex: 1; font-size: 17px; margin: 0; }
+.filtros { display: flex; gap: 6px; margin-bottom: 12px; }
+.filtro { flex: 1; border: 2px solid var(--borde); background: #fff; border-radius: 20px; padding: 9px 6px; font-weight: bold; font-size: 14px; cursor: pointer; }
+.filtro.activo { background: var(--principal); border-color: var(--principal); color: #fff; }
+.filtro b { display: inline-block; min-width: 20px; }
+.seg { margin-bottom: 12px; }
+.seg .arriba { display: flex; justify-content: space-between; gap: 8px; align-items: flex-start; }
+.seg .nom { font-size: 17px; font-weight: bold; margin: 0; }
+.seg .dato { font-size: 14px; color: var(--texto-suave); margin: 3px 0; }
+.seg .asunto { margin: 8px 0; white-space: pre-line; }
+.estado { font-size: 12px; font-weight: bold; border-radius: 10px; padding: 3px 9px; white-space: nowrap; }
+.estado.Enviado, .estado.Repetir { background: var(--alerta-fondo); color: var(--alerta); }
+.estado.Foto { background: #e0ecff; color: #1d4ed8; }
+.estado.Cerrado { background: var(--ok-fondo); color: var(--ok); }
+.fotos-ab { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 8px 0; }
+.fotos-ab a { display: block; text-align: center; border: 2px solid var(--borde); border-radius: 10px; padding: 12px 6px; text-decoration: none; color: var(--principal); font-weight: bold; }
+.seg .botones .boton { flex: 1 1 45%; }
+.boton.si { background: var(--ok); border-color: var(--ok); }
+.boton.no { background: #fff; color: var(--error); border: 2px solid var(--error); box-shadow: none; }
+.vacio { text-align: center; color: var(--texto-suave); margin: 30px 0; font-size: 17px; }

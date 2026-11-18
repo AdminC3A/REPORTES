@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Seguimientos</title>
+  <link rel="icon" href="../img/favicon.png">
+  <link rel="stylesheet" href="../css/comun.css">
+  <link rel="stylesheet" href="seguimientos.css">
+</head>
+<body>
+  <header class="encabezado cab-seg">
+    <img src="../img/logo.png" alt="" class="logo-app">
+    <h1>📋 Seguimientos</h1>
+    <a class="boton chico secundario" href="../reporte/index.html">➕ Reporte</a>
+  </header>
+  <main class="contenido">
+    <p id="cargando" class="sub">Cargando…</p>
+    <div id="filtros" class="filtros" hidden>
+      <button type="button" class="filtro activo" data-f="pend">Por revisar</button>
+      <button type="button" class="filtro" data-f="esp">Esperando foto</button>
+      <button type="button" class="filtro" data-f="cerr">Cerrados</button>
+    </div>
+    <div id="msg"></div>
+    <div id="lista"></div>
+  </main>
+  <footer class="pie"></footer>
+  <script src="../config.js"></script>
+  <script src="../js/comun.js"></script>
+  <script src="seguimientos.js"></script>
+</body>
+</html>
