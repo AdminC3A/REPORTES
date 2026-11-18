@@ -6,7 +6,7 @@
   const $ = function (id) { return document.getElementById(id); };
   const esc = App.esc;
   const t = new URLSearchParams(location.search).get('t') || '';
-  let foto = '';
+  let fotos = [];
   cargar();
 
   async function cargar() {
@@ -26,7 +26,17 @@
   }
   $('b-camara').addEventListener('click', function () { $('in-camara').value = ''; $('in-camara').click(); });
   $('b-galeria').addEventListener('click', function () { $('in-galeria').value = ''; $('in-galeria').click(); });
-  ['in-camara', 'in-galeria'].forEach(function (id) { $(id).addEventListener('change', function () { if (this.files[0]) reducir(this.files[0]); }); });
+  ['in-camara', 'in-galeria'].forEach(function (id) {
+    $(id).addEventListener('change', function () {
+      Array.from(this.files || []).forEach(function (f) { if (fotos.length < 6) reducir(f); else alert('Máximo 6 fotos.'); });
+    });
+  });
+  function pintar() {
+    $('vistas').innerHTML = fotos.map(function (f, i) { return '<div class="v"><img src="' + f + '" alt=""><button type="button" data-q="' + i + '" aria-label="Quitar">✕</button></div>'; }).join('');
+    $('vistas').querySelectorAll('[data-q]').forEach(function (b) { b.addEventListener('click', function () { fotos.splice(Number(b.getAttribute('data-q')), 1); pintar(); }); });
+    $('enviar').disabled = !fotos.length;
+    $('enviar').textContent = fotos.length > 1 ? 'Enviar ' + fotos.length + ' fotos' : 'Enviar foto';
+  }
   function reducir(file) {
     const lector = new FileReader();
     lector.onload = function () {
@@ -36,8 +46,8 @@
         const c = document.createElement('canvas');
         c.width = Math.round(img.width * k); c.height = Math.round(img.height * k);
         const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(img, 0, 0, c.width, c.height);
-        foto = c.toDataURL('image/jpeg', 0.8);
-        $('vista').src = foto; $('vista').hidden = false; $('enviar').disabled = false;
+        if (fotos.length < 6) fotos.push(c.toDataURL('image/jpeg', 0.8));
+        pintar();
       };
       img.src = lector.result;
     };
@@ -45,13 +55,13 @@
   }
   $('enviar').addEventListener('click', async function () {
     const b = this;
-    if (!foto) return;
+    if (!fotos.length) return;
     b.disabled = true; b.textContent = 'Enviando…';
     try {
-      const r = await App.api('seguimientoFoto', { t: t, foto: foto, nota: $('nota').value.trim() });
+      const r = await App.api('seguimientoFoto', { t: t, fotos: fotos, nota: $('nota').value.trim() });
       if (!r.ok) throw new Error(r.error);
       $('subir').hidden = true; $('gracias').hidden = false;
       window.scrollTo(0, 0);
-    } catch (e) { $('msg').innerHTML = '<div class="aviso error">⚠ ' + esc(e.message) + '</div>'; b.disabled = false; b.textContent = 'Enviar foto'; }
+    } catch (e) { $('msg').innerHTML = '<div class="aviso error">⚠ ' + esc(e.message) + '</div>'; b.disabled = false; pintar(); }
   });
 })();

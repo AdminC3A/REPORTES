@@ -44,7 +44,7 @@
         '<p class="asunto">' + esc(x.asunto) + '</p>' +
         '<p class="dato">Responsable: ' + esc(x.responsable || '—') + (x.correo ? ' · ' + esc(x.correo) : '') + (x.whatsapp ? ' · 📲 ' + esc(x.whatsapp) : '') + ' · reportó ' + esc(x.creo) + '</p>' +
         '<div class="fotos-ab"><a href="' + esc(x.pdf) + '" target="_blank" rel="noopener">📄 Antes (reporte)</a>' +
-        (x.foto ? '<a href="' + esc(x.foto) + '" target="_blank" rel="noopener">📸 Después (' + esc(fecha(x.fechaFoto)) + ')</a>' : '<a aria-disabled="true">⏳ Sin foto todavía</a>') + '</div>' +
+        (x.foto ? x.foto.split(/\s+/).filter(Boolean).map(function (u, k, arr) { return '<a href="' + esc(u) + '" target="_blank" rel="noopener">📸 Después' + (arr.length > 1 ? ' ' + (k + 1) : '') + ' (' + esc(fecha(x.fechaFoto)) + ')</a>'; }).join('') : '<a aria-disabled="true">⏳ Sin foto todavía</a>') + '</div>' +
         (x.notaResp ? '<p class="dato">💬 Responsable: ' + esc(x.notaResp) + '</p>' : '') +
         (x.notaRev ? '<p class="dato">↩ Revisión: ' + esc(x.notaRev) + ' (' + esc(x.reviso) + ')</p>' : '') +
         (x.estado === 'Foto recibida' ? '<div class="botones"><button class="boton si" type="button" data-cerrar="' + i + '">✅ Corregido</button><button class="boton no" type="button" data-repetir="' + i + '">↩ Repetir</button></div>' : '') +
