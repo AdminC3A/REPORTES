@@ -24,6 +24,7 @@
       <li data-p="2"><span>2</span>Evidencia</li>
       <li data-p="3"><span>3</span>Infractor</li>
       <li data-p="4"><span>4</span>Guardar</li>
+      <li data-p="5"><span>5</span>Ponche</li>
     </ol>
 
     <div id="caja-obra" class="tarjeta fila-obra" hidden>
@@ -89,14 +90,57 @@
       <div class="navegar"><button class="boton secundario" data-ir="3" type="button">◀ Atrás</button><button class="boton grande" id="guardar" type="button">💾 Guardar reporte</button></div>
     </section>
 
-    <!-- ✅ Listo -->
+    <!-- 5 · ¿Amerita ponche? -->
     <section id="p5" class="paso" hidden>
+      <div class="tarjeta">
+        <div class="aviso ok">✅ Reporte guardado en la bitácora.</div>
+        <h2>🔨 ¿Amerita PONCHE?</h2>
+        <div class="opciones">
+          <button type="button" class="opcion" id="pon-si">Sí<small>se llena su Formato A2</small></button>
+          <button type="button" class="opcion" id="pon-no">No<small>queda sólo el reporte</small></button>
+        </div>
+        <p id="pon-sugerencia" class="sub"></p>
+      </div>
+      <div id="pon-form" hidden>
+        <div class="tarjeta">
+          <div id="pon-permiso"></div>
+          <div id="pon-historial"></div>
+          <label class="etiqueta" for="pon-falta">Falta según la guía (Anexo A4)</label>
+          <select id="pon-falta" class="campo"></select>
+          <label class="etiqueta">Número de ponche (perforación)</label>
+          <div id="pon-numero" class="opciones tres"></div>
+          <p id="pon-recomienda" class="sub"></p>
+        </div>
+        <div class="tarjeta">
+          <h2>📝 Formato A2</h2>
+          <label class="etiqueta" for="pon-lugar">Lugar / frente de trabajo</label>
+          <input id="pon-lugar" class="campo" maxlength="150" placeholder="Ej. Nivel 2, fachada norte">
+          <label class="etiqueta" for="pon-actividad">Tipo de actividad</label>
+          <input id="pon-actividad" class="campo" maxlength="150" placeholder="Ej. Colado de losa">
+          <label class="etiqueta" for="pon-descripcion">Descripción de los hechos (qué, cómo y por qué)</label>
+          <textarea id="pon-descripcion" class="campo" rows="3" maxlength="1500"></textarea>
+          <label class="etiqueta" for="pon-norma">Norma o procedimiento infringido</label>
+          <input id="pon-norma" class="campo" maxlength="150" placeholder="Ej. NOM-031-STPS, Plan de seguridad">
+          <label class="etiqueta" for="pon-medidas">Acciones tomadas en el momento</label>
+          <textarea id="pon-medidas" class="campo" rows="2" maxlength="600"></textarea>
+          <label class="etiqueta" for="pon-recom">Recomendaciones o medidas preventivas</label>
+          <textarea id="pon-recom" class="campo" rows="2" maxlength="600"></textarea>
+        </div>
+        <div id="msg-ponche"></div>
+        <div class="navegar"><button class="boton grande" id="pon-guardar" type="button">🔨 Guardar ponche</button></div>
+      </div>
+    </section>
+
+    <!-- ✅ Listo -->
+    <section id="p6" class="paso" hidden>
       <div class="tarjeta listo">
         <div class="palomita">✅</div>
         <h2>Reporte guardado</h2>
         <p id="listo-texto" class="sub"></p>
+        <div id="listo-ponche"></div>
         <div class="botones col">
-          <a id="ver-pdf" class="boton secundario" target="_blank" rel="noopener">📄 Ver el PDF</a>
+          <a id="ver-pdf" class="boton secundario" target="_blank" rel="noopener">📄 Ver el PDF del reporte</a>
+          <a id="ver-a2" class="boton secundario" target="_blank" rel="noopener" hidden>📄 Ver el Formato A2</a>
           <button id="compartir" class="boton secundario" type="button">📲 Mandar por WhatsApp</button>
           <button id="nuevo" class="boton grande" type="button">➕ Nuevo reporte</button>
         </div>
