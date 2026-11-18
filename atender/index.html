@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reporte por atender</title>
+  <link rel="icon" href="../img/favicon.png">
+  <link rel="stylesheet" href="../css/comun.css">
+  <link rel="stylesheet" href="atender.css">
+</head>
+<body>
+  <header class="encabezado cab-at">
+    <div class="logos"><img src="../img/logo.png" alt="" class="logo-app"><img id="logo-obra" alt="" class="logo-obra" hidden></div>
+    <h1>⚠ Reporte de seguridad</h1>
+  </header>
+  <main class="contenido">
+    <p id="cargando" class="sub">Cargando…</p>
+    <section id="caja" hidden>
+      <div class="tarjeta aviso-grande">
+        <h2 id="saludo"></h2>
+        <p>Favor de atender el siguiente asunto:</p>
+        <p id="asunto" class="asunto"></p>
+        <p id="datos" class="sub"></p>
+        <div id="repetir"></div>
+        <a id="pdf" class="boton secundario ancho" target="_blank" rel="noopener">📄 Ver la copia del reporte</a>
+      </div>
+      <div class="tarjeta" id="subir">
+        <h2>📸 Una vez terminado, envía la foto aquí</h2>
+        <img id="vista" class="vista" alt="" hidden>
+        <div class="botones">
+          <button id="b-camara" class="boton" type="button">📸 Tomar foto</button>
+          <button id="b-galeria" class="boton secundario" type="button">🖼 Cargar del celular</button>
+        </div>
+        <input id="in-camara" type="file" accept="image/*" capture="environment" hidden>
+        <input id="in-galeria" type="file" accept="image/*" hidden>
+        <label class="etiqueta" for="nota">Comentario (opcional)</label>
+        <textarea id="nota" class="campo" rows="2" maxlength="300" placeholder="Ej. Se colocó el barandal en el nivel 2"></textarea>
+        <button id="enviar" class="boton grande ancho" type="button" disabled>Enviar foto</button>
+        <div id="msg"></div>
+      </div>
+      <div class="tarjeta gracias" id="gracias" hidden>
+        <div class="palomita">✅</div>
+        <h2>¡Gracias! La foto llegó.</h2>
+        <p class="sub">Seguridad la va a revisar. Si falta algo, te llegará otro aviso a esta misma liga.</p>
+      </div>
+    </section>
+  </main>
+  <footer class="pie"></footer>
+  <script src="../config.js"></script>
+  <script src="../js/comun.js"></script>
+  <script src="atender.js"></script>
+</body>
+</html>

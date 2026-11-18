@@ -3,7 +3,7 @@
 .cab-rep .logos { display: flex; align-items: center; gap: 6px; background: #fff; border-radius: 10px; padding: 4px 6px; }
 .cab-rep .logo-app, .cab-rep .logo-obra { height: 30px; width: auto; max-width: 64px; object-fit: contain; display: block; }
 .cab-rep .cab-texto { flex: 1; min-width: 0; }
-.cab-rep h1 { font-size: 17px; margin: 0; }
+.cab-rep h1 { font-size: 16px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .cab-rep .quien { display: block; font-size: 12px; opacity: .85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tarjeta h2 { font-size: 18px; margin: 0 0 10px; color: var(--principal); }
 .centro { text-align: center; }
@@ -77,4 +77,5 @@
 @media (max-width: 420px) {
   .opciones:not(.tres) { grid-template-columns: 1fr; }
   .cab-rep h1 { font-size: 15px; }
+  .cab-rep .logo-obra { display: none; }
 }
