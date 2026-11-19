@@ -313,6 +313,14 @@
       pintarHistorial();
     } catch (e) { $('historial').innerHTML = '<div class="aviso error">⚠ No se pudo traer su historial: ' + esc(e.message) + '</div>'; }
   }
+  /* 🚦 ¿Es reincidente? Lo que tocaría con un ponche más (guía Anexo A4: 1º aviso · 2º 3 días fuera · 3º retiro de obra) */
+  function veredicto(nPonches, nLlamadas) {
+    const sig = nPonches + 1, med = (P.medidas || {})[sig] || '';
+    if (nPonches >= 2) return '<div class="aviso error"><b>⛔ REINCIDENTE: ya tiene ' + nPonches + ' ponches.</b> Con uno más sería su ' + ORDINAL[3] + ' ponche: <b>RETIRO DE LA OBRA</b>' + (med ? ' (' + esc(med) + ')' : '') + '.</div>';
+    if (nPonches === 1) return '<div class="aviso alerta"><b>⚠ Reincidente: ya tiene 1 ponche.</b> Con otro sería su ' + ORDINAL[2] + ' ponche' + (med ? ': ' + esc(med) : '') + '.</div>';
+    if (nLlamadas >= 2) return '<div class="aviso alerta"><b>⚠ Ya lleva ' + nLlamadas + ' llamadas de atención.</b> Considera si esta vez amerita ponche.</div>';
+    return '';
+  }
   function pintarHistorial() {
     const ponches = P.previos.filter(function (x) { return !/por autorizar/i.test(x.estatus); });
     const pend = P.previos.length - ponches.length;
@@ -329,6 +337,7 @@
       '<div class="' + (ponches.length >= 2 ? 'rojo' : ponches.length ? 'amarillo' : '') + '"><b>' + ponches.length + '</b>ponche' + (ponches.length === 1 ? '' : 's') + (pend ? ' (+' + pend + ' por autorizar)' : '') + '</div>' +
       '<div class="' + (P.llamadas.length ? 'amarillo' : '') + '"><b>' + P.llamadas.length + '</b>llamada' + (P.llamadas.length === 1 ? '' : 's') + ' de atención</div>' +
       '<div><b>' + P.reportes.length + '</b>reporte' + (P.reportes.length === 1 ? '' : 's') + ' antes</div></div>' +
+      veredicto(ponches.length, P.llamadas.length) +
       (items.length ? '<ul class="hist-lista">' + items.slice(0, 8).map(function (i) { return '<li><span class="tipo">' + esc(i.t) + '</span> · ' + esc(fechaCorta(i.f)) + '<br><span class="sub">' + esc(i.d) + '</span></li>'; }).join('') + '</ul>'
         : '<div class="aviso ok">Sin antecedentes: es su primer reporte en esta obra.</div>');
   }
@@ -345,16 +354,28 @@
     try {
       const r = await App.api('llamadaDesdeReporte', { obra: I.obra, reporte: resultado.id, codigo: R.codigo, nombre: R.trabajador, empresa: R.contratista, texto: texto });
       if (!r.ok) throw new Error(r.error);
-      $('listo-ponche').innerHTML = '<div class="aviso alerta">🗣 Llamada de atención a <b>' + esc(R.trabajador) + '</b> (' + esc(r.folio) + '). Queda en su historial; no cuenta como ponche.</div>';
+      $('listo-ponche').innerHTML = '<div class="aviso alerta">🗣 Llamada de atención a <b>' + esc(R.trabajador) + '</b> (' + esc(r.folio) + '). Queda en su historial; no cuenta como ponche.' +
+        (r.estatus === 'Por revisar' ? '<br>🔎 Como no tienes permiso de ponchar, el coordinador la revisa (puede confirmarla o cambiarla a ponche).' : '') + '</div>';
       $('msg-llamada').innerHTML = '';
       prepararSeguimiento();
       irPaso(6);
     } catch (e) { $('msg-llamada').innerHTML = '<div class="aviso error">⚠ ' + esc(e.message) + '</div>'; }
     finally { b.disabled = false; b.textContent = '🗣 Guardar llamada de atención'; }
   });
-  $('pon-no').addEventListener('click', function () {
+  /* ✖ Sólo el reporte: queda anotado «no amerita ponche»; si no tienes permiso de ponchar, el coordinador lo revisa */
+  $('pon-no').addEventListener('click', async function () {
+    const b = this;
+    if (!confirm('¿Este reporte NO amerita ponche ni llamada de atención?')) return;
     ['pon-si', 'pon-llamada'].forEach(function (id) { $(id).classList.remove('si'); });
-    $('listo-ponche').innerHTML = '<div class="aviso alerta">Sin ponche ni llamada de atención: queda sólo el reporte.</div>';
+    b.disabled = true;
+    let txt = 'Sin ponche ni llamada de atención: queda sólo el reporte.';
+    try {
+      const r = await App.api('sinPoncheDesdeReporte', { obra: I.obra, reporte: resultado.id, codigo: R.codigo, nombre: R.trabajador, empresa: R.contratista });
+      if (r.ok && r.estatus === 'Por revisar') txt += '<br>🔎 Como no tienes permiso de ponchar, le llega al coordinador para revisarlo (puede confirmarlo o cambiarlo a ponche).';
+      else if (!r.ok && !/acci[oó]n desconocida/i.test(r.error || '')) txt += '<br>⚠ ' + esc(r.error);
+    } catch (e) { txt += '<br>⚠ No se pudo anotar la decisión (sin señal). El reporte sí quedó guardado.'; }
+    b.disabled = false;
+    $('listo-ponche').innerHTML = '<div class="aviso alerta">' + txt + '</div>';
     prepararSeguimiento();
     irPaso(6);
   });
