@@ -205,7 +205,7 @@
       ['Contratista', R.contratista],
       ['Clasificación', R.clas + (R.detalleClas ? ' · ' + R.detalleClas : '')],
       ['Riesgos', R.riesgos.join(', ') + (R.otros ? ' · ' + R.otros : '')],
-      ['Reporta', I.usuario + ' (' + I.rolTexto + ')']
+      ['Reporta', I.usuario]   /* sólo el nombre (sin «Administrador (ve y cambia todo)») */
     ];
     if (R.observacion) f.push(['Observación', R.observacion]);
     return f;
