@@ -318,7 +318,7 @@
     const sig = nPonches + 1, med = (P.medidas || {})[sig] || '';
     if (nPonches >= 2) return '<div class="aviso error"><b>⛔ REINCIDENTE: ya tiene ' + nPonches + ' ponches.</b> Con uno más sería su ' + ORDINAL[3] + ' ponche: <b>RETIRO DE LA OBRA</b>' + (med ? ' (' + esc(med) + ')' : '') + '.</div>';
     if (nPonches === 1) return '<div class="aviso alerta"><b>⚠ Reincidente: ya tiene 1 ponche.</b> Con otro sería su ' + ORDINAL[2] + ' ponche' + (med ? ': ' + esc(med) : '') + '.</div>';
-    if (nLlamadas >= 2) return '<div class="aviso alerta"><b>⚠ Ya lleva ' + nLlamadas + ' llamadas de atención.</b> Considera si esta vez amerita ponche.</div>';
+    if (nLlamadas >= 2) return '<div class="aviso alerta"><b>⚠ Ya lleva ' + nLlamadas + ' llamadas de atención o ponches perdonados.</b> Considera si esta vez amerita ponche.</div>';
     return '';
   }
   function pintarHistorial() {
@@ -327,6 +327,10 @@
     const items = [];
     P.previos.forEach(function (x) { items.push({ f: x.fecha, t: '🔨 ' + (ORDINAL[x.numero] || x.numero) + ' ponche' + (/por autorizar/i.test(x.estatus) ? ' (por autorizar)' : ''), d: x.infraccion }); });
     P.llamadas.forEach(function (x) { items.push({ f: x.fecha, t: '🗣 Llamada de atención', d: x.texto + (x.quien ? ' · ' + x.quien : '') }); });
+    const perd = P.perdonados || [];   /* 🕊 ponches perdonados (con su condición y cómo va) */
+    perd.forEach(function (x) { items.push({ f: x.fecha, t: '🕊 Ponche perdonado', d: (x.condicion ? 'Condición: ' + x.condicion + (x.seguimiento ? ' (' + x.seguimiento + ')' : '') : x.nota || '') }); });
+    const noap = P.noAplica || [];   /* ✖ «No aplica»: no fue ponche, pero se lee con su motivo */
+    noap.forEach(function (x) { items.push({ f: x.fecha, t: '✖ No aplica', d: x.nota || '' }); });
     const decididos = items.map(function (i) { return i.f; });   /* el reporte de un ponche o llamada ya se ve en ese renglón */
     P.reportes.forEach(function (x) {
       const ya = decididos.indexOf(x.fecha) !== -1;
@@ -336,11 +340,19 @@
     $('historial').innerHTML = '<div class="hist-cuentas">' +
       '<div class="' + (ponches.length >= 2 ? 'rojo' : ponches.length ? 'amarillo' : '') + '"><b>' + ponches.length + '</b>ponche' + (ponches.length === 1 ? '' : 's') + (pend ? ' (+' + pend + ' por autorizar)' : '') + '</div>' +
       '<div class="' + (P.llamadas.length ? 'amarillo' : '') + '"><b>' + P.llamadas.length + '</b>llamada' + (P.llamadas.length === 1 ? '' : 's') + ' de atención</div>' +
+      (perd.length ? '<div class="amarillo"><b>' + perd.length + '</b>perdonado' + (perd.length === 1 ? '' : 's') + '</div>' : '') +
+      (noap.length ? '<div><b>' + noap.length + '</b>no aplica</div>' : '') +
       '<div><b>' + P.reportes.length + '</b>reporte' + (P.reportes.length === 1 ? '' : 's') + ' antes</div></div>' +
-      veredicto(ponches.length, P.llamadas.length) +
-      (items.length ? '<ul class="hist-lista">' + items.slice(0, 8).map(function (i) { return '<li><span class="tipo">' + esc(i.t) + '</span> · ' + esc(fechaCorta(i.f)) + '<br><span class="sub">' + esc(i.d) + '</span></li>'; }).join('') + '</ul>'
+      veredicto(ponches.length, P.llamadas.length + perd.length) +
+      (items.length ? '<ul class="hist-lista">' + items.map(function (i, k) { return '<li' + (k >= 8 ? ' class="hist-mas" hidden' : '') + '><span class="tipo">' + esc(i.t) + '</span> · ' + esc(fechaCorta(i.f)) + '<br><span class="sub">' + esc(i.d) + '</span></li>'; }).join('') + '</ul>' +
+        (items.length > 8 ? '<button type="button" class="boton chico secundario" id="hist-todo">Ver todo el historial (' + items.length + ')</button>' : '')
         : '<div class="aviso ok">Sin antecedentes: es su primer reporte en esta obra.</div>');
   }
+  document.addEventListener('click', function (e) {   /* 📂 «Ver todo el historial» */
+    if (!e.target || e.target.id !== 'hist-todo') return;
+    document.querySelectorAll('.hist-mas').forEach(function (li) { li.hidden = false; });
+    e.target.remove();
+  });
   $('pon-llamada').addEventListener('click', function () {
     ['pon-si', 'pon-no'].forEach(function (id) { $(id).classList.remove('si'); }); $('pon-llamada').classList.add('si');
     $('pon-form').hidden = true; $('llamada-form').hidden = false;
