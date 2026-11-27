@@ -474,10 +474,7 @@
     if (!jsPDF) throw new Error('No cargó el armador de PDF (revisa tu internet)');
     const doc = new jsPDF({ unit: 'mm', format: 'letter' });
     const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
-    const logo = I.logoObra || logoApp;
-    if (logo) { try { const p = doc.getImageProperties(logo); doc.addImage(logo, 14, 10, Math.min(40, 16 * p.width / p.height), 16); } catch (e) {} }
-    doc.setTextColor('#16325c').setFontSize(14).text('Formato de reporte de incidentes y ponchado', W - 14, 15, { align: 'right' });
-    doc.setFontSize(9).setTextColor('#4b5563').text('Anexo A2 · Obra ' + I.obra + ' · Reporte ' + resultado.id, W - 14, 21, { align: 'right' });
+    encabezado(doc, W, 'Formato de reporte de incidentes y ponchado', 'Anexo A2 · Obra ' + I.obra + ' · Reporte ' + resultado.id, 14);
     const linea = function (t) { return t || '_______________________________________________'; };
     const marca = function (si, t) { return (si ? '[X] ' : '[  ] ') + t; };
     const nv = String(x.clasificacion || '').toLowerCase();
@@ -535,13 +532,7 @@
     if (!jsPDF) throw new Error('No cargó el armador de PDF (revisa tu internet)');
     const doc = new jsPDF({ unit: 'mm', format: 'letter' });
     const W = doc.internal.pageSize.getWidth(), H = doc.internal.pageSize.getHeight();
-    let x = 14;
-    [logoApp, I.logoObra].forEach(function (l) {
-      if (!l) return;
-      try { const p = doc.getImageProperties(l); const h = 14, w = Math.min(40, h * p.width / p.height); doc.addImage(l, x, 10, w, h); x += w + 4; } catch (e) {}
-    });
-    doc.setTextColor('#16325c').setFontSize(15).text('Reporte de seguridad e higiene', W - 14, 16, { align: 'right' });
-    doc.setFontSize(10).setTextColor('#4b5563').text(I.obra + ' · ' + new Date().toLocaleString('es-MX'), W - 14, 22, { align: 'right' });
+    encabezado(doc, W, 'Reporte de seguridad e higiene', I.obra + ' · ' + new Date().toLocaleString('es-MX'), 15);
     doc.autoTable({ startY: 30, head: [['Concepto', 'Información']], body: filas(), theme: 'grid',
       headStyles: { fillColor: [22, 50, 92] }, columnStyles: { 0: { cellWidth: 45, fontStyle: 'bold' } }, styles: { fontSize: 10 } });
     let y = (doc.lastAutoTable.finalY || 30) + 10;
@@ -559,6 +550,28 @@
     });
     doc.setFontSize(8).setTextColor('#9aa3af').text('Generado con la app de reportes · ' + I.nombreSistema, 14, H - 6);
     return 'data:application/pdf;base64,' + doc.output('datauristring').split(',')[1];
+  }
+  /* Encabezado de los PDF: logo de la app (empresa) a la IZQUIERDA, logo de la obra a la DERECHA
+     y el título con su renglón de datos CENTRADOS (igual que el Formato A2 de Ponchados). */
+  function encabezado(doc, W, titulo, sub, tam) {
+    const alto = 15, maxW = 42;
+    const pon = function (l, derecha) {
+      if (!l) return;
+      try { const p = doc.getImageProperties(l); const w = Math.min(maxW, alto * p.width / p.height), h = w * p.height / p.width;
+        doc.addImage(l, derecha ? W - 14 - w : 14, 9 + (alto - h) / 2, w, h); } catch (e) {}
+    };
+    pon(logoApp, false);
+    pon(I.logoObra, true);
+    const ancho = W - 2 * (14 + maxW + 4);
+    /* si no cabe entre los logos, la letra se achica (no se encima) */
+    let t = tam || 15;
+    doc.setFontSize(t);
+    while (doc.getTextWidth(titulo) > ancho && t > 10) doc.setFontSize(t -= 0.5);
+    doc.setTextColor('#16325c').text(titulo, W / 2, 15, { align: 'center' });
+    let ts = 9.5;
+    doc.setFontSize(ts);
+    while (doc.getTextWidth(sub) > ancho && ts > 7) doc.setFontSize(ts -= 0.5);
+    doc.setTextColor('#4b5563').text(sub, W / 2, 21, { align: 'center' });
   }
   function imagenADato(src) {
     return new Promise(function (ok) {
