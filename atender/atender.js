@@ -15,12 +15,15 @@
       if (!r.ok) throw new Error(r.error);
       $('cargando').hidden = true; $('caja').hidden = false;
       if (r.logoObra) { $('logo-obra').src = r.logoObra; $('logo-obra').hidden = false; }
-      $('saludo').textContent = 'Hola' + (r.responsable ? ' ' + r.responsable : '') + ': han sido reportados';
+      const perdon = r.tipo === 'Ponche perdonado';
+      $('saludo').textContent = 'Hola' + (r.responsable ? ' ' + r.responsable : '') + (perdon ? ': se les perdonó un ponche con esta condición' : ': han sido reportados');
+      if (perdon) $('intro').textContent = 'Queda anotado en el historial del trabajador. Condición que deben cumplir:';
       $('asunto').textContent = r.asunto;
       $('datos').textContent = 'Obra ' + r.obra + (r.contratista ? ' · ' + r.contratista : '') + (r.trabajador ? ' · Trabajador: ' + r.trabajador : '');
       $('pdf').href = r.pdf;
-      $('repetir').innerHTML = r.estado === 'Repetir' ? '<div class="aviso error">↩ Hay que repetir la corrección' + (r.notaRevision ? ': ' + esc(r.notaRevision) : '') + '</div>' : '';
-      if (r.estado === 'Cerrado') { $('subir').hidden = true; $('gracias').hidden = false; $('gracias').querySelector('h2').textContent = '✅ Este asunto ya está cerrado. ¡Gracias!'; }
+      $('repetir').innerHTML = r.estado === 'Repetir' ? '<div class="aviso error">↩ Hay que repetir la corrección' + (perdon ? ' (vuelta ' + r.vueltas + ' de ' + r.maxVueltas + ')' : '') + (r.notaRevision ? ': ' + esc(r.notaRevision) : '') + '</div>' : '';
+      if (perdon && !r.pdf) $('pdf').hidden = true;
+      if (['Cerrado', 'No cumplió', 'Ponche aplicado'].indexOf(r.estado) !== -1) { $('subir').hidden = true; $('gracias').hidden = false; $('gracias').querySelector('h2').textContent = '✅ Este asunto ya está cerrado. ¡Gracias!'; }
       else if (r.estado === 'Foto recibida') { $('msg').innerHTML = '<div class="aviso ok">Ya mandaste una foto; si quieres, puedes mandar otra.</div>'; }
     } catch (e) { $('cargando').textContent = '⚠ ' + e.message; }
   }
